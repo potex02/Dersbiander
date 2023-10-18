@@ -1,4 +1,10 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.21...3.27)  # Aggiornare alla versione minima di CMake necessaria
+
+if(${CMAKE_VERSION} VERSION_LESS 3.21)
+    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+else()
+    cmake_policy(VERSION 3.27)
+endif()
 
 # This template attempts to be "fetch_content"-able
 # so that it works well with tools like CPM or other
@@ -65,24 +71,6 @@ if(NOT PROJECT_IS_TOP_LEVEL)
   return()
 endif()
 
-# Adding the tests:
-include(CTest)
-
-if(BUILD_TESTING)
-  message(AUTHOR_WARNING "Building Tests. Be sure to check out test/constexpr_tests.cpp for constexpr testing")
-  add_subdirectory(test)
-endif()
-
-
-if(Dersbiander_BUILD_FUZZ_TESTS)
-  message(AUTHOR_WARNING "Building Fuzz Tests, using fuzzing sanitizer https://www.llvm.org/docs/LibFuzzer.html")
-  if (NOT Dersbiander_ENABLE_ADDRESS_SANITIZER AND NOT Dersbiander_ENABLE_THREAD_SANITIZER)
-    message(WARNING "You need asan or tsan enabled for meaningful fuzz testing")
-  endif()
-  add_subdirectory(fuzz_test)
-
-endif()
-
 # If MSVC is being used, and ASAN is enabled, we need to set the debugger environment
 # so that it behaves well with MSVC's debugger, and we can run the target from visual studio
 if(MSVC)
@@ -92,7 +80,7 @@ if(MSVC)
 endif()
 
 # set the startup project for the "play" button in MSVC
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT intro)
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT dersbiander)
 
 if(CMAKE_SKIP_INSTALL_RULES)
   return()
@@ -104,7 +92,7 @@ include(cmake/PackageProject.cmake)
 # we know we want to ship
 Dersbiander_package_project(
   TARGETS
-  intro
+  dersbiander
   Dersbiander_options
   Dersbiander_warnings
   # FIXME: this does not work! CK
