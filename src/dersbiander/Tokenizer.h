@@ -3,7 +3,7 @@
 enum class TokenType : long { IDENTIFIER, INTEGER, OPERATOR, KEYWORD, EOFT };
 
 struct Token {
-    [[no_unique_address]] TokenType type;
+    TokenType type;
     std::string value;
 };
 
