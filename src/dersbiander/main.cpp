@@ -39,7 +39,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
         std::string code = "42 + y";
         Tokenizer tokenizer(code);
         std::vector<Token> tokens = tokenizer.tokenize();
-        for(const Token &token : tokens) { LINFO("Token type: {}, value: {}", static_cast<int>(token.type), token.value); }
+        for(const Token &token : tokens) { LINFO("Token {}", token.toString()); }
     } catch(const std::exception &e) { LERROR("Unhandled exception in main: {}", e.what()); }
     SYSPAUSE()
 }
