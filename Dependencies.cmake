@@ -13,7 +13,8 @@ function(Dersbiander_setup_dependencies)
   endif()
 
   if(NOT TARGET spdlog::spdlog)
-    cpmaddpackage(
+    if(WIN32)
+      cpmaddpackage(
         NAME
         spdlog
         VERSION
@@ -28,6 +29,21 @@ function(Dersbiander_setup_dependencies)
         "SPDLOG_WCHAR_FILENAMES ON"
         "SPDLOG_BUILD_WARNINGS ON"
         "SPDLOG_SANITIZE_ADDRESS ON")
+    else()
+      cpmaddpackage(
+        NAME
+        spdlog
+        VERSION
+        1.12.0
+        GITHUB_REPOSITORY
+        "gabime/spdlog"
+        OPTIONS
+        "SPDLOG_FMT_EXTERNAL ON"
+        "SPDLOG_ENABLE_PCH ON"
+        "SPDLOG_BUILD_PIC ON"
+        "SPDLOG_BUILD_WARNINGS ON"
+        "SPDLOG_SANITIZE_ADDRESS ON")
+    endif()
   endif()
 
   if(NOT TARGET Catch2::Catch2WithMain)
