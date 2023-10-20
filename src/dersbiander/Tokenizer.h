@@ -1,3 +1,4 @@
+#include "TokentizeErr.h"
 #include "headers.h"
 
 enum class TokenType : int { IDENTIFIER, INTEGER, OPERATOR, KEYWORD, EOFT, ERROR, UNKNOWN };
@@ -52,8 +53,30 @@ public:
             return getNextToken();
         } else {
             // Handle unknown or invalid characters as an error
-            return handleError("Unknown character", currentLine, currentColumn);
+            handleError(currentChar, "Unknown Character");
+            std::exit(-1);  // Terminate the program with an error code
         }
+    }
+
+    void handleError(const char currentChar, const std::string &errorMsg) {
+        std::stringstream errorMessage;
+        auto values = std::string(1, currentChar);
+        errorMessage << D_FORMAT("{} '{}' (line {}, column {}):\n", errorMsg, values, currentLine, currentColumn);
+
+        // Add context information to the error message
+        errorMessage << "Context:" << NEWL;
+
+        std::size_t lineStart = currentPosition;
+        std::size_t lineEnd = currentPosition;
+
+        while(lineStart > 0 && input[lineStart - 1] != CNL) { lineStart--; }
+        while(lineEnd < inputSize && input[lineEnd] != CNL) { lineEnd++; }
+        errorMessage << input.substr(lineStart, lineEnd - lineStart) << NEWL;
+
+        // Include a marker pointing to the position of the error
+        errorMessage << std::string(currentPosition - lineStart, ' ') << std::string(values.length(), '^') << NEWL;
+
+        LERROR(errorMessage.str());
     }
 
     std::vector<Token> tokenize() {
@@ -62,7 +85,8 @@ public:
         currentLine = 1;
         currentColumn = 1;
 
-        while((token = getNextToken()).type != TokenType::EOFT) { tokens.emplace_back(token); }
+        const auto eofTokenType = TokenType::EOFT;
+        while((token = getNextToken()).type != eofTokenType) { tokens.emplace_back(token); }
 
         return tokens;
     }
@@ -115,10 +139,5 @@ private:
             currentColumn++;
         }
         currentPosition++;
-    }
-
-    Token handleError(const std::string &message, std::size_t line, std::size_t column) {
-        // You can customize error handling as needed
-        return {TokenType::ERROR, message, line, column};
     }
 };
