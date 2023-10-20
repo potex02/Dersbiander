@@ -1,9 +1,9 @@
 #include "headers.h"
 
-enum class TokenType : int { IDENTIFIER, INTEGER, OPERATOR, KEYWORD, EOFT, ERROR };
+enum class TokenType : int { IDENTIFIER, INTEGER, OPERATOR, KEYWORD, EOFT, ERROR, UNKNOWN };
 
 struct Token {
-    TokenType type;
+    TokenType type{TokenType::UNKNOWN};
     std::string value;
     std::size_t line{};
     std::size_t column{};
@@ -28,19 +28,19 @@ struct Token {
         }
     }
 
-    [[nodiscard]] inline std::string toString() const noexcept {
+    [[nodiscard]] inline std::string toString() const {
         return D_FORMAT("type: {}, value: {}, line {}, column {}", typeToString(), value, line, column);
     }
 };
 
 class Tokenizer {
 public:
-    explicit Tokenizer(const std::string &input) : input(input) { inputSize = input.size(); }
+    explicit Tokenizer(const std::string &input) : input(input) {}
 
     Token getNextToken() {
         if(currentPosition >= inputSize) { return {TokenType::EOFT, "", currentLine, currentColumn}; }
 
-        char currentChar = input[currentPosition];
+        const char currentChar = input.at(currentPosition);
         if(std::isalpha(currentChar)) {
             return extractIdentifier();
         } else if(std::isdigit(currentChar)) {
@@ -70,11 +70,11 @@ public:
 private:
     std::string input;
     std::size_t currentPosition = 0;
-    std::size_t inputSize;
+    std::size_t inputSize = input.size();
     std::size_t currentLine = 1;
     std::size_t currentColumn = 1;
 
-    [[nodiscard]] inline bool isOperator(char c) const {
+    [[nodiscard]] inline bool isOperator(char c) const noexcept {
         // Add logic to recognize specific operators
         // Example:
         return (c == '+' || c == '-' || c == '*' || c == '/');
@@ -82,8 +82,8 @@ private:
 
     Token extractIdentifier() {
         std::string value;
-        while(currentPosition < inputSize && (std::isalnum(input[currentPosition]) || input[currentPosition] == '_')) {
-            value += input[currentPosition];
+        while(currentPosition < inputSize && (std::isalnum(input.at(currentPosition)) || input.at(currentPosition) == '_')) {
+            value += input.at(currentPosition);
             ++currentPosition;
             ++currentColumn;
         }
@@ -92,8 +92,8 @@ private:
 
     Token extractInteger() {
         std::string value;
-        while(currentPosition < inputSize && std::isdigit(input[currentPosition])) {
-            value += input[currentPosition];
+        while(currentPosition < inputSize && std::isdigit(input.at(currentPosition))) {
+            value += input.at(currentPosition);
             currentPosition++;
             currentColumn++;
         }
@@ -107,7 +107,7 @@ private:
         return {TokenType::OPERATOR, value, currentLine, currentColumn - 1};
     }
 
-    void handleWhitespace(char currentChar) {
+    void handleWhitespace(char currentChar) noexcept {
         if(currentChar == '\n') {
             currentLine++;
             currentColumn = 1;

@@ -141,9 +141,35 @@ macro(Dersbiander_local_options)
     target_precompile_headers(
       Dersbiander_options
       INTERFACE
-      <vector>
+      <algorithm>
+      <array>
+      <atomic>
+      <chrono>
+      <execution>
+      <filesystem>
+      <fstream>
+      <iomanip>
+      <iostream>
+      <iterator>
+      <limits>
+      <map>
+      <memory>
+      <memory_resource>
+      <numbers>
+      <random>
+      <ranges>
+      <set>
+      <source_location>
+      <sstream>
+      <stack>
+      <stdexcept>
       <string>
-      <utility>)
+      <string_view>
+      <type_traits>
+      <unordered_set>
+      <utility>
+      <variant>
+      <vector>)
   endif()
 
   if(Dersbiander_ENABLE_CACHE)
