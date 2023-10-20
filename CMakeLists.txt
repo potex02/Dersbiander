@@ -44,7 +44,7 @@ Dersbiander_local_options()
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 set(GIT_SHA
-    "Unknown"
+    "0baa86c53b805b5e7cd31e9de60009ab2fa5eac4"
     CACHE STRING "SHA this build was generated from")
 string(
   SUBSTRING "${GIT_SHA}"
