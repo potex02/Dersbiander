@@ -1,7 +1,7 @@
 #include "TokentizeErr.h"
 #include "headers.h"
 
-enum class TokenType : int { IDENTIFIER, INTEGER, OPERATOR, KEYWORD, EOFT, ERROR, UNKNOWN };
+enum class TokenType : int { IDENTIFIER, INTEGER, DOUBLE, OPERATOR, KEYWORD, EOFT, ERROR, UNKNOWN };
 
 struct Token {
     TokenType type{TokenType::UNKNOWN};
@@ -16,6 +16,8 @@ struct Token {
             return "IDENTIFIER";
         case INTEGER:
             return "INTEGER";
+        case DOUBLE:
+            return "DOUBLE";
         case OPERATOR:
             return "OPERATOR";
         case KEYWORD:
@@ -45,7 +47,7 @@ public:
         if(std::isalpha(currentChar)) {
             return extractIdentifier();
         } else if(std::isdigit(currentChar)) {
-            return extractInteger();
+            return extractnumber();
         } else if(isOperator(currentChar)) {
             return extractOperator();
         } else if(std::isspace(currentChar)) {
@@ -53,14 +55,13 @@ public:
             return getNextToken();
         } else {
             // Handle unknown or invalid characters as an error
-            handleError(currentChar, "Unknown Character");
+            handleError(std::string(1, currentChar), "Unknown Character");
             std::exit(-1);  // Terminate the program with an error code
         }
     }
 
-    void handleError(const char currentChar, const std::string &errorMsg) {
+    void handleError(const std::string &values, const std::string &errorMsg) {
         std::stringstream errorMessage;
-        auto values = std::string(1, currentChar);
         errorMessage << D_FORMAT("{} '{}' (line {}, column {}):\n", errorMsg, values, currentLine, currentColumn);
 
         // Add context information to the error message
@@ -98,6 +99,13 @@ private:
     std::size_t currentLine = 1;
     std::size_t currentColumn = 1;
 
+    // Funzione per aggiungere un carattere al valore e incrementare posizione e colonna corrente
+    void appendCharToValue(std::string &value, const char &character) {
+        value += character;
+        ++currentPosition;
+        ++currentColumn;
+    }
+
     [[nodiscard]] inline bool isOperator(char c) const noexcept {
         // Add logic to recognize specific operators
         // Example:
@@ -107,20 +115,66 @@ private:
     Token extractIdentifier() {
         std::string value;
         while(currentPosition < inputSize && (std::isalnum(input.at(currentPosition)) || input.at(currentPosition) == '_')) {
-            value += input.at(currentPosition);
-            ++currentPosition;
-            ++currentColumn;
+            appendCharToValue(value, input.at(currentPosition));
         }
         return {TokenType::IDENTIFIER, value, currentLine, currentColumn - value.length()};
     }
 
-    Token extractInteger() {
+    Token extractnumber() {
         std::string value;
+
+        // Handle the digits before the decimal point
         while(currentPosition < inputSize && std::isdigit(input.at(currentPosition))) {
-            value += input.at(currentPosition);
-            currentPosition++;
-            currentColumn++;
+            appendCharToValue(value, input.at(currentPosition));
         }
+
+        // Check for a decimal point
+        if(currentPosition < inputSize && input.at(currentPosition) == '.') {
+            appendCharToValue(value, input.at(currentPosition));
+
+            // Handle digits after the decimal point (optional)
+            while(currentPosition < inputSize && std::isdigit(input.at(currentPosition))) {
+                appendCharToValue(value, input.at(currentPosition));
+            }
+
+            // Check for an exponent (optional)
+            if(currentPosition < inputSize && (input.at(currentPosition) == 'e' || input.at(currentPosition) == 'E')) {
+                appendCharToValue(value, input.at(currentPosition));
+
+                // Check for the sign of the exponent (optional)
+                if(currentPosition < inputSize && (input.at(currentPosition) == '+' || input.at(currentPosition) == '-')) {
+                    appendCharToValue(value, input.at(currentPosition));
+                }
+
+                // Handle digits in the exponent (optional)
+                while(currentPosition < inputSize && std::isdigit(input.at(currentPosition))) {
+                    appendCharToValue(value, input.at(currentPosition));
+                }
+            }
+
+            return {TokenType::DOUBLE, value, currentLine, currentColumn - value.length()};
+        }
+
+        // Check for an exponent without a decimal point (e.g., 1e+1)
+        if(currentPosition < inputSize && (input.at(currentPosition) == 'e' || input.at(currentPosition) == 'E')) {
+            appendCharToValue(value, input.at(currentPosition));
+
+            // Check for the sign of the exponent (optional)
+            if(currentPosition < inputSize && (input.at(currentPosition) == '+' || input.at(currentPosition) == '-')) {
+                appendCharToValue(value, input.at(currentPosition));
+            }
+
+            // Handle digits in the exponent (optional)
+            while(currentPosition < inputSize && std::isdigit(input.at(currentPosition))) {
+                value += input.at(currentPosition);
+                currentPosition++;
+                currentColumn++;
+            }
+
+            return {TokenType::DOUBLE, value, currentLine, currentColumn - value.length()};
+        }
+
+        // If none of the above conditions match, it's a regular integer
         return {TokenType::INTEGER, value, currentLine, currentColumn - value.length()};
     }
 

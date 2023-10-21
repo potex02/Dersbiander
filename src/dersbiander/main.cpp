@@ -36,7 +36,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
         */
 
         LINFO("{} version {}", Dersbiander::cmake::project_name, Dersbiander::cmake::project_version);
-        std::string code = "42 + y,";
+        std::string code = "42 + y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1";
+        LINFO("code legt {}", code.length());
         Tokenizer tokenizer(code);
         std::vector<Token> tokens = tokenizer.tokenize();
         for(const Token &token : tokens) { LINFO("Token {}", token.toString()); }
