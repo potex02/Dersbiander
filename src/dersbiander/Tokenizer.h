@@ -1,5 +1,7 @@
+#include "Timer.h"
 #include "TokentizeErr.h"
 #include "headers.h"
+#include <compare>
 
 enum class TokenType : int { IDENTIFIER, INTEGER, DOUBLE, OPERATOR, KEYWORD, EOFT, ERROR, UNKNOWN };
 
@@ -34,16 +36,19 @@ struct Token {
     [[nodiscard]] inline std::string toString() const {
         return D_FORMAT("type: {}, value: {}, line {}, column {}", typeToString(), value, line, column);
     }
+
+    auto operator<=>(const Token &other) const = default;
 };
 
 class Tokenizer {
 public:
-    explicit Tokenizer(const std::string &input) : input(input) {}
+    explicit Tokenizer(const std::string &input)
+      : input(input), inputSpan(input.c_str(), input.size()), inputSize(input.size()) {}
 
     Token getNextToken() {
         if(currentPosition >= inputSize) { return {TokenType::EOFT, "", currentLine, currentColumn}; }
 
-        const char currentChar = input.at(currentPosition);
+        const char currentChar = inputSpan[currentPosition];
         if(std::isalpha(currentChar)) {
             return extractIdentifier();
         } else if(std::isdigit(currentChar)) {
@@ -70,8 +75,8 @@ public:
         std::size_t lineStart = currentPosition;
         std::size_t lineEnd = currentPosition;
 
-        while(lineStart > 0 && input[lineStart - 1] != CNL) { lineStart--; }
-        while(lineEnd < inputSize && input[lineEnd] != CNL) { lineEnd++; }
+        while(lineStart > 0 && inputSpan[lineStart - 1] != CNL) { lineStart--; }
+        while(lineEnd < inputSize && inputSpan[lineEnd] != CNL) { lineEnd++; }
         errorMessage << input.substr(lineStart, lineEnd - lineStart) << NEWL;
 
         // Include a marker pointing to the position of the error
@@ -94,8 +99,9 @@ public:
 
 private:
     std::string input;
+    std::span<const char> inputSpan;
     std::size_t currentPosition = 0;
-    std::size_t inputSize = input.size();
+    std::size_t inputSize = 0;
     std::size_t currentLine = 1;
     std::size_t currentColumn = 1;
 
@@ -114,8 +120,8 @@ private:
 
     Token extractIdentifier() {
         std::string value;
-        while(currentPosition < inputSize && (std::isalnum(input.at(currentPosition)) || input.at(currentPosition) == '_')) {
-            appendCharToValue(value, input.at(currentPosition));
+        while(currentPosition < inputSize && (std::isalnum(inputSpan[currentPosition]) || inputSpan[currentPosition] == '_')) {
+            appendCharToValue(value, inputSpan[currentPosition]);
         }
         return {TokenType::IDENTIFIER, value, currentLine, currentColumn - value.length()};
     }
@@ -124,56 +130,53 @@ private:
         std::string value;
 
         // Handle the digits before the decimal point
-        while(currentPosition < inputSize && std::isdigit(input.at(currentPosition))) {
-            appendCharToValue(value, input.at(currentPosition));
+        while(currentPosition < inputSize && std::isdigit(inputSpan[currentPosition])) {
+            appendCharToValue(value, inputSpan[currentPosition]);
         }
 
         // Check for a decimal point
-        if(currentPosition < inputSize && input.at(currentPosition) == '.') {
-            appendCharToValue(value, input.at(currentPosition));
+        if(currentPosition < inputSize && inputSpan[currentPosition] == '.') {
+            appendCharToValue(value, inputSpan[currentPosition]);
 
             // Handle digits after the decimal point (optional)
-            while(currentPosition < inputSize && std::isdigit(input.at(currentPosition))) {
-                appendCharToValue(value, input.at(currentPosition));
+            while(currentPosition < inputSize && std::isdigit(inputSpan[currentPosition])) {
+                appendCharToValue(value, inputSpan[currentPosition]);
             }
 
             // Check for an exponent (optional)
-            if(currentPosition < inputSize && (input.at(currentPosition) == 'e' || input.at(currentPosition) == 'E')) {
-                appendCharToValue(value, input.at(currentPosition));
+            if(currentPosition < inputSize && (std::toupper(inputSpan[currentPosition]) == 'E')) {
+                appendCharToValue(value, inputSpan[currentPosition]);
 
                 // Check for the sign of the exponent (optional)
-                if(currentPosition < inputSize && (input.at(currentPosition) == '+' || input.at(currentPosition) == '-')) {
-                    appendCharToValue(value, input.at(currentPosition));
+                if(currentPosition < inputSize) {
+                    auto c = inputSpan[currentPosition];
+                    if(c == '+' || c == '-') { appendCharToValue(value, c); }
                 }
 
                 // Handle digits in the exponent (optional)
-                while(currentPosition < inputSize && std::isdigit(input.at(currentPosition))) {
-                    appendCharToValue(value, input.at(currentPosition));
+                while(currentPosition < inputSize && std::isdigit(inputSpan[currentPosition])) {
+                    appendCharToValue(value, inputSpan[currentPosition]);
                 }
             }
-
             return {TokenType::DOUBLE, value, currentLine, currentColumn - value.length()};
         }
 
         // Check for an exponent without a decimal point (e.g., 1e+1)
-        if(currentPosition < inputSize && (input.at(currentPosition) == 'e' || input.at(currentPosition) == 'E')) {
-            appendCharToValue(value, input.at(currentPosition));
+        if(currentPosition < inputSize && std::toupper(inputSpan[currentPosition]) == 'E') {
+            appendCharToValue(value, inputSpan[currentPosition]);
 
             // Check for the sign of the exponent (optional)
-            if(currentPosition < inputSize && (input.at(currentPosition) == '+' || input.at(currentPosition) == '-')) {
-                appendCharToValue(value, input.at(currentPosition));
+            if(currentPosition < inputSize) {
+                auto c = inputSpan[currentPosition];
+                if(c == '+' || c == '-') { appendCharToValue(value, c); }
             }
 
             // Handle digits in the exponent (optional)
-            while(currentPosition < inputSize && std::isdigit(input.at(currentPosition))) {
-                value += input.at(currentPosition);
-                currentPosition++;
-                currentColumn++;
+            while(currentPosition < inputSize && std::isdigit(inputSpan[currentPosition])) {
+                appendCharToValue(value, inputSpan[currentPosition]);
             }
-
             return {TokenType::DOUBLE, value, currentLine, currentColumn - value.length()};
         }
-
         // If none of the above conditions match, it's a regular integer
         return {TokenType::INTEGER, value, currentLine, currentColumn - value.length()};
     }
@@ -186,7 +189,7 @@ private:
     }
 
     void handleWhitespace(char currentChar) noexcept {
-        if(currentChar == '\n') {
+        if(currentChar == CNL) {
             currentLine++;
             currentColumn = 1;
         } else {

@@ -1,6 +1,10 @@
 #include "Tokenizer.h"
 #include "headers.h"
+
+DISABLE_WARNINGS_PUSH(
+    4005 4201 4459 4514 4625 4626 4820 6244 6285 6385 6386 26409 26415 26418 26429 26432 26437 26438 26440 26446 26447 26450 26451 26455 26457 26459 26460 26461 26467 26472 26473 26474 26475 26481 26482 26485 26490 26491 26493 26494 26495 26496 26497 26498 26800 26814 26818 26826)
 #include <CLI/CLI.hpp>
+DISABLE_WARNINGS_POP()
 // This file will be generated automatically when cur_you run the CMake
 // configuration step. It creates a namespace called `Dersbiander`. You can modify
 // the source template at `configured_files/config.hpp.in`.
@@ -39,8 +43,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
         std::string code = "42 + y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1";
         LINFO("code legt {}", code.length());
         Tokenizer tokenizer(code);
+        const Timer t;
         std::vector<Token> tokens = tokenizer.tokenize();
-        for(const Token &token : tokens) { LINFO("Token {}", token.toString()); }
+        t.elapsedMllisToString("tokenizer.tokenize()");
+        std::span<Token> tokenSpan(tokens);
+        t.elapsedMllisToString("tokenSpan");
+        for(const Token &token : tokenSpan) { LINFO("Token {}", token.toString()); }
     } catch(const std::exception &e) { LERROR("Unhandled exception in main: {}", e.what()); }
     SYSPAUSE()
 }
