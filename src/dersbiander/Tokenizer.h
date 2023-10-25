@@ -5,6 +5,12 @@
 
 enum class TokenType : int { IDENTIFIER, INTEGER, DOUBLE, OPERATOR, KEYWORD, EOFT, ERROR, UNKNOWN };
 
+/* inline static const std::unordered_map<const char, TokenType> charToTokenTypeMap{
+    {'+', TokenType::OPERATOR}, {'-', TokenType::OPERATOR}, {'*', TokenType::OPERATOR}, {'/', TokenType::OPERATOR},
+    {'=', TokenType::OPERATOR}, {'(', TokenType::OPERATOR}, {')', TokenType::OPERATOR},
+    // Add more mappings as needed
+};*/
+
 struct Token {
     TokenType type{TokenType::UNKNOWN};
     std::string value;
@@ -75,8 +81,8 @@ public:
         std::size_t lineStart = currentPosition;
         std::size_t lineEnd = currentPosition;
 
-        while(lineStart > 0 && inputSpan[lineStart - 1] != CNL) { lineStart--; }
-        while(lineEnd < inputSize && inputSpan[lineEnd] != CNL) { lineEnd++; }
+        while(lineStart > 0 && inputSpan[lineStart - 1] != CNL) { --lineStart; }
+        while(lineEnd < inputSize && inputSpan[lineEnd] != CNL) { ++lineEnd; }
         errorMessage << input.substr(lineStart, lineEnd - lineStart) << NEWL;
 
         // Include a marker pointing to the position of the error
@@ -106,11 +112,12 @@ private:
     std::size_t currentColumn = 1;
 
     // Funzione per aggiungere un carattere al valore e incrementare posizione e colonna corrente
-    void appendCharToValue(std::string &value, const char &character) {
+    inline void appendCharToValue(std::string &value, const char &character) {
         value += character;
         ++currentPosition;
         ++currentColumn;
     }
+    [[nodiscard]] inline bool isPlusORMinus(char c) const noexcept { return (c == '+' || c == '-'); }
 
     [[nodiscard]] inline bool isOperator(char c) const noexcept {
         // Add logic to recognize specific operators
@@ -126,75 +133,57 @@ private:
         return {TokenType::IDENTIFIER, value, currentLine, currentColumn - value.length()};
     }
 
-    Token extractnumber() {
-        std::string value;
-
-        // Handle the digits before the decimal point
+    inline void extractDigits(std::string &value) {
         while(currentPosition < inputSize && std::isdigit(inputSpan[currentPosition])) {
             appendCharToValue(value, inputSpan[currentPosition]);
         }
+    }
 
-        // Check for a decimal point
+    inline void extractExponent(std::string &value) {
+        if(currentPosition < inputSize) {
+            auto c = inputSpan[currentPosition];
+            if(isPlusORMinus(c)) { appendCharToValue(value, c); }
+        }
+        extractDigits(value);
+    }
+
+    Token extractnumber() {
+        std::string value;
+        extractDigits(value);
+
         if(currentPosition < inputSize && inputSpan[currentPosition] == '.') {
             appendCharToValue(value, inputSpan[currentPosition]);
+            extractDigits(value);
 
-            // Handle digits after the decimal point (optional)
-            while(currentPosition < inputSize && std::isdigit(inputSpan[currentPosition])) {
+            if(currentPosition < inputSize && std::toupper(inputSpan[currentPosition]) == 'E') {
                 appendCharToValue(value, inputSpan[currentPosition]);
-            }
-
-            // Check for an exponent (optional)
-            if(currentPosition < inputSize && (std::toupper(inputSpan[currentPosition]) == 'E')) {
-                appendCharToValue(value, inputSpan[currentPosition]);
-
-                // Check for the sign of the exponent (optional)
-                if(currentPosition < inputSize) {
-                    auto c = inputSpan[currentPosition];
-                    if(c == '+' || c == '-') { appendCharToValue(value, c); }
-                }
-
-                // Handle digits in the exponent (optional)
-                while(currentPosition < inputSize && std::isdigit(inputSpan[currentPosition])) {
-                    appendCharToValue(value, inputSpan[currentPosition]);
-                }
+                extractExponent(value);
             }
             return {TokenType::DOUBLE, value, currentLine, currentColumn - value.length()};
         }
 
-        // Check for an exponent without a decimal point (e.g., 1e+1)
         if(currentPosition < inputSize && std::toupper(inputSpan[currentPosition]) == 'E') {
             appendCharToValue(value, inputSpan[currentPosition]);
-
-            // Check for the sign of the exponent (optional)
-            if(currentPosition < inputSize) {
-                auto c = inputSpan[currentPosition];
-                if(c == '+' || c == '-') { appendCharToValue(value, c); }
-            }
-
-            // Handle digits in the exponent (optional)
-            while(currentPosition < inputSize && std::isdigit(inputSpan[currentPosition])) {
-                appendCharToValue(value, inputSpan[currentPosition]);
-            }
+            extractExponent(value);
             return {TokenType::DOUBLE, value, currentLine, currentColumn - value.length()};
         }
-        // If none of the above conditions match, it's a regular integer
         return {TokenType::INTEGER, value, currentLine, currentColumn - value.length()};
     }
 
     Token extractOperator() {
         auto value = input.substr(currentPosition, 1);
-        currentPosition++;
-        currentColumn++;
+        ++currentPosition;
+        ++currentColumn;
         return {TokenType::OPERATOR, value, currentLine, currentColumn - 1};
     }
 
     void handleWhitespace(char currentChar) noexcept {
         if(currentChar == CNL) {
-            currentLine++;
+            ++currentLine;
             currentColumn = 1;
         } else {
-            currentColumn++;
+            ++currentColumn;
         }
-        currentPosition++;
+        ++currentPosition;
     }
 };
