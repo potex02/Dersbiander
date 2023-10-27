@@ -44,14 +44,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
 
         LINFO("{} version {}", Dersbiander::cmake::project_name, Dersbiander::cmake::project_version);
         LINFO("code legt {}", code.length());
+
         Tokenizer tokenizer(code);
         Timer timer("tokenizer.tokenize()");
         std::vector<Token> tokens = tokenizer.tokenize();
         LINFO(timer.to_string());
-        Timer timerT("tokenizer.span");
-        std::span<Token> tokenSpan(tokens);
-        LINFO("{}", timerT.to_string());
-        for(const Token &token : tokenSpan) { LINFO("Token {}", token.toString()); }
+        for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) { LINFO("Token {}", token.toString()); }
     } catch(const std::exception &e) { LERROR("Unhandled exception in main: {}", e.what()); }
     SYSPAUSE()
 }

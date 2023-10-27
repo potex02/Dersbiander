@@ -84,6 +84,8 @@ DISABLE_WARNINGS_POP()
 // clang-format on
 static inline constexpr char CNL = '\n';
 static inline constexpr char CCR = '\r';
+static inline constexpr char PNT = '.';
+static inline constexpr char ECR = 'E';
 static inline constexpr const char *CRNL = "\r\n";
 
 #ifdef _WIN32                              // Windows

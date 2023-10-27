@@ -40,35 +40,46 @@ struct Token {
     }
 
     [[nodiscard]] inline std::string toString() const {
-        return D_FORMAT("type: {}, value: {}, line {}, column {}", typeToString(), value, line, column);
+        return D_FORMAT("type: {}, value: '{}', line {}, column {}", typeToString(), value, line, column);
     }
 
     auto operator<=>(const Token &other) const = default;
 };
+
+static inline constexpr TokenType eofTokenType = TokenType::EOFT;
 
 class Tokenizer {
 public:
     explicit Tokenizer(const std::string &input)
       : input(input), inputSpan(input.c_str(), input.size()), inputSize(input.size()) {}
 
-    Token getNextToken() {
-        if(currentPosition >= inputSize) { return {TokenType::EOFT, "", currentLine, currentColumn}; }
+    std::vector<Token> tokenize() {
+        std::vector<Token> tokens;
+        // while((token = getNextToken()).type != eofTokenType) { tokens.emplace_back(token); }
+        while(currentPosition < inputSize) {
+            const char currentChar = inputSpan[currentPosition];
 
-        const char currentChar = inputSpan[currentPosition];
-        if(std::isalpha(currentChar)) {
-            return extractIdentifier();
-        } else if(std::isdigit(currentChar)) {
-            return extractnumber();
-        } else if(isOperator(currentChar)) {
-            return extractOperator();
-        } else if(std::isspace(currentChar)) {
-            handleWhitespace(currentChar);
-            return getNextToken();
-        } else {
-            // Handle unknown or invalid characters as an error
-            handleError(std::string(1, currentChar), "Unknown Character");
-            std::exit(-1);  // Terminate the program with an error code
+            if(std::isalpha(currentChar)) {
+                tokens.emplace_back(extractIdentifier());
+            } else if(std::isdigit(currentChar)) {
+                tokens.emplace_back(extractnumber());
+            } else if(isOperator(currentChar)) {
+                tokens.emplace_back(extractOperator());
+            } else if(std::isspace(currentChar)) {
+                handleWhitespace(currentChar);
+                // Continue the loop to get the next token
+                continue;
+            } else {
+                // Handle unknown or invalid characters as an error
+                handleError(std::string(1, currentChar), "Unknown Character");
+                std::exit(-1);  // Terminate the program with an error code
+            }
         }
+
+        // Return an EOFT token when the input is fully processed
+        tokens.emplace_back(TokenType::EOFT, "", currentLine, currentColumn - 1);
+
+        return tokens;
     }
 
     void handleError(const std::string &values, const std::string &errorMsg) {
@@ -91,18 +102,6 @@ public:
         LERROR(errorMessage.str());
     }
 
-    std::vector<Token> tokenize() {
-        std::vector<Token> tokens;
-        Token token;
-        currentLine = 1;
-        currentColumn = 1;
-
-        const auto eofTokenType = TokenType::EOFT;
-        while((token = getNextToken()).type != eofTokenType) { tokens.emplace_back(token); }
-
-        return tokens;
-    }
-
 private:
     std::string input;
     std::span<const char> inputSpan;
@@ -112,7 +111,7 @@ private:
     std::size_t currentColumn = 1;
 
     // Funzione per aggiungere un carattere al valore e incrementare posizione e colonna corrente
-    inline void appendCharToValue(std::string &value, const char &character) {
+    inline void appendCharToValue(std::string &value, char character) {
         value += character;
         ++currentPosition;
         ++currentColumn;
@@ -122,7 +121,7 @@ private:
     [[nodiscard]] inline bool isOperator(char c) const noexcept {
         // Add logic to recognize specific operators
         // Example:
-        return (c == '+' || c == '-' || c == '*' || c == '/');
+        return (isPlusORMinus(c) || c == '*' || c == '/');
     }
 
     Token extractIdentifier() {
@@ -151,18 +150,18 @@ private:
         std::string value;
         extractDigits(value);
 
-        if(currentPosition < inputSize && inputSpan[currentPosition] == '.') {
+        if(currentPosition < inputSize && inputSpan[currentPosition] == PNT) {
             appendCharToValue(value, inputSpan[currentPosition]);
             extractDigits(value);
 
-            if(currentPosition < inputSize && std::toupper(inputSpan[currentPosition]) == 'E') {
+            if(currentPosition < inputSize && std::toupper(inputSpan[currentPosition]) == ECR) {
                 appendCharToValue(value, inputSpan[currentPosition]);
                 extractExponent(value);
             }
             return {TokenType::DOUBLE, value, currentLine, currentColumn - value.length()};
         }
 
-        if(currentPosition < inputSize && std::toupper(inputSpan[currentPosition]) == 'E') {
+        if(currentPosition < inputSize && std::toupper(inputSpan[currentPosition]) == ECR) {
             appendCharToValue(value, inputSpan[currentPosition]);
             extractExponent(value);
             return {TokenType::DOUBLE, value, currentLine, currentColumn - value.length()};
