@@ -111,8 +111,8 @@ private:
     std::size_t currentColumn = 1;
 
     // Funzione per aggiungere un carattere al valore e incrementare posizione e colonna corrente
-    inline void appendCharToValue(std::string &value, char character) {
-        value += character;
+    inline void appendCharToValue(std::string &value) {
+        value += inputSpan[currentPosition];
         ++currentPosition;
         ++currentColumn;
     }
@@ -127,22 +127,17 @@ private:
     Token extractIdentifier() {
         std::string value;
         while(currentPosition < inputSize && (std::isalnum(inputSpan[currentPosition]) || inputSpan[currentPosition] == '_')) {
-            appendCharToValue(value, inputSpan[currentPosition]);
+            appendCharToValue(value);
         }
         return {TokenType::IDENTIFIER, value, currentLine, currentColumn - value.length()};
     }
 
     inline void extractDigits(std::string &value) {
-        while(currentPosition < inputSize && std::isdigit(inputSpan[currentPosition])) {
-            appendCharToValue(value, inputSpan[currentPosition]);
-        }
+        while(currentPosition < inputSize && std::isdigit(inputSpan[currentPosition])) { appendCharToValue(value); }
     }
 
     inline void extractExponent(std::string &value) {
-        if(currentPosition < inputSize) {
-            auto c = inputSpan[currentPosition];
-            if(isPlusORMinus(c)) { appendCharToValue(value, c); }
-        }
+        if(currentPosition < inputSize && isPlusORMinus(inputSpan[currentPosition])) { appendCharToValue(value); }
         extractDigits(value);
     }
 
@@ -151,18 +146,18 @@ private:
         extractDigits(value);
 
         if(currentPosition < inputSize && inputSpan[currentPosition] == PNT) {
-            appendCharToValue(value, inputSpan[currentPosition]);
+            appendCharToValue(value);
             extractDigits(value);
 
             if(currentPosition < inputSize && std::toupper(inputSpan[currentPosition]) == ECR) {
-                appendCharToValue(value, inputSpan[currentPosition]);
+                appendCharToValue(value);
                 extractExponent(value);
             }
             return {TokenType::DOUBLE, value, currentLine, currentColumn - value.length()};
         }
 
         if(currentPosition < inputSize && std::toupper(inputSpan[currentPosition]) == ECR) {
-            appendCharToValue(value, inputSpan[currentPosition]);
+            appendCharToValue(value);
             extractExponent(value);
             return {TokenType::DOUBLE, value, currentLine, currentColumn - value.length()};
         }
