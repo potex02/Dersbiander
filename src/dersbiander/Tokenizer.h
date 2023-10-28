@@ -3,13 +3,13 @@
 #include "headers.h"
 #include <compare>
 
-enum class TokenType : int { IDENTIFIER, INTEGER, DOUBLE, OPERATOR, KEYWORD, EOFT, ERROR, UNKNOWN };
-
 /* inline static const std::unordered_map<const char, TokenType> charToTokenTypeMap{
     {'+', TokenType::OPERATOR}, {'-', TokenType::OPERATOR}, {'*', TokenType::OPERATOR}, {'/', TokenType::OPERATOR},
     {'=', TokenType::OPERATOR}, {'(', TokenType::OPERATOR}, {')', TokenType::OPERATOR},
     // Add more mappings as needed
 };*/
+
+enum class TokenType : int { IDENTIFIER, INTEGER, DOUBLE, OPERATOR, KEYWORD, EOFT, ERROR, UNKNOWN };
 
 struct Token {
     TokenType type{TokenType::UNKNOWN};

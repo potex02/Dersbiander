@@ -49,7 +49,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char **argv) {
         Timer timer("tokenizer.tokenize()");
         std::vector<Token> tokens = tokenizer.tokenize();
         LINFO(timer.to_string());
-        for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) { LINFO("Token {}", token.toString()); }
+        for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
+            LINFO("Token {}", std::move(token.toString()));
+        }
     } catch(const std::exception &e) { LERROR("Unhandled exception in main: {}", e.what()); }
     SYSPAUSE()
 }
