@@ -1,5 +1,21 @@
 #pragma once
 // NOLINTBEGIN
+#define GLM_FORCE_MESSAGES  // Or defined when building (e.g. -DGLM_FORCE_SWIZZLE)
+#define GLM_FORCE_INTRINSICS
+#define GLM_ENABLE_EXPERIMENTAL
+#define GLM_FORCE_SILENT_WARNINGS
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#define GLM_FORCE_WIN32
+#define GLM_FORCE_SIZE_T_LENGTH
+#define GLM_FORCE_PURE
+#define GLM_FORCE_EXPLICIT_CTOR
+#define GLM_FORCE_CXX20
+#define GLM_FORCE_UNRESTRICTED_GENTYPE
+#define GLM_FORCE_PRECISION_HIGHP_DOUBLE
+#define GLM_FORCE_PRECISION_HIGHP_FLOAT
+#define GLM_FORCE_PRECISION_HIGHP_INT
+#define GLM_FORCE_PRECISION_HIGHP_UINT
 #include "disableWarn.h"
 // clang-format off
 DISABLE_WARNINGS_PUSH(
@@ -27,6 +43,16 @@ DISABLE_WARNINGS_PUSH(
 #endif
 #include <filesystem>
 #include <fstream>
+#include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/random.hpp>
+#include <glm/gtx/norm.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/hash.hpp>
+#include <glm/gtx/fast_square_root.hpp> // fastNormalize
 #include <iomanip>
 #include <iostream>
 #include <iterator>

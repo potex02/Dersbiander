@@ -5,6 +5,10 @@ include(cmake/CPM.cmake)
 # targets
 function(Dersbiander_setup_dependencies)
 
+  if(NOT TARGET glm::glm)
+    cpmaddpackage("gh:g-truc/glm#0.9.9.8")
+  endif()
+
   # For each dependency, see if it's
   # already been provided to us by a parent project
 
