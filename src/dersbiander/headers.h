@@ -1,6 +1,5 @@
 #pragma once
 // NOLINTBEGIN
-#define GLM_FORCE_MESSAGES  // Or defined when building (e.g. -DGLM_FORCE_SWIZZLE)
 #define GLM_FORCE_INTRINSICS
 #define GLM_ENABLE_EXPERIMENTAL
 #define GLM_FORCE_SILENT_WARNINGS
@@ -129,6 +128,33 @@ static inline constexpr const char *NEWL = CNL;  // FreeBSD
 #else
 static inline constexpr const char *NEWL = CNL;  // Default case
 #endif
+
+template <typename T> using isfloat = std::is_same<T, float>::value;
+template <typename T> using isdouble = std::is_same<T, double>::value;
+template <typename T> using isbool = std::is_same<T, bool>::value;
+template <typename T> using isuint8 = std::is_same<T, uint8_t>::value;
+template <typename T> using isint8 = std::is_same<T, int8_t>::value;
+template <typename T> using isuint16 = std::is_same<T, uint16_t>::value;
+template <typename T> using isint16 = std::is_same<T, int16_t>::value;
+template <typename T> using isuint32 = std::is_same<T, uint32_t>::value;
+template <typename T> using isint32 = std::is_same<T, int32_t>::value;
+template <typename T> using isuint64 = std::is_same<T, uint64_t>::value;
+template <typename T> using isint64 = std::is_same<T, int64_t>::value;
+
+#pragma optimize("gt", on)
+template <typename OStream, glm::length_t L, typename T, glm::qualifier Q>
+inline OStream &operator<<(OStream &os, const glm::vec<L, T, Q> &vector) {
+    return os << glm::to_string(vector);
+}
+#pragma optimize("gt", on)
+template <typename OStream, glm::length_t C, glm::length_t R, typename T, glm::qualifier Q>
+inline OStream &operator<<(OStream &os, const glm::mat<C, R, T, Q> &matrix) {
+    return os << glm::to_string(matrix);
+}
+#pragma optimize("gt", on)
+template <typename OStream, typename T, glm::qualifier Q> inline OStream &operator<<(OStream &os, glm::qua<T, Q> quaternion) {
+    return os << glm::to_string(quaternion);
+}
 
 #define SYSPAUSE()                                                                                                               \
     do {                                                                                                                         \

@@ -12,7 +12,7 @@
 inline static constexpr long double MICROSENCONDSFACTOR = 1000.0;
 inline static constexpr long double MILLISENCONDSFACTOR = 1'000'000.0;
 inline static constexpr long double SENCONDSFACTOR = 1'000'000'000.0;
-DISABLE_WARNINGS_PUSH(26447 26455 26496)
+DISABLE_WARNINGS_PUSH(6005 26447 26455 26496)
 class Timer {
 protected:
     /// This is a typedef to make clocks easier to use

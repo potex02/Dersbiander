@@ -83,7 +83,8 @@ public:
     }
 
     void handleError(const std::string &values, const std::string &errorMsg) {
-        std::stringstream errorMessage;
+        Timer timer(errorMsg);
+        std::ostringstream errorMessage;
         errorMessage << D_FORMAT("{} '{}' (line {}, column {}):\n", errorMsg, values, currentLine, currentColumn);
 
         // Add context information to the error message
@@ -94,12 +95,12 @@ public:
 
         while(lineStart > 0 && inputSpan[lineStart - 1] != CNL) { --lineStart; }
         while(lineEnd < inputSize && inputSpan[lineEnd] != CNL) { ++lineEnd; }
-        errorMessage << input.substr(lineStart, lineEnd - lineStart) << NEWL;
+        errorMessage << std::string_view(input.data() + lineStart, lineEnd - lineStart) << NEWL;
 
         // Include a marker pointing to the position of the error
         errorMessage << std::string(currentPosition - lineStart, ' ') << std::string(values.length(), '^') << NEWL;
-
-        LERROR(errorMessage.str());
+        auto time = timer.to_string();
+        LERROR("{}{}", std::move(errorMessage).str(), std::move(time));
     }
 
 private:
