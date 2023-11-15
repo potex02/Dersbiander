@@ -1,5 +1,4 @@
 ﻿#include "Tokenizer.h"
-#include "glm_prety_string_cast.h"
 #include "headers.h"
 
 DISABLE_WARNINGS_PUSH(
@@ -11,68 +10,9 @@ DISABLE_WARNINGS_POP()
 // the source template at `configured_files/config.hpp.in`.
 #include <internal_use_only/config.hpp>
 
-static constexpr long double PIY = 3.1415926535897932384626433832795028841971693993751058209749445923;
+static const std::string code = "42 + y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1";
 
-static const std::string code = "42 + y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1;";
-
-namespace glm {
-    typedef mat<2, 2, long double, lowp> lowp_ldmat2;
-    typedef mat<3, 3, long double, lowp> lowp_ldmat3;
-    typedef mat<4, 4, long double, lowp> lowp_ldmat4;
-
-    typedef mat<2, 2, long double, mediump> mediump_ldmat2;
-    typedef mat<3, 3, long double, mediump> mediump_ldmat3;
-    typedef mat<4, 4, long double, mediump> mediump_ldmat4;
-
-    typedef mat<2, 2, long double, highp> highp_ldmat2;
-    typedef mat<3, 3, long double, highp> highp_ldmat3;
-    typedef mat<4, 4, long double, highp> highp_ldmat4;
-
-    typedef mat<2, 2, long double, defaultp> ldmat2;
-    typedef mat<3, 3, long double, defaultp> ldmat3;
-    typedef mat<4, 4, long double, defaultp> ldmat4;
-    typedef mat<2, 2, long double, lowp> lowp_ldmat2x2;
-    typedef mat<2, 3, long double, lowp> lowp_ldmat2x3;
-    typedef mat<2, 4, long double, lowp> lowp_ldmat2x4;
-    typedef mat<3, 2, long double, lowp> lowp_ldmat3x2;
-    typedef mat<3, 3, long double, lowp> lowp_ldmat3x3;
-    typedef mat<3, 4, long double, lowp> lowp_ldmat3x4;
-    typedef mat<4, 2, long double, lowp> lowp_ldmat4x2;
-    typedef mat<4, 3, long double, lowp> lowp_ldmat4x3;
-    typedef mat<4, 4, long double, lowp> lowp_ldmat4x4;
-
-    typedef mat<2, 2, double, mediump> mediump_ldmat2x2;
-    typedef mat<2, 3, double, mediump> mediump_ldmat2x3;
-    typedef mat<2, 4, double, mediump> mediump_ldmat2x4;
-    typedef mat<3, 2, double, mediump> mediump_ldmat3x2;
-    typedef mat<3, 3, double, mediump> mediump_ldmat3x3;
-    typedef mat<3, 4, double, mediump> mediump_ldmat3x4;
-    typedef mat<4, 2, double, mediump> mediump_ldmat4x2;
-    typedef mat<4, 3, double, mediump> mediump_ldmat4x3;
-    typedef mat<4, 4, double, mediump> mediump_ldmat4x4;
-
-    typedef mat<2, 2, double, highp> highp_ldmat2x2;
-    typedef mat<2, 3, double, highp> highp_ldmat2x3;
-    typedef mat<2, 4, double, highp> highp_ldmat2x4;
-    typedef mat<3, 2, double, highp> highp_ldmat3x2;
-    typedef mat<3, 3, double, highp> highp_ldmat3x3;
-    typedef mat<3, 4, double, highp> highp_ldmat3x4;
-    typedef mat<4, 2, double, highp> highp_ldmat4x2;
-    typedef mat<4, 3, double, highp> highp_ldmat4x3;
-    typedef mat<4, 4, double, highp> highp_ldmat4x4;
-
-    typedef mat<2, 2, double, defaultp> ldmat2x2;
-    typedef mat<3, 2, double, defaultp> ldmat3x2;
-    typedef mat<4, 2, double, defaultp> ldmat4x2;
-    typedef mat<2, 3, double, defaultp> ldmat2x3;
-    typedef mat<3, 3, double, defaultp> ldmat3x3;
-    typedef mat<4, 3, double, defaultp> ldmat4x3;
-    typedef mat<2, 4, double, defaultp> ldmat2x4;
-    typedef mat<3, 4, double, defaultp> ldmat3x4;
-    typedef mat<4, 4, double, defaultp> ldmat4x4;
-}  // namespace glm
-
-// Strassen's matrix multiplication for 2x2 matrices
+/* // Strassen's matrix multiplication for 2x2 matrices
 template <typename T> glm::mat<2, 2, T> strassen2x2(const glm::mat<2, 2, T> &A, const glm::mat<2, 2, T> &B) {
     auto M1 = (A[0][0] + A[1][1]) * (B[0][0] + B[1][1]);
     auto M2 = (A[1][0] + A[1][1]) * B[0][0];
@@ -156,7 +96,7 @@ template <typename T, int N> glm::mat<N, N, T> coppersmithWinograd(const glm::ma
     }
 
     return C;
-}
+}*/
 
 DISABLE_WARNINGS_PUSH(26461 26821)
 // NOLINTNEXTLINE(bugprone-exception-escape)
@@ -186,7 +126,7 @@ int main(int argc, const char **argv) {
             // } else {
             // }
         } else {
-            auto A4x4 = getRandomMat4<double>(1.0, 4.0);
+            /* auto A4x4 = getRandomMat4<double>(1.0, 4.0);
             auto B4x4 = getRandomMat4<double>(5.0, 8.0);
             auto C = getRandomMat4<long double>(1.0f, 4.0);
 
@@ -202,22 +142,21 @@ int main(int argc, const char **argv) {
             LINFO("glm Result for 4x4 matrices:\n{}", glmp::to_string(result4x4));
             LINFO("strassen Result for 4x4 matrices:\n{}", glmp::to_string(result2_4x4));
             LINFO("coppersmithWinograd Result for 4x4 matrices:\n{}", glmp::to_string(result3_4x4));
-            LINFO("long double 4x4\n{}", glmp::to_string(C));
+            LINFO("long double 4x4\n{}", glmp::to_string(C));*/
             // */
 
             // glm::mat4 A4x4(1.0f);
-            // glm::mat4 B4x4(2.0f);
-            // glm::mat4 result4x4 = strassen4x4(A4x4, B4x4);
-            // std::cout << "Result for 4x4 matrices:\n" << glm::to_string(result4x4) << std::endl;
-            /* LINFO("code legt {}", code.length());
-
+            //  glm::mat4 B4x4(2.0f);
+            //  glm::mat4 result4x4 = strassen4x4(A4x4, B4x4);
+            //  std::cout << "Result for 4x4 matrices:\n" << glm::to_string(result4x4) << std::endl;
+            LINFO("code legt {}", code.length());
             Tokenizer tokenizer(code);
             Timer timer("tokenizer.tokenize()");
             std::vector<Token> tokens = tokenizer.tokenize();
             LINFO(timer.to_string());
             for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
                 LINFO("Token {}", std::move(token.toString()));
-            }*/
+            }
         }
     } catch(const std::exception &e) {
         LERROR("Unhandled exception in main: {}", e.what());
