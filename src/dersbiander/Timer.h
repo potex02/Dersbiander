@@ -8,15 +8,17 @@
 #endif
 
 #include <iostream>
-
 inline static constexpr long double MICROSENCONDSFACTOR = 1000.0;
 inline static constexpr long double MILLISENCONDSFACTOR = 1'000'000.0;
 inline static constexpr long double SENCONDSFACTOR = 1'000'000'000.0;
+
 DISABLE_WARNINGS_PUSH(6005 26447 26455 26496)
 class Timer {
 protected:
     /// This is a typedef to make clocks easier to use
     using clock = std::chrono::high_resolution_clock;
+    using times =
+        std::tuple<long double, long double, long double, long double, std::string, std::string, std::string, std::string>;
 
     /// This typedef is for points in time
     using time_point = std::chrono::time_point<clock>;
@@ -45,10 +47,9 @@ public:
                         title, time);
     }
 
-public:
     /// Standard constructor, can set title and print function
-    explicit Timer(std::string title = "Timer", const time_print_t &time_print = Simple)
-      : title_(std::move(title)), time_print_(time_print), start_(clock::now()) {}
+    explicit Timer(const std::string &title = "Timer", const time_print_t &time_print = Simple)
+      : title_(title), time_print_(time_print), start_(clock::now()) {}
 
     Timer(const Timer &other) = delete;              // Delete copy constructor
     Timer &operator=(const Timer &other) = delete;   // Delete copy assignment operator
@@ -56,9 +57,9 @@ public:
     Timer &operator=(const Timer &&other) = delete;  // Delete move assignment operator
 
     /// Time a function by running it multiple times. Target time is the len to target.
-    std::string time_it(std::function<void()> f, long double target_time = 1) {
+    [[nodiscard]] std::string time_it(const std::function<void()> &f, long double target_time = 1) {
         const time_point start = start_;
-        long double total_time = NAN;
+        [[maybe_unused]] long double total_time = NAN;
 
         start_ = clock::now();
         std::size_t n = 0;
@@ -68,82 +69,57 @@ public:
             total_time = elapsed.count();
         } while(n++ < 100u && total_time < target_time);
 
-        // std::string out = make_time_str(total_time / static_cast<long double>(n)) + " for " + std::to_string(n) + " tries";
         std::string out = D_FORMAT("{} for {} tries", make_time_str(total_time / static_cast<long double>(n)), std::to_string(n));
         start_ = start;
         return out;
     }
 
-    inline long double make_time() const noexcept {
-        const std::chrono::duration<long double, std::nano> elapsed = clock::now() - start_;
+    [[nodiscard]] inline long double make_time() const noexcept {
+        const std::chrono::duration<long double, std::nano> elapsed = clock::now() - start_);
         return elapsed.count();
     }
 
-    std::tuple<long double, long double, long double, long double, std::string, std::string, std::string, std::string>
-    make_named_times(long double time) const {
+    [[nodiscard]] times make_named_times(long double time) const {
         auto secondsTime = time / SENCONDSFACTOR;
         auto millisTime = time / MILLISENCONDSFACTOR;
         auto microTime = time / MICROSENCONDSFACTOR;
-        std::tuple<long double, long double, long double, long double, std::string, std::string, std::string, std::string>
-            myTuple;
-
-        // Example initialization
-        std::get<0>(myTuple) = secondsTime;
-        std::get<1>(myTuple) = millisTime;
-        std::get<2>(myTuple) = microTime;
-        std::get<3>(myTuple) = time;
-        std::get<4>(myTuple) = "s";
-        std::get<5>(myTuple) = "ms";
-        std::get<6>(myTuple) = "us";
-        std::get<7>(myTuple) = "ns";
-
-        return myTuple;
+        return {secondsTime, millisTime, microTime, time, "s", "ms", "us", "ns"};
     }
 
-    std::tuple<long double, long double, long double, long double, std::string, std::string, std::string, std::string>
-    multi_time() const {
-        const long double time = make_time();
-        return make_named_times(time);
-    }
+    [[nodiscard]] times multi_time() const { return make_named_times(make_time()); }
 
-    std::pair<long double, std::string> make_named_time(long double time) const {
-        auto myTuple = make_named_times(time);
+    [[nodiscard]] std::pair<long double, std::string> make_named_time(long double time) const {
+        auto [ld1, ld2, ld3, ld4, str1, str2, str3, str4] = make_named_times(time);
         // Accessing values
-        auto ld1 = std::get<0>(myTuple);  // nano
-        auto ld2 = std::get<1>(myTuple);  // micro
-        auto ld3 = std::get<2>(myTuple);  // milli
-        auto ld4 = std::get<3>(myTuple);  // seconds
-        auto str1 = std::get<4>(myTuple);
-        auto str2 = std::get<5>(myTuple);
-        auto str3 = std::get<6>(myTuple);
-        auto str4 = std::get<7>(myTuple);
-
-        if(ld1 > 1)
-            return std::make_pair(ld1, str1);
-        else if(ld2 > 1)
-            return std::make_pair(ld2, str2);
-        else if(ld3 > 1)
-            return std::make_pair(ld3, str3);
-        else
-            return std::make_pair(ld4, str4);
+        if(ld1 > 1) [[likely]] {  // nano
+            return {ld1, str1};
+        } else if(ld2 > 1) [[likely]] {  // micro
+            return {ld2, str2};
+        } else if(ld3 > 1) [[likely]] {  // seconds
+            return {ld3, str3};
+        } else {
+            return {ld4, str4};
+        }
     }
 
     /// This formats the numerical value for the time string
-    inline std::string make_time_str() const {  // NOLINT(modernize-use-nodiscard)
+    [[nodiscard]] inline std::string make_time_str() const {  // NOLINT(modernize-use-nodiscard)
         const long double time = make_time() / static_cast<long double>(cycles);
         return make_time_str(time);
     }
 
     // LCOV_EXCL_START
     /// This prints out a time string from a time
-    std::string make_time_str(long double time) const {  // NOLINT(modernize-use-nodiscard)
-        auto [titme, stime] = make_named_time(time);
+    [[nodiscard]] inline std::string make_time_str(long double time) const {  // NOLINT(modernize-use-nodiscard)
+        const auto [titme, stime] = make_named_time(time);
         return D_FORMAT("{:.f} {}", titme, stime);
     }
     // LCOV_EXCL_STOP
 
     /// This is the main function, it creates a string
-    std::string to_string() const noexcept { return time_print_(title_, make_time_str()); }  // NOLINT(modernize-use-nodiscard)
+    [[nodiscard]] inline std::string to_string() const noexcept {
+        return time_print_(title_, make_time_str());
+    }  // NOLINT(modernize-use-nodiscard)
 
     /// Division sets the number of cycles to divide by (no graphical change)
     Timer &operator/(std::size_t val) noexcept {
