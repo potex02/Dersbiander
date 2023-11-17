@@ -75,7 +75,7 @@ public:
     }
 
     [[nodiscard]] inline long double make_time() const noexcept {
-        const std::chrono::duration<long double, std::nano> elapsed = clock::now() - start_);
+        const std::chrono::duration<long double, std::nano> elapsed = clock::now() - start_;
         return elapsed.count();
     }
 
