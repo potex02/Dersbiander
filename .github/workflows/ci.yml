@@ -147,6 +147,7 @@ jobs:
           ninja: true
           vcpkg: true
           ccache: true
+          vcpkg-packages: gsl  # Add gsl as a Vcpkg package to install
           clangtidy: ${{ env.CLANG_TIDY_VERSION }}
 
 
