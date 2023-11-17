@@ -146,7 +146,7 @@ jobs:
 
           cmake: true
           ninja: true
-          vcpkg: false
+          vcpkg: true
           ccache: true
           clangtidy: ${{ env.CLANG_TIDY_VERSION }}
 
