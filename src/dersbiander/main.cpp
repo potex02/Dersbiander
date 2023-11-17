@@ -149,13 +149,13 @@ int main(int argc, const char **argv) {
             //  glm::mat4 B4x4(2.0f);
             //  glm::mat4 result4x4 = strassen4x4(A4x4, B4x4);
             //  std::cout << "Result for 4x4 matrices:\n" << glm::to_string(result4x4) << std::endl;
-            LINFO("code legt {}", code.length());
+            LINFO("code length {}", code.length());
             Tokenizer tokenizer(code);
             Timer timer("tokenizer.tokenize()");
             std::vector<Token> tokens = tokenizer.tokenize();
             LINFO(timer.to_string());
             for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
-                LINFO("Token {}", std::move(token.toString()));
+                LINFO("Token {}", std::move(token.typeToString()));
             }
         }
     } catch(const std::exception &e) {
