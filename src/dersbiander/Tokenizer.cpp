@@ -60,7 +60,7 @@ void Tokenizer::appendCharToValue(std::string &value) {
 
 bool Tokenizer::isPlusORMinus(char c) const noexcept { return (c == '+' || c == '-'); }
 
-bool Tokenizer::isOperator(char c) const noexcept { return (isPlusORMinus(c) || c == '*' || c == '/'); }
+bool Tokenizer::isOperator(char c) const noexcept { return (isPlusORMinus(c) || c == '*' || c == '/' || c == '='); }
 
 Token Tokenizer::extractIdentifier() {
     std::string value;

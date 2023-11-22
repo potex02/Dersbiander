@@ -1,4 +1,5 @@
 ﻿#include "Tokenizer.h"
+#include "Instruction.h"
 #include "headers.h"
 
 DISABLE_WARNINGS_PUSH(
@@ -10,7 +11,7 @@ DISABLE_WARNINGS_POP()
 // the source template at `configured_files/config.hpp.in`.
 #include <internal_use_only/config.hpp>
 
-static const std::string code = "42 + y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1";
+static const std::string code = "variable = 42 + y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1";
 
 /* // Strassen's matrix multiplication for 2x2 matrices
 template <typename T> glm::mat<2, 2, T> strassen2x2(const glm::mat<2, 2, T> &A, const glm::mat<2, 2, T> &B) {
@@ -153,10 +154,12 @@ int main(int argc, const char **argv) {
             Tokenizer tokenizer(code);
             Timer timer("tokenizer.tokenize()");
             std::vector<Token> tokens = tokenizer.tokenize();
+            Instruction instruction(tokens);
             LINFO(timer.to_string());
             for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
                 LINFO("Token {}", std::move(token.typeToString()));
             }
+            instruction.validate();
         }
     } catch(const std::exception &e) {
         LERROR("Unhandled exception in main: {}", e.what());
