@@ -159,7 +159,7 @@ int main(int argc, const char **argv) {
             for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
                 LINFO("Token {}", std::move(token.typeToString()));
             }
-            instruction.validate();
+            LINFO("{}", instruction.validate());
         }
     } catch(const std::exception &e) {
         LERROR("Unhandled exception in main: {}", e.what());

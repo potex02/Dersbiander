@@ -4,8 +4,6 @@
 #include "headers.h"
 #include <compare>
 
-
-
 Tokenizer::Tokenizer(const std::string &input) : input(input), inputSpan(input.c_str(), input.size()), inputSize(input.size()) {}
 
 std::vector<Token> Tokenizer::tokenize() {

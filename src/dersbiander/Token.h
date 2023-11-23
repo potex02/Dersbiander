@@ -13,6 +13,7 @@ struct Token {
 
     [[nodiscard]] inline std::string typeToString() const noexcept;
     [[nodiscard]] inline std::string toString() const;
+    [[nodiscard]] inline bool isNumber() const;
     auto operator<=>(const Token &other) const = default;
 };
 
@@ -40,4 +41,10 @@ std::string Token::typeToString() const noexcept {
 
 std::string Token::toString() const {
     return D_FORMAT("type: {}, value: '{}', line {}, column {}", typeToString(), value, line, column);
+}
+
+bool Token::isNumber() const {
+
+    return this->type == TokenType::INTEGER || this->type == TokenType::DOUBLE;
+
 }
