@@ -1,4 +1,5 @@
 ﻿#include "Tokenizer.h"
+#include "Instruction.h"
 #include "headers.h"
 
 DISABLE_WARNINGS_PUSH(
@@ -10,7 +11,7 @@ DISABLE_WARNINGS_POP()
 // the source template at `configured_files/config.hpp.in`.
 #include <internal_use_only/config.hpp>
 
-static const std::string code = "42 + y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1";
+static const std::string code = "variable = 42 + y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1";
 
 /* // Strassen's matrix multiplication for 2x2 matrices
 template <typename T> glm::mat<2, 2, T> strassen2x2(const glm::mat<2, 2, T> &A, const glm::mat<2, 2, T> &B) {
@@ -149,14 +150,16 @@ int main(int argc, const char **argv) {
             //  glm::mat4 B4x4(2.0f);
             //  glm::mat4 result4x4 = strassen4x4(A4x4, B4x4);
             //  std::cout << "Result for 4x4 matrices:\n" << glm::to_string(result4x4) << std::endl;
-            LINFO("code legt {}", code.length());
+            LINFO("code length {}", code.length());
             Tokenizer tokenizer(code);
             Timer timer("tokenizer.tokenize()");
             std::vector<Token> tokens = tokenizer.tokenize();
+            Instruction instruction(tokens);
             LINFO(timer.to_string());
             for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
-                LINFO("Token {}", std::move(token.toString()));
+                LINFO("Token {}", std::move(token.typeToString()));
             }
+            LINFO("{}", instruction.validate());
         }
     } catch(const std::exception &e) {
         LERROR("Unhandled exception in main: {}", e.what());

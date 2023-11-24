@@ -1,6 +1,6 @@
 #pragma once
 #include <bit>
-#include <gsl/gsl>
+//#include <gsl/gsl>
 
 // Macro to cast to bool
 // Description:
