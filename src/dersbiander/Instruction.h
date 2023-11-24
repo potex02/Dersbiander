@@ -21,11 +21,10 @@ private:
     std::vector<Token> tokens;
     std::vector<Token> previousTokens;
     InstructionType instructionType;
-    std::string unexpected(const Token &token);
+    std::string unexpected(const Token &token) const;
     bool checkToken(const Token &token);
     bool checkIdentifier();
     bool checkNumber();
     bool checkOperator();
-    bool checkKeyWord();
-
+    bool checkKeyWord() const;
 };
