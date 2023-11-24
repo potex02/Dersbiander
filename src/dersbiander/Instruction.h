@@ -1,5 +1,6 @@
-#include <vector>
+#pragma once
 #include "Token.h"
+#include <vector>
 
 enum class InstructionType : short {
 
