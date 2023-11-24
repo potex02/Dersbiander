@@ -11,40 +11,30 @@ struct Token {
     std::size_t line{};
     std::size_t column{};
 
-    [[nodiscard]] inline std::string typeToString() const noexcept;
-    [[nodiscard]] inline std::string toString() const;
-    [[nodiscard]] inline bool isNumber() const;
+    [[nodiscard]] std::string typeToString() const noexcept {
+        switch(type) {
+            using enum TokenType;
+        case IDENTIFIER:
+            return "IDENTIFIER";
+        case INTEGER:
+            return "INTEGER";
+        case DOUBLE:
+            return "DOUBLE";
+        case OPERATOR:
+            return "OPERATOR";
+        case KEYWORD:
+            return "KEYWORD";
+        case EOFT:
+            return "EOFT";
+        case ERROR:
+            return "ERROR";
+        default:
+            return "UNKNOWN";
+        }
+    }
+    [[nodiscard]] inline std::string toString() const {
+        return D_FORMAT("type: {}, value: '{}', line {}, column {}", typeToString(), value, line, column);
+    }
+    [[nodiscard]] inline bool isNumber() const { return this->type == TokenType::INTEGER || this->type == TokenType::DOUBLE; }
     auto operator<=>(const Token &other) const = default;
 };
-
-std::string Token::typeToString() const noexcept {
-    switch(type) {
-        using enum TokenType;
-    case IDENTIFIER:
-        return "IDENTIFIER";
-    case INTEGER:
-        return "INTEGER";
-    case DOUBLE:
-        return "DOUBLE";
-    case OPERATOR:
-        return "OPERATOR";
-    case KEYWORD:
-        return "KEYWORD";
-    case EOFT:
-        return "EOFT";
-    case ERROR:
-        return "ERROR";
-    default:
-        return "UNKNOWN";
-    }
-}
-
-std::string Token::toString() const {
-    return D_FORMAT("type: {}, value: '{}', line {}, column {}", typeToString(), value, line, column);
-}
-
-bool Token::isNumber() const {
-
-    return this->type == TokenType::INTEGER || this->type == TokenType::DOUBLE;
-
-}
