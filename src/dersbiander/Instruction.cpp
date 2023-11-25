@@ -66,8 +66,9 @@ bool Instruction::checkOperator(const Token &token) {
         }
         return false;
     }
-    if(this->instructionType == InstructionType::ASSIGNATION && this->previousTokens.size() > 2 &&
-       (this->previousTokens.back().type == TokenType::IDENTIFIER || this->previousTokens.back().isNumber())) {
+    if(this->instructionType == InstructionType::ASSIGNATION &&
+       (token.value == "-" ||
+       (this->previousTokens.back().type == TokenType::IDENTIFIER || this->previousTokens.back().isNumber()))) {
         return true;
     }
     return false;
