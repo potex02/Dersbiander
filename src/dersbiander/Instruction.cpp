@@ -48,7 +48,7 @@ bool Instruction::checkIdentifier() {
 }
 
 bool Instruction::checkNumber() {
-    if(this->previousTokens.empty() || this->previousTokens.back().type != TokenType::OPERATOR) { return false; }
+    if(this->previousTokens.empty() || this->instructionType == InstructionType::OPERATION || this->previousTokens.back().type != TokenType::OPERATOR) { return false; }
     return true;
 }
 
