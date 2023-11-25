@@ -23,7 +23,7 @@ bool Instruction::checkToken(const Token &token) {
         return this->checkNumber();
         break;
     case OPERATOR:
-        return this->checkOperator();
+        return this->checkOperator(token);
         break;
     /*case KEYWORD:
         break;*/
@@ -52,8 +52,21 @@ bool Instruction::checkNumber() {
     return true;
 }
 
-bool Instruction::checkOperator() {
-    if(!this->previousTokens.empty() &&
+bool Instruction::checkOperator(const Token &token) {
+    if(this->previousTokens.empty()) {
+
+        return  false;
+
+    }
+    if(token.value == "=") {
+        if(this->instructionType == InstructionType::OPERATION && this->previousTokens.size() == 1 &&
+            this->previousTokens.back().type == TokenType::IDENTIFIER) {
+            this->instructionType = InstructionType::ASSIGNATION;
+            return true;
+        }
+        return false;
+    }
+    if(this->instructionType == InstructionType::ASSIGNATION && this->previousTokens.size() > 2 &&
        (this->previousTokens.back().type == TokenType::IDENTIFIER || this->previousTokens.back().isNumber())) {
         return true;
     }

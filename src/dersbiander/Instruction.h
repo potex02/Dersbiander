@@ -4,7 +4,9 @@
 
 enum class InstructionType : short {
 
+    PROCEDURE_CALL,
     OPERATION,
+    ASSIGNATION,
     CONDITION,
     DEFINITION,
     BLANK,
@@ -25,6 +27,6 @@ private:
     bool checkToken(const Token &token);
     bool checkIdentifier();
     bool checkNumber();
-    bool checkOperator();
+    bool checkOperator(const Token &token);
     bool checkKeyWord() const;
 };
