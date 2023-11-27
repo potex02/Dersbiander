@@ -44,14 +44,15 @@ int main(int argc, const char **argv) {
             // } else {
             // }
         } else {
+            Timer tim("tokenizer total time");
             for(std::string i : code) {
                 LINFO("code {}", i);
                 LINFO("code length {}", i.length());
                 Tokenizer tokenizer(i);
                 Timer timer("tokenizer.tokenize()");
                 std::vector<Token> tokens = tokenizer.tokenize();
-                Instruction instruction(tokens);
                 LINFO(timer.to_string());
+                Instruction instruction(tokens);
                 for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
 #ifdef ONLY_TOKEN_TYPE
                     LINFO("Token {}", std::move(token.typeToString()));
@@ -59,8 +60,12 @@ int main(int argc, const char **argv) {
                     LINFO("{}", std::move(token.toString()));
 #endif  // ONLY_TOKEN_TYPE
                 }
-                LINFO("{}", instruction.validate());
+                Timer time("instruction.validate()");
+                const std::string valiadation = instruction.validate();
+                LINFO(time.to_string());
+                LINFO("{}", valiadation);
             }
+            LINFO(tim.to_string());
         }
     } catch(const std::exception &e) {
         LERROR("Unhandled exception in main: {}", e.what());
