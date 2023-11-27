@@ -3,14 +3,14 @@
 Instruction::Instruction(const std::vector<Token> &tokens) : tokens(tokens), instructionType(InstructionType::BLANK) {}
 
 std::string Instruction::validate() {
-    for(Token i : this->tokens) {
+    for(const Token &i : this->tokens) {
         if(!this->checkToken(i)) { return this->unexpected(i); }
-        this->previousTokens.push_back(i);
+        this->previousTokens.emplace_back(i);
     }
     return D_FORMAT("OK: {}", this->typeToString());
 }
 
-std::string Instruction::unexpected(const Token &token) const { return "Unexpected token: " + token.value; }
+std::string Instruction::unexpected(const Token &token) const { return D_FORMAT("Unexpected token:: {}", token.value); }
 
 std::string Instruction::typeToString() const noexcept {
     switch(this->instructionType) {
@@ -37,23 +37,16 @@ bool Instruction::checkToken(const Token &token) {
         using enum TokenType;
     case IDENTIFIER:
         return this->checkIdentifier();
-        break;
     case INTEGER:
     case DOUBLE:
         return this->checkNumber();
-        break;
     case OPERATOR:
         return this->checkOperator(token);
-        break;
-    /*case KEYWORD:
-        break;*/
+    /*case KEYWORD:*/
     case EOFT:
         return true;
-        break;
         /*case ERROR:
-            break;
-        case UNKNOWN:
-            break;*/
+        case UNKNOWN:*/
     }
     return false;
 }
