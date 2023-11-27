@@ -1,5 +1,4 @@
 #include "Instruction.h"
-#include<iostream>
 
 Instruction::Instruction(const std::vector<Token> &tokens) : tokens(tokens) { this->instructionType = InstructionType::BLANK; }
 
