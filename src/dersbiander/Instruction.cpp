@@ -42,7 +42,8 @@ bool Instruction::checkToken(const Token &token) {
         return this->checkNumber();
     case OPERATOR:
         return this->checkOperator(token);
-    /*case KEYWORD:*/
+    case KEYWORD:
+        return true;
     case EOFT:
         return true;
         /*case ERROR:

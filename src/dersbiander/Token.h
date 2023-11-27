@@ -2,6 +2,8 @@
 #include "headers.h"
 #include <string>
 
+static const std::array<std::string, 1> KEYWORDS = {"var"};
+
 enum class TokenType : int { IDENTIFIER, INTEGER, DOUBLE, OPERATOR, KEYWORD, EOFT, ERROR, UNKNOWN };
 
 static inline constexpr TokenType eofTokenType = TokenType::EOFT;
