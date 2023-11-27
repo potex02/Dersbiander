@@ -35,6 +35,8 @@ struct Token {
     [[nodiscard]] inline std::string toString() const {
         return D_FORMAT("type: {}, value: '{}', line {}, column {}", typeToString(), value, line, column);
     }
-    [[nodiscard]] inline bool isNumber() const { return this->type == TokenType::INTEGER || this->type == TokenType::DOUBLE; }
+    [[nodiscard]] inline bool isNumber() const noexcept {
+        return this->type == TokenType::INTEGER || this->type == TokenType::DOUBLE;
+    }
     auto operator<=>(const Token &other) const = default;
 };
