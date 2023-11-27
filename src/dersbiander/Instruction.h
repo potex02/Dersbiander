@@ -9,8 +9,7 @@ enum class InstructionType : short {
     ASSIGNATION,
     CONDITION,
     DEFINITION,
-    BLANK,
-    UNKNOWN,
+    BLANK
 
 };
 

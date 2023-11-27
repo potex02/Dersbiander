@@ -1,6 +1,6 @@
 #include "Instruction.h"
 
-Instruction::Instruction(const std::vector<Token> &tokens) : tokens(tokens) { this->instructionType = InstructionType::UNKNOWN; }
+Instruction::Instruction(const std::vector<Token> &tokens) : tokens(tokens) { this->instructionType = InstructionType::BLANK; }
 
 std::string Instruction::validate() {
     for(Token i : this->tokens) {
