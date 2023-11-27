@@ -17,6 +17,7 @@ class Instruction {
 public:
     explicit Instruction(const std::vector<Token> &tokens);
     std::string validate();
+    [[nodiscard]] std::string typeToString() const noexcept;
 
 private:
     std::vector<Token> tokens;

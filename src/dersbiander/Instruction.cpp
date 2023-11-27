@@ -1,4 +1,5 @@
 #include "Instruction.h"
+#include<iostream>
 
 Instruction::Instruction(const std::vector<Token> &tokens) : tokens(tokens) { this->instructionType = InstructionType::BLANK; }
 
@@ -7,10 +8,30 @@ std::string Instruction::validate() {
         if(!this->checkToken(i)) { return this->unexpected(i); }
         this->previousTokens.push_back(i);
     }
-    return "OK";
+    return D_FORMAT("OK: {}", this->typeToString());
 }
 
 std::string Instruction::unexpected(const Token &token) const { return "Unexpected token: " + token.value; }
+
+std::string Instruction::typeToString() const noexcept {
+    switch(this->instructionType) {
+        using enum InstructionType;
+    case PROCEDURE_CALL:
+        return "PROCEDURE_CALL";
+    case OPERATION:
+        return "OPERATION";
+    case ASSIGNATION:
+        return "ASSIGNATION";
+    case CONDITION:
+        return "CONDITION";
+    case DEFINITION:
+        return "DEFINITION";
+    case BLANK:
+        return "BLANK";
+    default:
+        return "UNKNOWN";
+    }
+}
 
 bool Instruction::checkToken(const Token &token) {
     switch(token.type) {
