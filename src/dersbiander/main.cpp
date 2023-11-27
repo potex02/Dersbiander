@@ -13,11 +13,8 @@ DISABLE_WARNINGS_POP()
 // the source template at `configured_files/config.hpp.in`.
 #include <internal_use_only/config.hpp>
 
-static const std::string code[] = {
-    "variable = 42 * -y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1",
-    "",
-    "variable = -4"
-};
+static const std::array<std::string, 3> code = {
+    "variable = 42 * -y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1", "", "variable = -4"};
 
 DISABLE_WARNINGS_PUSH(26461 26821)
 // NOLINTNEXTLINE(bugprone-exception-escape)
@@ -30,7 +27,7 @@ int main(int argc, const char **argv) {
 
         bool show_version = false;
         bool run_code_from_console = false;
-        [[maybe_unused]] bool time_error = false;
+        //[[maybe_unused]] bool time_error = false;
         std::optional<std::string> input;
         app.add_option("-i,--input", input, "A message to print back out");
         app.add_flag("--version", show_version, "Show version information");
