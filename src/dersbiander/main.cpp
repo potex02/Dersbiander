@@ -13,7 +13,11 @@ DISABLE_WARNINGS_POP()
 // the source template at `configured_files/config.hpp.in`.
 #include <internal_use_only/config.hpp>
 
-static const std::string code = "variable = 42 + y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1";
+static const std::string code[] = {
+    "variable = 42 * -y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1",
+    "",
+    "variable = -4"
+};
 
 DISABLE_WARNINGS_PUSH(26461 26821)
 // NOLINTNEXTLINE(bugprone-exception-escape)
@@ -43,20 +47,23 @@ int main(int argc, const char **argv) {
             // } else {
             // }
         } else {
-            LINFO("code length {}", code.length());
-            Tokenizer tokenizer(code);
-            Timer timer("tokenizer.tokenize()");
-            std::vector<Token> tokens = tokenizer.tokenize();
-            Instruction instruction(tokens);
-            LINFO(timer.to_string());
-            for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
+            for(std::string i : code) {
+                LINFO("code {}", i);
+                LINFO("code length {}", i.length());
+                Tokenizer tokenizer(i);
+                Timer timer("tokenizer.tokenize()");
+                std::vector<Token> tokens = tokenizer.tokenize();
+                Instruction instruction(tokens);
+                LINFO(timer.to_string());
+                for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
 #ifdef ONLY_TOKEN_TYPE
-                LINFO("Token {}", std::move(token.typeToString()));
+                    LINFO("Token {}", std::move(token.typeToString()));
 #else
-                LINFO("{}", std::move(token.toString()));
+                    LINFO("{}", std::move(token.toString()));
 #endif  // ONLY_TOKEN_TYPE
+                }
+                LINFO("{}", instruction.validate());
             }
-            LINFO("{}", instruction.validate());
         }
     } catch(const std::exception &e) {
         LERROR("Unhandled exception in main: {}", e.what());

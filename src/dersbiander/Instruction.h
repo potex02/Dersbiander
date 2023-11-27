@@ -4,11 +4,12 @@
 
 enum class InstructionType : short {
 
+    PROCEDURE_CALL,
     OPERATION,
+    ASSIGNATION,
     CONDITION,
     DEFINITION,
-    BLANK,
-    UNKNOWN,
+    BLANK
 
 };
 
@@ -16,6 +17,7 @@ class Instruction {
 public:
     explicit Instruction(const std::vector<Token> &tokens);
     std::string validate();
+    [[nodiscard]] std::string typeToString() const noexcept;
 
 private:
     std::vector<Token> tokens;
@@ -25,6 +27,6 @@ private:
     bool checkToken(const Token &token);
     bool checkIdentifier();
     bool checkNumber();
-    bool checkOperator();
+    bool checkOperator(const Token &token);
     bool checkKeyWord() const;
 };
