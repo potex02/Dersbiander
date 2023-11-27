@@ -15,9 +15,11 @@ private:
     std::vector<Token> previousTokens;
     InstructionType instructionType;
     std::string unexpected(const Token &token) const;
-    bool checkToken(const Token &token);
-    bool checkIdentifier() noexcept;
-    bool checkNumber() noexcept;
-    bool checkOperator(const Token &token);
-    bool checkKeyWord() const noexcept;
+    [[nodiscard]] bool checkToken(const Token &token);
+    [[nodiscard]] bool checkIdentifier() noexcept;
+    [[nodiscard]] bool checkNumber() noexcept;
+    [[nodiscard]] bool checkOperator(const Token &token);
+    [[nodiscard]] inline bool checkKeyWord() const noexcept { return false; }
+    [[nodiscard]] constexpr Token &previousTokensLast() noexcept { return this->previousTokens.back(); }
+    [[nodiscard]] constexpr bool ispreviousEmpty() const noexcept { return this->previousTokens.empty(); }
 };
