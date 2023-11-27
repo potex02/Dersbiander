@@ -1,6 +1,6 @@
 #include "Instruction.h"
 
-Instruction::Instruction(const std::vector<Token> &tokens) : tokens(tokens) { this->instructionType = InstructionType::BLANK; }
+Instruction::Instruction(const std::vector<Token> &tokens) : tokens(tokens), instructionType(InstructionType::BLANK) {}
 
 std::string Instruction::validate() {
     for(Token i : this->tokens) {
@@ -58,7 +58,7 @@ bool Instruction::checkToken(const Token &token) {
     return false;
 }
 
-bool Instruction::checkIdentifier() {
+bool Instruction::checkIdentifier() noexcept {
     if(this->previousTokens.empty()) {
         this->instructionType = InstructionType::OPERATION;
         return true;
@@ -67,31 +67,32 @@ bool Instruction::checkIdentifier() {
     return false;
 }
 
-bool Instruction::checkNumber() {
-    if(this->previousTokens.empty() || this->instructionType == InstructionType::OPERATION || this->previousTokens.back().type != TokenType::OPERATOR) { return false; }
+bool Instruction::checkNumber() noexcept {
+    if(this->previousTokens.empty() || this->instructionType == InstructionType::OPERATION ||
+       this->previousTokens.back().type != TokenType::OPERATOR) {
+        return false;
+    }
     return true;
 }
 
 bool Instruction::checkOperator(const Token &token) {
-    if(this->previousTokens.empty()) {
+    using enum InstructionType;
+    if(this->previousTokens.empty()) { return false; }
 
-        return  false;
-
-    }
     if(token.value == "=") {
-        if(this->instructionType == InstructionType::OPERATION && this->previousTokens.size() == 1 &&
-            this->previousTokens.back().type == TokenType::IDENTIFIER) {
-            this->instructionType = InstructionType::ASSIGNATION;
+        if(this->instructionType == OPERATION && this->previousTokens.size() == 1 &&
+           this->previousTokens.back().type == TokenType::IDENTIFIER) {
+            this->instructionType = ASSIGNATION;
             return true;
         }
         return false;
     }
-    if(this->instructionType == InstructionType::ASSIGNATION &&
+    if(this->instructionType == ASSIGNATION &&
        (token.value == "-" ||
-       (this->previousTokens.back().type == TokenType::IDENTIFIER || this->previousTokens.back().isNumber()))) {
+        (this->previousTokens.back().type == TokenType::IDENTIFIER || this->previousTokens.back().isNumber()))) {
         return true;
     }
     return false;
 }
 
-bool Instruction::checkKeyWord() const { return false; }
+bool Instruction::checkKeyWord() const noexcept { return false; }

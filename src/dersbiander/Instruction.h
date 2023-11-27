@@ -2,16 +2,7 @@
 #include "Token.h"
 #include <vector>
 
-enum class InstructionType : short {
-
-    PROCEDURE_CALL,
-    OPERATION,
-    ASSIGNATION,
-    CONDITION,
-    DEFINITION,
-    BLANK
-
-};
+enum class InstructionType : short { PROCEDURE_CALL, OPERATION, ASSIGNATION, CONDITION, DEFINITION, BLANK };
 
 class Instruction {
 public:
@@ -25,8 +16,8 @@ private:
     InstructionType instructionType;
     std::string unexpected(const Token &token) const;
     bool checkToken(const Token &token);
-    bool checkIdentifier();
-    bool checkNumber();
+    bool checkIdentifier() noexcept;
+    bool checkNumber() noexcept;
     bool checkOperator(const Token &token);
-    bool checkKeyWord() const;
+    bool checkKeyWord() const noexcept;
 };
