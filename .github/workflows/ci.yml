@@ -16,7 +16,7 @@ env:
 
 jobs:
   Test:
-    runs-on: windows-2019
+    runs-on: windows
     strategy:
       fail-fast: false
 
@@ -28,10 +28,6 @@ jobs:
       # Disable/enable builds in this list to meet the above recommendations
       # and your own projects needs
       matrix:
-        compiler:
-          # you can specify the version after `-` like "llvm-15.0.2".
-          - llvm-16.0.5
-          - gcc-11
         generator:
           - "Ninja Multi-Config"
         build_type:
@@ -42,24 +38,6 @@ jobs:
           - OFF
         build_shared:
           - OFF
-
-        exclude:
-          # mingw is determined by this author to be too buggy to support
-          - os: windows-2019
-            compiler: gcc-11
-          - os: windows-2019
-            compiler: llvm-16.0.5
-
-        include:
-          # Add appropriate variables for gcov version required. This will intentionally break
-          # if you try to use a compiler that does not have gcov set
-          - compiler: gcc-11
-            gcov_executable: gcov
-            enable_ipo: On
-
-          - compiler: llvm-16.0.5
-            enable_ipo: Off
-            gcov_executable: "llvm-cov gcov"
 
           #- os: macos-10.15
           #   enable_ipo: Off
