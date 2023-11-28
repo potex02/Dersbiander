@@ -45,10 +45,10 @@ int main(int argc, const char **argv) {
             // }
         } else {
             Timer tim("tokenizer total time");
-            for(std::string i : code) {
-                LINFO("code {}", i);
-                LINFO("code length {}", i.length());
-                Tokenizer tokenizer(i);
+            for(std::string str : code) {
+                LINFO("code {}", str);
+                LINFO("code length {}", str.length());
+                Tokenizer tokenizer(str);
                 Timer timer("tokenizer.tokenize()");
                 std::vector<Token> tokens = tokenizer.tokenize();
                 LINFO(timer.to_string());
