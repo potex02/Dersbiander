@@ -16,7 +16,7 @@ env:
 
 jobs:
   Test:
-    runs-on: windows
+    runs-on: windows-lastest
     strategy:
       fail-fast: false
 
