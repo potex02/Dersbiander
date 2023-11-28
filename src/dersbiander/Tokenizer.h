@@ -1,9 +1,9 @@
 #pragma once
+#include "Timer.h"
+#include "Token.h"
 #include <span>
 #include <string>
 #include <vector>
-#include "Timer.h"
-#include "Token.h"
 
 class Tokenizer {
 public:
