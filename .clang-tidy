@@ -19,6 +19,8 @@ Checks: "*,
         -readability-convert-member-functions-to-static
         -clang-diagnostic-switch
         -readability-simplify-boolean-expr
+        -concurrency-mt-unsafe
+        -cppcoreguidelines-pro-bounds-pointer-arithmetic
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
@@ -26,9 +28,9 @@ FormatStyle:     none
 
 CheckOptions:
   - key: readability-identifier-length.IgnoredVariableNames
-    value: 'x|y|z,i'
+    value: 'x|y|z,i,c'
   - key: readability-identifier-length.IgnoredParameterNames
-    value: 'x|y|z,i'
+    value: 'x|y|z,i,c'
 
 
 
