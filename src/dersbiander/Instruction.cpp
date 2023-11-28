@@ -9,11 +9,10 @@ std::string Instruction::validate() {
         if(!this->checkToken(i)) { return this->unexpected(i); }
         this->previousTokens.emplace_back(i);
     }
-    LINFO("previousTokens.size:{}", previousTokens.size());
     return D_FORMAT("OK: {}", this->typeToString());
 }
 
-std::string Instruction::unexpected(const Token &token) const { return D_FORMAT("Unexpected token:: {}", token.value); }
+std::string Instruction::unexpected(const Token &token) const { return D_FORMAT("Unexpected token: {}", token.value); }
 
 [[nodiscard]] std::string Instruction::typeToString() const noexcept {
     switch(this->instructionType) {
