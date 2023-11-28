@@ -17,6 +17,8 @@ Checks: "*,
         -misc-const-correctness
         -readability-implicit-bool-conversion,-warnings-as-errors
         -readability-convert-member-functions-to-static
+        -clang-diagnostic-switch
+        -readability-simplify-boolean-expr
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
