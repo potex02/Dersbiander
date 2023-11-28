@@ -5,9 +5,9 @@ Instruction::Instruction(const std::vector<Token> &tokens) : tokens(tokens), ins
 }
 
 std::string Instruction::validate() {
-    for(const Token &i : this->tokens) {
-        if(!this->checkToken(i)) { return this->unexpected(i); }
-        this->previousTokens.emplace_back(i);
+    for(const Token &inst : this->tokens) {
+        if(!this->checkToken(inst)) { return this->unexpected(inst); }
+        this->previousTokens.emplace_back(inst);
     }
     return D_FORMAT("OK: {}", this->typeToString());
 }
