@@ -16,6 +16,7 @@ Checks: "*,
         -cert-err58-cpp
         -misc-const-correctness
         -readability-implicit-bool-conversion,-warnings-as-errors
+        -readability-convert-member-functions-to-static
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
