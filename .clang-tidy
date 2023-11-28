@@ -15,6 +15,7 @@ Checks: "*,
         -misc-non-private-member-variables-in-classes,
         -cert-err58-cpp
         -misc-const-correctness
+        -readability-implicit-bool-conversion,-warnings-as-errors
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
