@@ -111,6 +111,8 @@ Token Tokenizer::extractOperator() {
     auto value = input.substr(currentPosition, 1);
     ++currentPosition;
     ++currentColumn;
+    if(value == "-") { return {TokenType::MINUS_OPERATOR, value, currentLine, currentColumn - 1}; }
+    if(value == "=") { return {TokenType::EQUAL_OPERATOR, value, currentLine, currentColumn - 1}; }
     return {TokenType::OPERATOR, value, currentLine, currentColumn - 1};
 }
 

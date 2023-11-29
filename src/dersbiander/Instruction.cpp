@@ -1,6 +1,6 @@
 #include "Instruction.h"
 
-Instruction::Instruction(const std::vector<Token> &tokens) : tokens(tokens), instructionType(InstructionType::BLANK) {
+Instruction::Instruction(const std::vector<Token> &tokens) : tokens(tokens), instructionType(InstructionType::BLANK), allowedTokens({ TokenType::KEYWORD, TokenType::IDENTIFIER, TokenType::EOFT }) {
     previousTokens.reserve(tokens.size());
 }
 
@@ -37,68 +37,93 @@ std::string Instruction::unexpected(const Token &token) const { return D_FORMAT(
 }
 
 [[nodiscard]] bool Instruction::checkToken(const Token &token) {
+    if(std::find(this->allowedTokens.begin(), this->allowedTokens.end(), token.type) == this->allowedTokens.end()) {
+        return false;
+    }
     switch(token.type) {
         using enum TokenType;
     case IDENTIFIER:
-        return this->checkIdentifier();
+        this->checkIdentifier();
+        break;
     case INTEGER:
     case DOUBLE:
-        return this->checkNumber();
+        this->checkNumber();
+        break;
     case OPERATOR:
-        return this->checkOperator(token);
+        this->checkOperator();
+        break;
+    case MINUS_OPERATOR:
+        this->checkMinusOperator();
+        break;
+    case EQUAL_OPERATOR:
+        this->checkEqualOperator();
+        break;
     case KEYWORD:
-        return this->checkKeyword(token);
+        this->checkKeyword(token);
+        break;
     case EOFT:
-        return true;
+        break;
         /*case ERROR:
         case UNKNOWN:*/
-    }
-    return false;
-}
-
-[[nodiscard]] bool Instruction::checkIdentifier() noexcept {
-    if(ispreviousEmpty()) {
-        this->instructionType = InstructionType::OPERATION;
-        return true;
-    }
-    if(this->instructionType == InstructionType::DECLARATION) { return true; }
-    if(previousTokensLast().type == TokenType::OPERATOR) { return true; }
-    return false;
-}
-
-[[nodiscard]] bool Instruction::checkNumber() noexcept {
-    if(ispreviousEmpty() || this->instructionType == InstructionType::OPERATION ||
-       previousTokensLast().type != TokenType::OPERATOR) {
-        return false;
     }
     return true;
 }
 
-[[nodiscard]] bool Instruction::checkOperator(const Token &token) {
-    using enum InstructionType;
-    if(ispreviousEmpty()) { return false; }
-
-    if(token.value == "=") {
-        if(this->instructionType == OPERATION && this->previousTokens.size() == 1 &&
-           previousTokensLast().type == TokenType::IDENTIFIER) {
-            this->instructionType = ASSIGNATION;
-            return true;
-        }
-        return false;
+void Instruction::checkIdentifier() noexcept {
+    if(this->instructionType == InstructionType::BLANK) {
+        this->instructionType = InstructionType::OPERATION;
+        this->allowedTokens = {TokenType::EQUAL_OPERATOR};
+        return;
     }
-    if(this->instructionType == ASSIGNATION &&
-       (token.value == "-" || (previousTokensLast().type == TokenType::IDENTIFIER || previousTokensLast().isNumber()))) {
-        return true;
+    if (this->instructionType == InstructionType::DECLARATION) {
+        this->allowedTokens = {TokenType::EOFT};
+        return;
     }
-    return false;
+    if (this->instructionType == InstructionType::ASSIGNATION) {
+        this->allowedTokens = {TokenType::OPERATOR, TokenType::MINUS_OPERATOR, TokenType::EOFT};
+        return;
+    }
+    this->allowedTokens = {};
 }
 
-[[nodiscard]] bool Instruction::checkKeyword(const Token &token) {
-    if (token.value == "var") {
-        if (this->ispreviousEmpty() && this->tokens.size() >= 2) {
-            this->instructionType = InstructionType::DECLARATION;
-            return true;
-        }
+void Instruction::checkNumber() noexcept {
+    if(this->instructionType == InstructionType::ASSIGNATION) {
+        this->allowedTokens = {TokenType::OPERATOR, TokenType::MINUS_OPERATOR, TokenType::EOFT};
+        return;
     }
-    return false;
+    this->allowedTokens = {};
+}
+
+void Instruction::checkOperator() {
+    if(this->instructionType == InstructionType::ASSIGNATION) {
+        this->allowedTokens = {TokenType::IDENTIFIER, TokenType::INTEGER, TokenType::DOUBLE, TokenType::MINUS_OPERATOR};
+        return;
+    }
+    this->allowedTokens = {};
+}
+
+void Instruction::checkMinusOperator() {
+    if(this->instructionType == InstructionType::ASSIGNATION) {
+        this->allowedTokens = {TokenType::IDENTIFIER, TokenType::INTEGER, TokenType::DOUBLE};
+        return;
+    }
+    this->allowedTokens = {};
+}
+
+void Instruction::checkEqualOperator() {
+    if (this->instructionType == InstructionType::OPERATION) {
+        this->instructionType = InstructionType::ASSIGNATION;
+        this->allowedTokens = {TokenType::IDENTIFIER, TokenType::INTEGER, TokenType::DOUBLE, TokenType::MINUS_OPERATOR};
+        return;
+    }
+    this->allowedTokens = {};
+}
+
+void Instruction::checkKeyword(const Token &token) {
+    if(token.value == "var" && this->instructionType == InstructionType::BLANK) {
+        this->instructionType = InstructionType::DECLARATION;
+        this->allowedTokens = {TokenType::IDENTIFIER};
+        return;
+    }
+    this->allowedTokens = {};
 }
