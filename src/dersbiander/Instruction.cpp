@@ -25,6 +25,8 @@ std::string Instruction::unexpected(const Token &token) const { return D_FORMAT(
         return "ASSIGNATION";
     case CONDITION:
         return "CONDITION";
+    case DECLARATION:
+        return "DECLARATION";
     case DEFINITION:
         return "DEFINITION";
     case BLANK:
@@ -45,7 +47,7 @@ std::string Instruction::unexpected(const Token &token) const { return D_FORMAT(
     case OPERATOR:
         return this->checkOperator(token);
     case KEYWORD:
-        return true;
+        return this->checkKeyword(token);
     case EOFT:
         return true;
         /*case ERROR:
@@ -86,6 +88,16 @@ std::string Instruction::unexpected(const Token &token) const { return D_FORMAT(
     if(this->instructionType == ASSIGNATION &&
        (token.value == "-" || (previousTokensLast().type == TokenType::IDENTIFIER || previousTokensLast().isNumber()))) {
         return true;
+    }
+    return false;
+}
+
+[[nodiscard]] bool Instruction::checkKeyword(const Token &token) {
+    if (token.value == "var") {
+        if (this->ispreviousEmpty()) {
+            this->instructionType = InstructionType::DECLARATION;
+            return true;
+        }
     }
     return false;
 }

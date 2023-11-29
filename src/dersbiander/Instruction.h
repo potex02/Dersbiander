@@ -2,7 +2,7 @@
 #include "Token.h"
 #include <vector>
 
-enum class InstructionType : short { PROCEDURE_CALL, OPERATION, ASSIGNATION, CONDITION, DEFINITION, BLANK };
+enum class InstructionType : short { PROCEDURE_CALL, OPERATION, ASSIGNATION, CONDITION, DECLARATION, DEFINITION, BLANK };
 
 class Instruction {
 public:
@@ -19,6 +19,7 @@ private:
     [[nodiscard]] bool checkIdentifier() noexcept;
     [[nodiscard]] bool checkNumber() noexcept;
     [[nodiscard]] bool checkOperator(const Token &token);
+    [[nodiscard]] bool checkKeyword(const Token &token);
     [[nodiscard]] inline bool checkKeyWord() const noexcept { return false; }
     [[nodiscard]] const Token &previousTokensLast() noexcept { return this->previousTokens.back(); }
     [[nodiscard]] bool ispreviousEmpty() const noexcept { return this->previousTokens.empty(); }
