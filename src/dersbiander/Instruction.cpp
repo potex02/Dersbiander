@@ -61,6 +61,7 @@ std::string Instruction::unexpected(const Token &token) const { return D_FORMAT(
         this->instructionType = InstructionType::OPERATION;
         return true;
     }
+    if(this->instructionType == InstructionType::DECLARATION) { return true; }
     if(previousTokensLast().type == TokenType::OPERATOR) { return true; }
     return false;
 }
@@ -94,7 +95,7 @@ std::string Instruction::unexpected(const Token &token) const { return D_FORMAT(
 
 [[nodiscard]] bool Instruction::checkKeyword(const Token &token) {
     if (token.value == "var") {
-        if (this->ispreviousEmpty()) {
+        if (this->ispreviousEmpty() && this->tokens.size() >= 2) {
             this->instructionType = InstructionType::DECLARATION;
             return true;
         }
