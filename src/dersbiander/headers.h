@@ -119,17 +119,17 @@ static inline constexpr const char *CRNL = "\r\n";
 #ifdef _WIN32                              // Windows
 static inline constexpr auto NEWL = CRNL;  // Windows
 #elif defined macintosh                    // OS 9
-static inline constexpr const char *NEWL = CCR;  // Classic Mac OS
+static inline constexpr const char *NEWL = &CCR;  // Classic Mac OS
 #elif defined __unix__                     // Linux and Unix-like systems
-static inline constexpr const char *NEWL = CNL;  // Linux and Unix
+static inline constexpr const char *NEWL = &CNL;  // Linux and Unix
 #elif defined __APPLE__                    // macOS
-static inline constexpr const char *NEWL = CNL;  // macOS
+static inline constexpr const char *NEWL = &CNL;  // macOS
 #elif defined __VMS                        // OpenVMS
-static inline constexpr const char *NEWL = CRNL;  // OpenVMS
+static inline constexpr const char *NEWL = &CRNL;  // OpenVMS
 #elif defined __FreeBSD__                  // FreeBSD
-static inline constexpr const char *NEWL = CNL;  // FreeBSD
+static inline constexpr const char *NEWL = &CNL;  // FreeBSD
 #else
-static inline constexpr const char *NEWL = CNL;  // Default case
+static inline constexpr const char *NEWL = &CNL;  // Default case
 #endif
 
 #define SYSPAUSE()                                                                                                               \
