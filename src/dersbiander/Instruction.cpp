@@ -8,7 +8,7 @@ Instruction::Instruction(const std::vector<Token> &tokens)
 }
 
 std::string Instruction::validate() {
-    for(std::span<Token> tokenSpan(this->tokens); const Token &inst : tokenSpan) {
+    for(const Token &inst : tokens) {
         if(!this->checkToken(inst)) { return this->unexpected(inst); }
         this->previousTokens.emplace_back(inst);
     }

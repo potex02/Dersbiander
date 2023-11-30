@@ -11,7 +11,6 @@ public:
     [[nodiscard]] std::string typeToString() const noexcept;
 
 private:
-    // TODO: use std::span<Token> tokenSpan(tokens)
     std::vector<Token> tokens;
     std::vector<Token> previousTokens;
     InstructionType instructionType;
