@@ -1,11 +1,14 @@
 #include "Instruction.h"
+DISABLE_WARNINGS_PUSH(26461 26821)
 
-Instruction::Instruction(const std::vector<Token> &tokens) : tokens(tokens), instructionType(InstructionType::BLANK), allowedTokens({ TokenType::KEYWORD, TokenType::IDENTIFIER, TokenType::EOFT }) {
+Instruction::Instruction(const std::vector<Token> &tokens)
+  : tokens(tokens), instructionType(InstructionType::BLANK),
+    allowedTokens({TokenType::KEYWORD, TokenType::IDENTIFIER, TokenType::EOFT}) {
     previousTokens.reserve(tokens.size());
 }
 
 std::string Instruction::validate() {
-    for(const Token &inst : this->tokens) {
+    for(std::span<Token> tokenSpan(this->tokens); const Token &inst : tokenSpan) {
         if(!this->checkToken(inst)) { return this->unexpected(inst); }
         this->previousTokens.emplace_back(inst);
     }
@@ -37,9 +40,7 @@ std::string Instruction::unexpected(const Token &token) const { return D_FORMAT(
 }
 
 [[nodiscard]] bool Instruction::checkToken(const Token &token) {
-    if(std::find(this->allowedTokens.begin(), this->allowedTokens.end(), token.type) == this->allowedTokens.end()) {
-        return false;
-    }
+    if(std::ranges::find(this->allowedTokens, token.type) == this->allowedTokens.end()) { return false; }
     switch(token.type) {
         using enum TokenType;
     case IDENTIFIER:
@@ -70,17 +71,19 @@ std::string Instruction::unexpected(const Token &token) const { return D_FORMAT(
 }
 
 void Instruction::checkIdentifier() noexcept {
-    if(this->instructionType == InstructionType::BLANK) {
-        this->instructionType = InstructionType::OPERATION;
-        this->allowedTokens = {TokenType::EQUAL_OPERATOR};
+    using enum TokenType;
+    using enum InstructionType;
+    if(this->instructionType == BLANK) {
+        this->instructionType = OPERATION;
+        this->allowedTokens = {EQUAL_OPERATOR};
         return;
     }
-    if (this->instructionType == InstructionType::DECLARATION) {
-        this->allowedTokens = {TokenType::EOFT};
+    if(this->instructionType == DECLARATION) {
+        this->allowedTokens = {EOFT};
         return;
     }
-    if (this->instructionType == InstructionType::ASSIGNATION) {
-        this->allowedTokens = {TokenType::OPERATOR, TokenType::MINUS_OPERATOR, TokenType::EOFT};
+    if(this->instructionType == ASSIGNATION) {
+        this->allowedTokens = {OPERATOR, MINUS_OPERATOR, EOFT};
         return;
     }
     this->allowedTokens = {};
@@ -111,7 +114,7 @@ void Instruction::checkMinusOperator() {
 }
 
 void Instruction::checkEqualOperator() {
-    if (this->instructionType == InstructionType::OPERATION) {
+    if(this->instructionType == InstructionType::OPERATION) {
         this->instructionType = InstructionType::ASSIGNATION;
         this->allowedTokens = {TokenType::IDENTIFIER, TokenType::INTEGER, TokenType::DOUBLE, TokenType::MINUS_OPERATOR};
         return;
@@ -127,3 +130,4 @@ void Instruction::checkKeyword(const Token &token) {
     }
     this->allowedTokens = {};
 }
+DISABLE_WARNINGS_POP()
