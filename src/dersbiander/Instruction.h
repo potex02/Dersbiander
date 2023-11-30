@@ -2,7 +2,7 @@
 #include "Token.h"
 #include <vector>
 
-enum class InstructionType : short { PROCEDURE_CALL, OPERATION, ASSIGNATION, CONDITION, DEFINITION, BLANK };
+enum class InstructionType : short { PROCEDURE_CALL, OPERATION, ASSIGNATION, CONDITION, DECLARATION, DEFINITION, BLANK };
 
 class Instruction {
 public:
@@ -14,12 +14,13 @@ private:
     std::vector<Token> tokens;
     std::vector<Token> previousTokens;
     InstructionType instructionType;
+    std::vector<TokenType> allowedTokens;
     std::string unexpected(const Token &token) const;
     [[nodiscard]] bool checkToken(const Token &token);
-    [[nodiscard]] bool checkIdentifier() noexcept;
-    [[nodiscard]] bool checkNumber() noexcept;
-    [[nodiscard]] bool checkOperator(const Token &token);
-    [[nodiscard]] inline bool checkKeyWord() const noexcept { return false; }
-    [[nodiscard]] const Token &previousTokensLast() noexcept { return this->previousTokens.back(); }
-    [[nodiscard]] bool ispreviousEmpty() const noexcept { return this->previousTokens.empty(); }
+    void checkIdentifier() noexcept;
+    void checkNumber() noexcept;
+    void checkOperator();
+    void checkMinusOperator();
+    void checkEqualOperator();
+    void checkKeyword(const Token &token);
 };

@@ -65,10 +65,14 @@ bool Tokenizer::isOperator(char c) const noexcept { return (isPlusORMinus(c) || 
 
 Token Tokenizer::extractIdentifier() {
     std::string value;
+    TokenType type = TokenType::IDENTIFIER;
     while(currentPosition < inputSize && (std::isalnum(inputSpan[currentPosition]) || inputSpan[currentPosition] == '_')) {
         appendCharToValue(value);
     }
-    return {TokenType::IDENTIFIER, value, currentLine, currentColumn - value.length()};
+    if (std::find(KEYWORDS.begin(), KEYWORDS.end(), value) != KEYWORDS.end()) { 
+        type = TokenType::KEYWORD;
+    }
+    return {type, value, currentLine, currentColumn - value.length()};
 }
 
 void Tokenizer::extractDigits(std::string &value) {
@@ -107,6 +111,8 @@ Token Tokenizer::extractOperator() {
     auto value = input.substr(currentPosition, 1);
     ++currentPosition;
     ++currentColumn;
+    if(value == "-") { return {TokenType::MINUS_OPERATOR, value, currentLine, currentColumn - 1}; }
+    if(value == "=") { return {TokenType::EQUAL_OPERATOR, value, currentLine, currentColumn - 1}; }
     return {TokenType::OPERATOR, value, currentLine, currentColumn - 1};
 }
 

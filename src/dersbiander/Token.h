@@ -2,7 +2,9 @@
 #include "headers.h"
 #include <string>
 
-enum class TokenType : int { IDENTIFIER, INTEGER, DOUBLE, OPERATOR, KEYWORD, EOFT, ERROR, UNKNOWN };
+static const std::array<std::string, 1> KEYWORDS = {"var"};
+
+enum class TokenType : int { IDENTIFIER, INTEGER, DOUBLE, OPERATOR, MINUS_OPERATOR, EQUAL_OPERATOR, KEYWORD, EOFT, ERROR, UNKNOWN };
 
 static inline constexpr TokenType eofTokenType = TokenType::EOFT;
 struct Token {
@@ -22,6 +24,10 @@ struct Token {
             return "DOUBLE";
         case OPERATOR:
             return "OPERATOR";
+        case MINUS_OPERATOR:
+            return "MINUS_OPERATOR";
+        case EQUAL_OPERATOR:
+            return "EQUAL_OPERATOR";
         case KEYWORD:
             return "KEYWORD";
         case EOFT:
