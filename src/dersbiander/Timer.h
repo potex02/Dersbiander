@@ -11,6 +11,7 @@
 inline static constexpr long double MICROSENCONDSFACTOR = 1000.0;
 inline static constexpr long double MILLISENCONDSFACTOR = 1'000'000.0;
 inline static constexpr long double SENCONDSFACTOR = 1'000'000'000.0;
+inline static constexpr long MFACTOR = 100;
 
 DISABLE_WARNINGS_PUSH(6005 26447 26455 26496)
 class Timer {
@@ -57,17 +58,17 @@ public:
     Timer &operator=(const Timer &&other) = delete;  // Delete move assignment operator
 
     /// Time a function by running it multiple times. Target time is the len to target.
-    [[nodiscard]] std::string time_it(const std::function<void()> &f, long double target_time = 1) {
+    [[nodiscard]] std::string time_it(const std::function<void()> &f, long double target_time = 1) { // NOLINT(*-identifier-length)
         const time_point start = start_;
         [[maybe_unused]] long double total_time = NAN;
 
         start_ = clock::now();
-        std::size_t n = 0;
-        do {
+        std::size_t n = 0; // NOLINT(*-identifier-length)
+        do { // NOLINT(*-avoid-do-while)
             f();
             std::chrono::duration<long double> elapsed = clock::now() - start_;
             total_time = elapsed.count();
-        } while(n++ < 100u && total_time < target_time);
+        } while(n++ < MFACTOR && total_time < target_time);
 
         std::string out = D_FORMAT("{} for {} tries", make_time_str(total_time / static_cast<long double>(n)), std::to_string(n));
         start_ = start;
@@ -144,5 +145,5 @@ public:
 };
 
 /// This prints out the time if shifted into a std::cout like stream.
-inline std::ostream &operator<<(std::ostream &in, const Timer &timer) { return in << timer.to_string(); }
+inline std::ostream &operator<<(std::ostream &in, const Timer &timer) { return in << timer.to_string(); } // NOLINT(*-identifier-length)
 DISABLE_WARNINGS_POP()
