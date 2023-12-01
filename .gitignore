@@ -33,3 +33,6 @@ $RECYCLE.BIN/
 ehthumbs.db
 Thumbs.db
 buildCliom
+buildCliom-MinSizeRel
+buildCliom-release
+buildCliom-RelWithDebInfo
