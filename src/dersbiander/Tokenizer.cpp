@@ -59,9 +59,9 @@ void Tokenizer::appendCharToValue(std::string &value) {
     ++currentColumn;
 }
 
-bool Tokenizer::isPlusORMinus(char c) const noexcept { return (c == '+' || c == '-'); }
+bool Tokenizer::isPlusORMinus(char c) const noexcept { return (c == '+' || c == '-'); } // NOLINT(*-identifier-length)
 
-bool Tokenizer::isOperator(char c) const noexcept { return (isPlusORMinus(c) || c == '*' || c == '/' || c == '='); }
+bool Tokenizer::isOperator(char c) const noexcept { return (isPlusORMinus(c) || c == '*' || c == '/' || c == '='); } // NOLINT(*-identifier-length)
 
 Token Tokenizer::extractIdentifier() {
     std::string value;

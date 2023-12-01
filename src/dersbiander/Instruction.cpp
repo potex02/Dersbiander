@@ -15,7 +15,7 @@ std::string Instruction::validate() {
     return D_FORMAT("OK: {}", this->typeToString());
 }
 
-std::string Instruction::unexpected(const Token &token) const { return D_FORMAT("Unexpected token: {}", token.value); }
+[[nodiscard]] std::string Instruction::unexpected(const Token &token) const { return D_FORMAT("Unexpected token: {}", token.value); }
 
 [[nodiscard]] std::string Instruction::typeToString() const noexcept {
     switch(this->instructionType) {
@@ -63,9 +63,9 @@ std::string Instruction::unexpected(const Token &token) const { return D_FORMAT(
         this->checkKeyword(token);
         break;
     case EOFT:
+    case ERROR:
+    case UNKNOWN:
         break;
-        /*case ERROR:
-        case UNKNOWN:*/
     }
     return true;
 }

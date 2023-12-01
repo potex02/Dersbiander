@@ -15,7 +15,7 @@ private:
     std::vector<Token> previousTokens;
     InstructionType instructionType;
     std::vector<TokenType> allowedTokens;
-    std::string unexpected(const Token &token) const;
+    [[nodiscard]] std::string unexpected(const Token &token) const;
     [[nodiscard]] bool checkToken(const Token &token);
     void checkIdentifier() noexcept;
     void checkNumber() noexcept;
