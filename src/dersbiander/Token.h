@@ -13,6 +13,7 @@ enum class TokenType : int {
     MINUS_OPERATOR,
     EQUAL_OPERATOR,
     COMMA,
+    COLON,
     KEYWORD,
     EOFT,
     ERROR,
@@ -44,6 +45,8 @@ struct Token {
             return "EQUAL_OPERATOR";
         case COMMA:
             return "COMMA";
+        case COLON:
+            return "COLON";
         case KEYWORD:
             return "KEYWORD";
         case EOFT:

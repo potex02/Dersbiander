@@ -24,6 +24,10 @@ std::vector<Token> Tokenizer::tokenize() {
             tokens.emplace_back(Token{TokenType::COMMA, ",", currentLine, currentColumn - 1});
             ++currentPosition;
             ++currentColumn;
+        } else if(currentChar == ':') {
+            tokens.emplace_back(Token{TokenType::COLON, ":", currentLine, currentColumn - 1});
+            ++currentPosition;
+            ++currentColumn;
         } else if(std::isspace(currentChar)) {
             handleWhitespace(currentChar);
             continue;  // Continue the loop to get the next token
