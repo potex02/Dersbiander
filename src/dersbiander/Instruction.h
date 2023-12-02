@@ -26,5 +26,8 @@ private:
     void checkMinusOperator();
     void checkEqualOperator();
     void checkComma();
+    void checkColon();
     void checkKeyword(const Token &token);
+    [[nodiscard]] constexpr TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }
+    [[nodiscard]] constexpr bool ispreviousEmpty() const noexcept { return this->previousTokens.empty(); }
 };

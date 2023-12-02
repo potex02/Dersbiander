@@ -65,6 +65,9 @@ std::string Instruction::validate() {
     case COMMA:
         this->checkComma();
         break;
+    case COLON:
+        this->checkColon();
+        break;
     case KEYWORD:
         this->checkKeyword(token);
         break;
@@ -85,7 +88,11 @@ void Instruction::checkIdentifier() noexcept {
         return;
     }
     if(this->instructionType == DECLARATION) {
-        this->allowedTokens = {COMMA, EOFT};
+        if (!this->ispreviousEmpty() && this->previousTokensLast() == TokenType::COLON) {
+            this->allowedTokens = {EOFT};
+            return;
+        }
+        this->allowedTokens = {COMMA, COLON};
         return;
     }
     if(this->instructionType == ASSIGNATION) {
@@ -129,6 +136,14 @@ void Instruction::checkEqualOperator() {
 }
 
 void Instruction::checkComma() {
+    if(this->instructionType == InstructionType::DECLARATION) {
+        this->allowedTokens = {TokenType::IDENTIFIER};
+        return;
+    }
+    this->allowedTokens = {};
+}
+
+void Instruction::checkColon() {
     if(this->instructionType == InstructionType::DECLARATION) {
         this->allowedTokens = {TokenType::IDENTIFIER};
         return;
