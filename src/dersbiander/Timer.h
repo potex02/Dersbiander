@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include "headers.h"
 
 // On GCC < 4.8, the following define is often missing. Due to the
@@ -8,6 +9,7 @@
 #endif
 
 #include <iostream>
+
 inline static constexpr long double MICROSENCONDSFACTOR = 1000.0;
 inline static constexpr long double MILLISENCONDSFACTOR = 1'000'000.0;
 inline static constexpr long double SENCONDSFACTOR = 1'000'000'000.0;

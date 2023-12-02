@@ -15,16 +15,18 @@
 #define GLM_FORCE_PRECISION_HIGHP_FLOAT
 #define GLM_FORCE_PRECISION_HIGHP_INT
 #define GLM_FORCE_PRECISION_HIGHP_UINT
+
 #include "disableWarn.h"
 // clang-format off
 DISABLE_WARNINGS_PUSH(
-    4005 4201 4459 4514 4625 4626 4820 
-    6244 6285 6385 6386 26409 26415 26418
-    26429 26432 26437 26438 26440 26446 26447 
-    26450 26451 26455 26457 26459 26460 26461 
-    26467 26472 26473 26474 26475 26481 26482 
-    26485 26490 26491 26493 26494 26495 26496 
-    26497 26498 26800 26814 26818 26826)
+        4005 4201 4459 4514 4625 4626 4820
+        6244 6285 6385 6386 26409 26415 26418
+        26429 26432 26437 26438 26440 26446 26447
+        26450 26451 26455 26457 26459 26460 26461
+        26467 26472 26473 26474 26475 26481 26482
+        26485 26490 26491 26493 26494 26495 26496
+        26497 26498 26800 26814 26818 26826)
+
 #include <cassert>
 #include <algorithm>
 #include <array>
@@ -35,11 +37,15 @@ DISABLE_WARNINGS_PUSH(
 #include <cstring>
 #include <ctime>
 #include <execution>
+
 #ifdef _WIN32 // Check if the target platform is Windows
-  #ifdef _MSC_VER // Check if the compiler is MSVC
-    #include <format>
-  #endif
+#ifdef _MSC_VER // Check if the compiler is MSVC
+
+#include <format>
+
 #endif
+#endif
+
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -88,15 +94,15 @@ DISABLE_WARNINGS_POP()
 
 // clang-format off
 #ifdef _WIN32
-     #ifdef _MSC_VER
-         #ifdef USE_STD_FORMAT
-              #define D_FORMAT(...) std::format(__VA_ARGS__)
-         #else
-              #define D_FORMAT(...) fmt::format(__VA_ARGS__)
-         #endif
-     #endif
+#ifdef _MSC_VER
+#ifdef USE_STD_FORMAT
+#define D_FORMAT(...) std::format(__VA_ARGS__)
 #else
-      #define D_FORMAT(...) fmt::format(__VA_ARGS__)
+#define D_FORMAT(...) fmt::format(__VA_ARGS__)
+#endif
+#endif
+#else
+#define D_FORMAT(...) fmt::format(__VA_ARGS__)
 #endif
 // clang-format on
 
