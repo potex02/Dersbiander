@@ -17,7 +17,15 @@ std::string Instruction::validate() {
 }
 
 [[nodiscard]] std::string Instruction::unexpected(const Token &token) const {
-    return D_FORMAT("Unexpected token: {}", token.value);
+
+    std::string value;
+
+    if (token.type != TokenType::EOFT) {
+        value = token.value;
+    } else {
+        value = "EOFT";
+    }
+    return D_FORMAT("Unexpected token: {}", value);
 }
 
 [[nodiscard]] std::string Instruction::typeToString() const noexcept {
