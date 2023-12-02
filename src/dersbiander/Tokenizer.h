@@ -27,14 +27,9 @@ private:
     [[nodiscard]] inline bool isPlusORMinus(char c) const noexcept;  // NOLINT(*-identifier-length)
     [[nodiscard]] inline bool isOperator(char c) const noexcept;     // NOLINT(*-identifier-length)
     Token extractIdentifier();
-
     void extractDigits(std::string &value);
-
     void extractExponent(std::string &value);
-
     Token extractnumber();
-
     Token extractOperator();
-
     void handleWhitespace(char currentChar) noexcept;
 };
