@@ -1,4 +1,5 @@
 #include "Instruction.h"
+
 DISABLE_WARNINGS_PUSH(26461 26821)
 
 Instruction::Instruction(const std::vector<Token> &tokens)
@@ -15,7 +16,9 @@ std::string Instruction::validate() {
     return D_FORMAT("OK: {}", this->typeToString());
 }
 
-[[nodiscard]] std::string Instruction::unexpected(const Token &token) const { return D_FORMAT("Unexpected token: {}", token.value); }
+[[nodiscard]] std::string Instruction::unexpected(const Token &token) const {
+    return D_FORMAT("Unexpected token: {}", token.value);
+}
 
 [[nodiscard]] std::string Instruction::typeToString() const noexcept {
     switch(this->instructionType) {
@@ -130,4 +133,5 @@ void Instruction::checkKeyword(const Token &token) {
     }
     this->allowedTokens = {};
 }
+
 DISABLE_WARNINGS_POP()

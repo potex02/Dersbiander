@@ -14,6 +14,7 @@ inline static constexpr long double SENCONDSFACTOR = 1'000'000'000.0;
 inline static constexpr long MFACTOR = 100;
 
 DISABLE_WARNINGS_PUSH(6005 26447 26455 26496)
+
 class Timer {
 protected:
     /// This is a typedef to make clocks easier to use
@@ -58,13 +59,14 @@ public:
     Timer &operator=(const Timer &&other) = delete;  // Delete move assignment operator
 
     /// Time a function by running it multiple times. Target time is the len to target.
-    [[nodiscard]] std::string time_it(const std::function<void()> &f, long double target_time = 1) { // NOLINT(*-identifier-length)
+    [[nodiscard]] std::string time_it(const std::function<void()> &f,
+                                      long double target_time = 1) {  // NOLINT(*-identifier-length)
         const time_point start = start_;
         [[maybe_unused]] long double total_time = NAN;
 
         start_ = clock::now();
-        std::size_t n = 0; // NOLINT(*-identifier-length)
-        do { // NOLINT(*-avoid-do-while)
+        std::size_t n = 0;  // NOLINT(*-identifier-length)
+        do {                // NOLINT(*-avoid-do-while)
             f();
             std::chrono::duration<long double> elapsed = clock::now() - start_;
             total_time = elapsed.count();
@@ -134,6 +136,7 @@ class AutoTimer : public Timer {
 public:
     /// Reimplementing the constructor is required in GCC 4.7
     explicit AutoTimer(const std::string &title = "Timer", const time_print_t &time_print = Simple) : Timer(title, time_print) {}
+
     // GCC 4.7 does not support using inheriting constructors.
     AutoTimer(const AutoTimer &other) = delete;              // Delete copy constructor
     AutoTimer &operator=(const AutoTimer &other) = delete;   // Delete copy assignment operator
@@ -145,5 +148,7 @@ public:
 };
 
 /// This prints out the time if shifted into a std::cout like stream.
-inline std::ostream &operator<<(std::ostream &in, const Timer &timer) { return in << timer.to_string(); } // NOLINT(*-identifier-length)
+inline std::ostream &operator<<(std::ostream &in, const Timer &timer) {
+    return in << timer.to_string();
+}  // NOLINT(*-identifier-length)
 DISABLE_WARNINGS_POP()

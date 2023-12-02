@@ -1,6 +1,6 @@
 #include "Tokenizer.h"
 #include "Timer.h"
-//#include "TokentizeErr.h"
+// #include "TokentizeErr.h"
 #include "headers.h"
 #include <compare>
 
@@ -59,9 +59,11 @@ void Tokenizer::appendCharToValue(std::string &value) {
     ++currentColumn;
 }
 
-bool Tokenizer::isPlusORMinus(char c) const noexcept { return (c == '+' || c == '-'); } // NOLINT(*-identifier-length)
+bool Tokenizer::isPlusORMinus(char c) const noexcept { return (c == '+' || c == '-'); }  // NOLINT(*-identifier-length)
 
-bool Tokenizer::isOperator(char c) const noexcept { return (isPlusORMinus(c) || c == '*' || c == '/' || c == '='); } // NOLINT(*-identifier-length)
+bool Tokenizer::isOperator(char c) const noexcept {
+    return (isPlusORMinus(c) || c == '*' || c == '/' || c == '=');
+}  // NOLINT(*-identifier-length)
 
 Token Tokenizer::extractIdentifier() {
     std::string value;

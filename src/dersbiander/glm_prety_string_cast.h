@@ -187,7 +187,7 @@ namespace glmp {
         };
 
         template <typename T, glm::qualifier Q> struct compute_to_string<glm::qua<T, Q> > {
-            [[nodiscard]] GLMP_FUN_QUAL static std::string call(glm::qua<T, Q> const &q) { // NOLINT(*-identifier-length)
+            [[nodiscard]] GLMP_FUN_QUAL static std::string call(glm::qua<T, Q> const &q) {  // NOLINT(*-identifier-length)
                 return D_FORMAT("{}quat({}, [{}, {}, {}])", prefix<T>::value(), q.w, q.x, q.y, q.z);
             }
         };

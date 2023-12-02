@@ -1,4 +1,5 @@
 #pragma once
+
 #include "headers.h"
 
 class TokenizerErr : public std::runtime_error {

@@ -42,16 +42,6 @@ DISABLE_WARNINGS_PUSH(
 #endif
 #include <filesystem>
 #include <fstream>
-#include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtc/random.hpp>
-#include <glm/gtx/norm.hpp>
-#include <glm/gtx/quaternion.hpp>
-#include <glm/gtx/string_cast.hpp>
-#include <glm/gtx/hash.hpp>
-#include <glm/gtx/fast_square_root.hpp> // fastNormalize
 #include <iomanip>
 #include <iostream>
 #include <iterator>

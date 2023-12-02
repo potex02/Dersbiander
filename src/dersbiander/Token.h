@@ -1,4 +1,5 @@
 #pragma once
+
 #include "headers.h"
 #include <string>
 
@@ -18,6 +19,7 @@ enum class TokenType : int {
 };
 
 static inline constexpr TokenType eofTokenType = TokenType::EOFT;
+
 struct Token {
     TokenType type{TokenType::UNKNOWN};
     std::string value;
@@ -49,11 +51,14 @@ struct Token {
             return "UNKNOWN";
         }
     }
+
     [[nodiscard]] inline std::string toString() const {
         return D_FORMAT("type: {}, value: '{}', line {}, column {}", typeToString(), value, line, column);
     }
+
     [[nodiscard]] inline bool isNumber() const noexcept {
         return this->type == TokenType::INTEGER || this->type == TokenType::DOUBLE;
     }
+
     auto operator<=>(const Token &other) const = default;
 };
