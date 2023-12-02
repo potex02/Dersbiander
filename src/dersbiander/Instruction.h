@@ -7,7 +7,7 @@ enum class InstructionType : short { PROCEDURE_CALL, OPERATION, ASSIGNATION, CON
 
 class Instruction {
 public:
-    explicit Instruction(const std::vector<Token> &tokens);
+    explicit Instruction(const std::vector<Token> &_tokens);
 
     std::string validate();
     [[nodiscard]] std::string typeToString() const noexcept;

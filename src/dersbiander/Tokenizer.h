@@ -8,7 +8,7 @@
 
 class Tokenizer {
 public:
-    explicit Tokenizer(const std::string &input);
+    explicit Tokenizer(const std::string &_input);
 
     // delete copy constructor and copy assignment operator
     Tokenizer(const Tokenizer&) = delete;

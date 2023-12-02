@@ -2,8 +2,8 @@
 
 DISABLE_WARNINGS_PUSH(26461 26821)
 
-Instruction::Instruction(const std::vector<Token> &tokens)
-  : tokens(tokens), instructionType(InstructionType::BLANK),
+Instruction::Instruction(const std::vector<Token> &_tokens)
+  : tokens(_tokens), instructionType(InstructionType::BLANK),
     allowedTokens({TokenType::KEYWORD, TokenType::IDENTIFIER, TokenType::EOFT}) {
     previousTokens.reserve(tokens.size());
 }
