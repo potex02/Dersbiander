@@ -25,5 +25,6 @@ private:
     void checkOperator();
     void checkMinusOperator();
     void checkEqualOperator();
+    void checkComma();
     void checkKeyword(const Token &token);
 };

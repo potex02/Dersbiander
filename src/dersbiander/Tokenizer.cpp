@@ -20,6 +20,10 @@ std::vector<Token> Tokenizer::tokenize() {
             tokens.emplace_back(extractnumber());
         } else if(isOperator(currentChar)) {
             tokens.emplace_back(extractOperator());
+        } else if(currentChar == ',') {
+            tokens.emplace_back(Token{TokenType::COMMA, ",", currentLine, currentColumn - 1});
+            ++currentPosition;
+            ++currentColumn;
         } else if(std::isspace(currentChar)) {
             handleWhitespace(currentChar);
             continue;  // Continue the loop to get the next token
