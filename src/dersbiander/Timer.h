@@ -149,8 +149,12 @@ public:
     ~AutoTimer() { LINFO(to_string()); }
 };
 
-/// This prints out the time if shifted into a std::cout like stream.
-inline std::ostream &operator<<(std::ostream &in, const Timer &timer) {
+/**
+ * @file Timer.h
+ *
+ * @brief Defines the Timer class and a global operator<< function for convenient output of Timer objects
+ */
+inline std::ostream &operator<<(std::ostream &in, const Timer &timer) { // NOLINT(*-identifier-length)
     return in << timer.to_string();
-}  // NOLINT(*-identifier-length)
+}
 DISABLE_WARNINGS_POP()
