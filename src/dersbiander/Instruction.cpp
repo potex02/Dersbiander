@@ -2,8 +2,8 @@
 
 DISABLE_WARNINGS_PUSH(26461 26821)
 
-Instruction::Instruction(const std::vector<Token> &tokens)
-  : tokens(tokens), instructionType(InstructionType::BLANK),
+Instruction::Instruction(const std::vector<Token> &_tokens)
+  : tokens(_tokens), instructionType(InstructionType::BLANK),
     allowedTokens({TokenType::KEYWORD, TokenType::IDENTIFIER, TokenType::EOFT}) {
     previousTokens.reserve(tokens.size());
 }
@@ -17,7 +17,15 @@ std::string Instruction::validate() {
 }
 
 [[nodiscard]] std::string Instruction::unexpected(const Token &token) const {
-    return D_FORMAT("Unexpected token: {}", token.value);
+
+    std::string value;
+
+    if (token.type != TokenType::EOFT) {
+        value = token.value;
+    } else {
+        value = "EOFT";
+    }
+    return D_FORMAT("Unexpected token: {}", value);
 }
 
 [[nodiscard]] std::string Instruction::typeToString() const noexcept {
@@ -33,6 +41,8 @@ std::string Instruction::validate() {
         return "CONDITION";
     case DECLARATION:
         return "DECLARATION";
+    case INITIALIZATION:
+        return "INITIALIZATION";
     case DEFINITION:
         return "DEFINITION";
     case BLANK:
@@ -62,6 +72,12 @@ std::string Instruction::validate() {
     case EQUAL_OPERATOR:
         this->checkEqualOperator();
         break;
+    case COMMA:
+        this->checkComma();
+        break;
+    case COLON:
+        this->checkColon();
+        break;
     case KEYWORD:
         this->checkKeyword(token);
         break;
@@ -76,50 +92,97 @@ std::string Instruction::validate() {
 void Instruction::checkIdentifier() noexcept {
     using enum TokenType;
     using enum InstructionType;
+    if(this->instructionType == ASSIGNATION) {
+        this->allowedTokens = {OPERATOR, MINUS_OPERATOR, EOFT};
+        return;
+    }
     if(this->instructionType == BLANK) {
         this->instructionType = OPERATION;
         this->allowedTokens = {EQUAL_OPERATOR};
         return;
     }
     if(this->instructionType == DECLARATION) {
-        this->allowedTokens = {EOFT};
+        if (!this->ispreviousEmpty() && this->previousTokensLast() == TokenType::COLON) {
+            this->allowedTokens = {EQUAL_OPERATOR, EOFT};
+            return;
+        }
+        this->allowedTokens = {COMMA, COLON};
         return;
     }
-    if(this->instructionType == ASSIGNATION) {
-        this->allowedTokens = {OPERATOR, MINUS_OPERATOR, EOFT};
+    if (this->instructionType == INITIALIZATION) {
+        this->allowedTokens = {OPERATOR, MINUS_OPERATOR, COMMA, EOFT};
         return;
     }
     this->allowedTokens = {};
 }
 
 void Instruction::checkNumber() noexcept {
-    if(this->instructionType == InstructionType::ASSIGNATION) {
-        this->allowedTokens = {TokenType::OPERATOR, TokenType::MINUS_OPERATOR, TokenType::EOFT};
+    using enum TokenType;
+    using enum InstructionType;
+    if(this->instructionType == ASSIGNATION) {
+        this->allowedTokens = {OPERATOR, MINUS_OPERATOR, EOFT};
+        return;
+    }
+    if(this->instructionType == INITIALIZATION) {
+        this->allowedTokens = {OPERATOR, MINUS_OPERATOR, COMMA, EOFT};
         return;
     }
     this->allowedTokens = {};
 }
 
 void Instruction::checkOperator() {
-    if(this->instructionType == InstructionType::ASSIGNATION) {
-        this->allowedTokens = {TokenType::IDENTIFIER, TokenType::INTEGER, TokenType::DOUBLE, TokenType::MINUS_OPERATOR};
+    using enum TokenType;
+    using enum InstructionType;
+    if(this->instructionType == ASSIGNATION || this->instructionType == INITIALIZATION) {
+        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, MINUS_OPERATOR};
         return;
     }
     this->allowedTokens = {};
 }
 
 void Instruction::checkMinusOperator() {
-    if(this->instructionType == InstructionType::ASSIGNATION) {
-        this->allowedTokens = {TokenType::IDENTIFIER, TokenType::INTEGER, TokenType::DOUBLE};
+    using enum TokenType;
+    using enum InstructionType;
+    if(this->instructionType == ASSIGNATION || this->instructionType == INITIALIZATION) {
+        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE};
         return;
     }
     this->allowedTokens = {};
 }
 
 void Instruction::checkEqualOperator() {
-    if(this->instructionType == InstructionType::OPERATION) {
-        this->instructionType = InstructionType::ASSIGNATION;
-        this->allowedTokens = {TokenType::IDENTIFIER, TokenType::INTEGER, TokenType::DOUBLE, TokenType::MINUS_OPERATOR};
+    using enum TokenType;
+    using enum InstructionType;
+    if(this->instructionType == OPERATION) {
+        this->instructionType = ASSIGNATION;
+        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, MINUS_OPERATOR};
+        return;
+    }
+    if (this->instructionType == DECLARATION) {
+        this->instructionType = INITIALIZATION;
+        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, MINUS_OPERATOR};
+        return;
+    }
+    this->allowedTokens = {};
+}
+
+void Instruction::checkComma() {
+    using enum TokenType;
+    using enum InstructionType;
+    if(this->instructionType == DECLARATION) {
+        this->allowedTokens = {IDENTIFIER};
+        return;
+    }
+    if(this->instructionType == INITIALIZATION) {
+        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, MINUS_OPERATOR};
+        return;
+    }
+    this->allowedTokens = {};
+}
+
+void Instruction::checkColon() {
+    if(this->instructionType == InstructionType::DECLARATION) {
+        this->allowedTokens = {TokenType::IDENTIFIER};
         return;
     }
     this->allowedTokens = {};
