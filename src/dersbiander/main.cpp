@@ -15,9 +15,9 @@ DISABLE_WARNINGS_POP()
 // the source template at `configured_files/config.hpp.in`.
 #include <internal_use_only/config.hpp>
 
-static const std::array<std::string, 6> code = {
-    "var variable, var2: type", "variable = 42 * -y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1", "", "variable = -4",
-    "var a: ", "va2 = 5 -+"};
+static const std::array<std::string, 5> code = {
+    "var variable: type", "var num1, num2: type = 1 + 1, variable * -5", "variable = 42 * -y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1",
+    "", "variable = -4"};
 
 DISABLE_WARNINGS_PUSH(26461 26821)
 

@@ -3,7 +3,9 @@
 #include "Token.h"
 #include <vector>
 
-enum class InstructionType : short { PROCEDURE_CALL, OPERATION, ASSIGNATION, CONDITION, DECLARATION, DEFINITION, BLANK };
+enum class InstructionType : short {
+    PROCEDURE_CALL, OPERATION, ASSIGNATION, CONDITION, DECLARATION, INITIALIZATION, DEFINITION, BLANK
+};
 
 class Instruction {
 public:
