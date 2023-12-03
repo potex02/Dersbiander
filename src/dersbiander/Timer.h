@@ -85,7 +85,8 @@ public:
         return elapsed.count();
     }
 
-    [[nodiscard]] times make_named_times(long double time) const { // NOLINT(*-identifier-length) NOLINT(functionStatic)
+    // NOLINTNEXTLINE(clang-diagnostic-*)
+    [[nodiscard]] times make_named_times(long double time) const {  // NOLINT(*-identifier-length)
         auto secondsTime = time / SENCONDSFACTOR;
         auto millisTime = time / MILLISENCONDSFACTOR;
         auto microTime = time / MICROSENCONDSFACTOR;

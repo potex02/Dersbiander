@@ -11,10 +11,10 @@ public:
     explicit Tokenizer(const std::string &input);
 
     // delete copy constructor and copy assignment operator
-    Tokenizer(const Tokenizer&) = delete;
-    Tokenizer(Tokenizer&&) = delete;
-    Tokenizer& operator=(const Tokenizer&) = delete;
-    Tokenizer& operator=(Tokenizer&&) = delete;
+    Tokenizer(const Tokenizer &) = delete;
+    Tokenizer(Tokenizer &&) = delete;
+    Tokenizer &operator=(const Tokenizer &) = delete;
+    Tokenizer &operator=(Tokenizer &&) = delete;
 
     std::vector<Token> tokenize();
 
@@ -30,7 +30,8 @@ private:
 
     inline void appendCharToValue(std::string &value);
 
-    [[nodiscard]] inline bool isPlusORMinus(char c) const noexcept;  // NOLINT(*-identifier-length) NOLINT(functionStatic)
+    // NOLINTNEXTLINE(clang-diagnostic-*)
+    [[nodiscard]] inline bool isPlusORMinus(char c) const noexcept;  // NOLINT(*-identifier-length)
     [[nodiscard]] inline bool isOperator(char c) const noexcept;     // NOLINT(*-identifier-length) NOLINT(functionStatic)
     Token extractIdentifier();
     void extractDigits(std::string &value);
