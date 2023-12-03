@@ -59,9 +59,9 @@ int main(int argc, const char **argv) {
                 Instruction instruction(tokens);
                 for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
 #ifdef ONLY_TOKEN_TYPE
-                    LINFO("Token {}", std::move(token.typeToString()));
+                    LINFO("Token {}", token.typeToString());
 #else
-                    LINFO("{}", std::move(token.toString()));
+                    LINFO("{}", token.toString());
 #endif  // ONLY_TOKEN_TYPE
                 }
                 Timer time("instruction.validate()");
