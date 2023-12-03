@@ -73,7 +73,11 @@ Token Tokenizer::extractIdentifier() {
     while(currentPosition < inputSize && (std::isalnum(inputSpan[currentPosition]) || inputSpan[currentPosition] == '_')) {
         appendCharToValue(value);
     }
-    if(std::ranges::find(KEYWORDS, value) != KEYWORDS.end()) { type = TokenType::KEYWORD; }
+    if(std::ranges::find(KEYWORDS, value) != KEYWORDS.end()) {
+        type = TokenType::KEYWORD;
+    } else if(value == "true" || value == "false") {
+        type = TokenType::BOOLEAN;
+    };
     return {type, value, currentLine, currentColumn - value.length()};
 }
 
@@ -110,11 +114,10 @@ Token Tokenizer::extractnumber() {
 }
 Token Tokenizer::extractOperator() {
     using enum TokenType;
+    TokenType type = UNKNOWN;
     auto value = input.substr(currentPosition, 1);
     ++currentPosition;
     ++currentColumn;
-
-    TokenType type = UNKNOWN;
 
     switch(value[0]) {
     case '-':
