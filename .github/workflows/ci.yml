@@ -51,6 +51,8 @@ jobs:
           # mingw is determined by this author to be too buggy to support
           - os: windows-2019
             compiler: gcc-11
+          - os: windows-2019
+            compiler: llvm-16.0.5
 
         include:
           # Add appropriate variables for gcov version required. This will intentionally break
