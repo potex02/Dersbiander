@@ -8,6 +8,7 @@ static const std::array<const std::string, 1> KEYWORDS = {"var"};
 enum class TokenType : int {
     IDENTIFIER,
     INTEGER,
+    BOOLEAN,
     DOUBLE,
     OPERATOR,
     MINUS_OPERATOR,
