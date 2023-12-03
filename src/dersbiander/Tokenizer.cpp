@@ -66,12 +66,12 @@ void Tokenizer::appendCharToValue(std::string &value) {
     ++currentPosition;
     ++currentColumn;
 }
-
+// NOLINTNEXTLINE(clang-diagnostic-*)
 bool Tokenizer::isPlusORMinus(char c) const noexcept { return (c == '+' || c == '-'); }  // NOLINT(*-identifier-length)
-
-bool Tokenizer::isOperator(char c) const noexcept {
+// NOLINTNEXTLINE(clang-diagnostic-*)
+bool Tokenizer::isOperator(char c) const noexcept {  // NOLINT(*-identifier-length) NOLINT(functionStatic)
     return (isPlusORMinus(c) || c == '*' || c == '/' || c == '=');
-}  // NOLINT(*-identifier-length)
+}
 
 Token Tokenizer::extractIdentifier() {
     std::string value;
@@ -116,12 +116,13 @@ Token Tokenizer::extractnumber() {
 }
 
 Token Tokenizer::extractOperator() {
+    using enum TokenType;
     auto value = input.substr(currentPosition, 1);
     ++currentPosition;
     ++currentColumn;
-    if(value == "-") { return {TokenType::MINUS_OPERATOR, value, currentLine, currentColumn - 1}; }
-    if(value == "=") { return {TokenType::EQUAL_OPERATOR, value, currentLine, currentColumn - 1}; }
-    return {TokenType::OPERATOR, value, currentLine, currentColumn - 1};
+    if(value == "-") { return {MINUS_OPERATOR, value, currentLine, currentColumn - 1}; }
+    if(value == "=") { return {EQUAL_OPERATOR, value, currentLine, currentColumn - 1}; }
+    return {OPERATOR, value, currentLine, currentColumn - 1};
 }
 
 void Tokenizer::handleWhitespace(char currentChar) noexcept {
