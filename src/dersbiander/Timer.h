@@ -10,9 +10,9 @@
 
 #include <iostream>
 
-inline static constexpr long double MICROSENCONDSFACTOR = 1000.0;
-inline static constexpr long double MILLISENCONDSFACTOR = 1'000'000.0;
-inline static constexpr long double SENCONDSFACTOR = 1'000'000'000.0;
+inline static constexpr long double MICROSENCONDSFACTOR = 1000.0L;
+inline static constexpr long double MILLISENCONDSFACTOR = 1'000'000.0L;
+inline static constexpr long double SENCONDSFACTOR = 1'000'000'000.0L;
 inline static constexpr long MFACTOR = 100;
 
 DISABLE_WARNINGS_PUSH(6005 26447 26455 26496)
@@ -64,6 +64,7 @@ public:
     [[nodiscard]] std::string time_it(const std::function<void()> &f,
                                       long double target_time = 1) {  // NOLINT(*-identifier-length)
         const time_point start = start_;
+        // NOLINTNEXTLINE(clang-analyzer-cplusplus.InnerPointer)
         [[maybe_unused]] long double total_time = NAN;
 
         start_ = clock::now();
@@ -154,7 +155,7 @@ public:
  *
  * @brief Defines the Timer class and a global operator<< function for convenient output of Timer objects
  */
-inline std::ostream &operator<<(std::ostream &in, const Timer &timer) { // NOLINT(*-identifier-length)
+inline std::ostream &operator<<(std::ostream &in, const Timer &timer) {  // NOLINT(*-identifier-length)
     return in << timer.to_string();
 }
 DISABLE_WARNINGS_POP()
