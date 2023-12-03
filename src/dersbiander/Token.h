@@ -13,10 +13,7 @@ enum class TokenType : int {
     OPERATOR,
     MINUS_OPERATOR,
     EQUAL_OPERATOR,
-    INCREMENT_EQUAL,
-    DECREMENT_EQUAL,
-    MULTIPLY_EQUAL,
-    DIVIDE_EQUAL,
+    OPERATION_EQUAL,
     BOOLEAN_OPERATOR,
     COMMA,
     COLON,
@@ -52,14 +49,8 @@ struct Token {
             return "MINUS_OPERATOR";
         case EQUAL_OPERATOR:
             return "EQUAL_OPERATOR";
-        case INCREMENT_EQUAL:
-            return "INCREMENT_EQUAL";
-        case DECREMENT_EQUAL:
-            return "DECREMENT_EQUAL";
-        case MULTIPLY_EQUAL:
-            return "MULTIPLY_EQUAL";
-        case DIVIDE_EQUAL:
-            return "DIVIDE_OPERATOR";
+        case OPERATION_EQUAL:
+            return "OPERATION_EQUAL";
         case BOOLEAN_OPERATOR:
             return "BOOLEAN_OPERATOR";
         case COMMA:

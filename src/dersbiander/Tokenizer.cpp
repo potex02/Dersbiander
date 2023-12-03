@@ -66,8 +66,8 @@ bool Tokenizer::isOperator(char c) const noexcept {
             c == ')' || c == '!');
 }
 bool Tokenizer::isVarLenOperator(const std::string &val) const noexcept {
-    if(val.length() == 1) { return isOperator(val[0]); }
-    return (val == "+=" || val == "-=" || val == "*=" || val == "/=" || val == ">=" || val == "<=" || val == "!=");
+    return (isOperator(val[0]) || val == "+=" || val == "-=" || val == "*=" || val == "/=" || val == ">=" || val == "<=" ||
+            val == "!=");
 }
 
 // NOLINTEND
@@ -118,9 +118,7 @@ Token Tokenizer::extractnumber() {
     return {TokenType::INTEGER, value, currentLine, currentColumn - value.length()};
 }
 void Tokenizer::extractVarLenOperator(std::string &value) {
-    while((currentPosition < inputSize && isOperator(inputSpan[currentPosition])) && isVarLenOperator(value)) {
-        appendCharToValue(value);
-    }
+    while((currentPosition < inputSize && isOperator(inputSpan[currentPosition]))) { appendCharToValue(value); }
 }
 Token Tokenizer::extractOperator() {
     using enum TokenType;
@@ -147,14 +145,8 @@ Token Tokenizer::extractOperator() {
             break;
         }
     } else {
-        if(value == "+=") {
-            type = INCREMENT_EQUAL;
-        } else if(value == "-=") {
-            type = DECREMENT_EQUAL;
-        } else if(value == "*=") {
-            type = MULTIPLY_EQUAL;
-        } else if(value == "/=") {
-            type = DIVIDE_EQUAL;
+        if(value == "+=" || value == "-=" || value == "*=" || value == "/=") {
+            type = OPERATION_EQUAL;
         } else if(value == ">=" || value == "<=" || value == "!=") {
             type = BOOLEAN_OPERATOR;
         }
