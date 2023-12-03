@@ -69,7 +69,7 @@ bool Tokenizer::isOperationEqualOperator(const std::string &value) const noexcep
     return value == "+=" || value == "-=" || value == "*=" || value == "/=";
 }
 bool Tokenizer::isBooleanOperator(const std::string &value) const noexcept {
-    return value == ">=" || value == "<=" || value == "!=" || value == "||" || value == "&&";
+    return value == "==" || value == ">=" || value == "<=" || value == "!=" || value == "||" || value == "&&";
 }
 bool Tokenizer::isVarLenOperator(const std::string &val) const noexcept {
     return isOperator(val[0]) || isOperationEqualOperator(val) || isBooleanOperator(val);
