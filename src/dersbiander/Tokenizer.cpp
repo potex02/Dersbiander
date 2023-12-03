@@ -69,7 +69,10 @@ bool Tokenizer::isOperationEqualOperator(const std::string &value) const noexcep
     return value == "+=" || value == "-=" || value == "*=" || value == "/=";
 }
 bool Tokenizer::isBooleanOperator(const std::string &value) const noexcept {
-    return value == "==" || value == ">=" || value == "<=" || value == "!=" || value == "||" || value == "&&";
+    return value == "==" || value == ">=" || value == "<=" || value == "!=";
+}
+bool Tokenizer::isLogicalOperator(const std::string &value) const noexcept {
+    return value == "&&" || value == "||";
 }
 bool Tokenizer::isVarLenOperator(const std::string &val) const noexcept {
     return isOperator(val[0]) || isOperationEqualOperator(val) || isBooleanOperator(val);
@@ -145,6 +148,9 @@ Token Tokenizer::extractOperator() {
         case ':':
             type = COLON;
             break;
+        case '!':
+            type = NOT_OPERATOR;
+            break;
         default:
             type = OPERATOR;
             break;
@@ -154,6 +160,8 @@ Token Tokenizer::extractOperator() {
             type = OPERATION_EQUAL;
         } else if(isBooleanOperator(value)) {
             type = BOOLEAN_OPERATOR;
+        } else if(isLogicalOperator(value)) {
+            type = LOGICAL_OPERATOR;
         }
     }
 

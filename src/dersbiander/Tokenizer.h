@@ -35,6 +35,7 @@ private:
     [[nodiscard]] inline bool isOperator(char c) const noexcept;     // NOLINT(*-identifier-length) NOLINT(functionStatic)
     [[nodiscard]] inline bool isOperationEqualOperator(const std::string &value) const noexcept;
     [[nodiscard]] inline bool isBooleanOperator(const std::string &value) const noexcept;
+    [[nodiscard]] inline bool isLogicalOperator(const std::string &value) const noexcept;
     [[nodiscard]] inline bool isVarLenOperator(const std::string &val) const noexcept;
     Token extractIdentifier();
     void extractDigits(std::string &value);
