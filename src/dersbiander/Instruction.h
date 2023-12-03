@@ -18,7 +18,9 @@ private:
     InstructionType instructionType;
     std::vector<TokenType> allowedTokens;
 
+    // NOLINTBEGIN
     [[nodiscard]] std::string unexpected(const Token &token) const; // NOLINT(*-identifier-length) NOLINT(functionStatic)
+    // NOLINTEND
     [[nodiscard]] bool checkToken(const Token &token);
     void checkIdentifier() noexcept;
     void checkNumber() noexcept;

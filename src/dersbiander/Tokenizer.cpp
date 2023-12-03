@@ -58,12 +58,14 @@ void Tokenizer::appendCharToValue(std::string &value) {
     ++currentPosition;
     ++currentColumn;
 }
-// NOLINTNEXTLINE(clang-diagnostic-*)
-bool Tokenizer::isPlusORMinus(char c) const noexcept { return (c == '+' || c == '-'); }  // NOLINT(*-identifier-length)
-// NOLINTNEXTLINE(clang-diagnostic-*)
-bool Tokenizer::isOperator(char c) const noexcept {  // NOLINT(*-identifier-length) NOLINT(functionStatic)
+// NOLINTBEGIN
+bool Tokenizer::isPlusORMinus(char c) const noexcept {
+    return (c == '+' || c == '-');
+}
+bool Tokenizer::isOperator(char c) const noexcept {
     return (isPlusORMinus(c) || c == '*' || c == '/' || c == '=');
 }
+// NOLINTEND
 
 Token Tokenizer::extractIdentifier() {
     std::string value;
