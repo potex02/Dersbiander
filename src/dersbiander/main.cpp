@@ -26,6 +26,9 @@ static const std::array<std::string, 10> code = {
     "variable -= -4",
     "variable *= -4",
     "variable /= -4"};
+static const std::array<std::string, 6> codeBooleanOperators = {"variable = !false",         "variable = !true",
+                                                                "variable = !false || true", "variable = !true || false",
+                                                                "variable = !false && true", "variable = !true && false"};
 
 DISABLE_WARNINGS_PUSH(26461 26821)
 
@@ -57,9 +60,13 @@ int main(int argc, const char **argv) {
             // }
         } else {
             Timer tim("tokenizer total time");
-            for(std::string str : code) {
-                LINFO("code {}", str);
-                LINFO("code length {}", str.length());
+            for(const std::string &str : code) {
+                if(str.size() < 93) {
+                    LINFO("code'{}',code length {}",str, str.length());
+                } else {
+                    LINFO("code'{}'",str);
+                    LINFO("code length {}", str.length());
+                }
                 Tokenizer tokenizer(str);
                 Timer timer("tokenizer.tokenize()");
                 std::vector<Token> tokens = tokenizer.tokenize();
@@ -76,6 +83,27 @@ int main(int argc, const char **argv) {
                 const std::string valiadation = instruction.validate();
                 LINFO(time.to_string());
                 LINFO("{}", valiadation);
+            }
+            LINFO("-------------------------------------------------------------------------");
+            for(const std::string &str : codeBooleanOperators) {
+                if(str.size() < 93) {
+                    LINFO("code'{}',code length {}",str, str.length());
+                } else {
+                    LINFO("code'{}'",str);
+                    LINFO("code length {}", str.length());
+                }
+                Tokenizer tokenizer(str);
+                Timer timer("tokenizer.tokenize()");
+                std::vector<Token> tokens = tokenizer.tokenize();
+                LINFO(timer.to_string());
+                Instruction instruction(tokens);
+                for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
+#ifdef ONLY_TOKEN_TYPE
+                    LINFO("Token {}", token.typeToString());
+#else
+                    LINFO("{}", token.toString());
+#endif  // ONLY_TOKEN_TYPE
+                }
             }
             LINFO(tim.to_string());
         }
