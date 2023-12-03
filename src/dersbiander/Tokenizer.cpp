@@ -60,14 +60,19 @@ void Tokenizer::appendCharToValue(std::string &value) {
     ++currentColumn;
 }
 // NOLINTBEGIN
-bool Tokenizer::isPlusORMinus(char c) const noexcept { return (c == '+' || c == '-'); }
+bool Tokenizer::isPlusORMinus(char c) const noexcept { return c == '+' || c == '-'; }
 bool Tokenizer::isOperator(char c) const noexcept {
-    return (isPlusORMinus(c) || c == '*' || c == '/' || c == '=' || c == ',' || c == ':' || c == '<' || c == '>' || c == '(' ||
-            c == ')' || c == '!');
+    return isPlusORMinus(c) || c == '*' || c == '/' || c == '=' || c == ',' || c == ':' || c == '<' || c == '>' || c == '(' ||
+           c == ')' || c == '!' || c == '|' || c == '&';
+}
+bool Tokenizer::isOperationEqualOperator(const std::string &value) const noexcept {
+    return value == "+=" || value == "-=" || value == "*=" || value == "/=";
+}
+bool Tokenizer::isBooleanOperator(const std::string &value) const noexcept {
+    return value == ">=" || value == "<=" || value == "!=" || value == "||" || value == "&&";
 }
 bool Tokenizer::isVarLenOperator(const std::string &val) const noexcept {
-    return (isOperator(val[0]) || val == "+=" || val == "-=" || val == "*=" || val == "/=" || val == ">=" || val == "<=" ||
-            val == "!=");
+    return isOperator(val[0]) || isOperationEqualOperator(val) || isBooleanOperator(val);
 }
 
 // NOLINTEND
@@ -145,9 +150,9 @@ Token Tokenizer::extractOperator() {
             break;
         }
     } else {
-        if(value == "+=" || value == "-=" || value == "*=" || value == "/=") {
+        if(isOperationEqualOperator(value)) {
             type = OPERATION_EQUAL;
-        } else if(value == ">=" || value == "<=" || value == "!=") {
+        } else if(isBooleanOperator(value)) {
             type = BOOLEAN_OPERATOR;
         }
     }
