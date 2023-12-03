@@ -30,8 +30,8 @@ private:
 
     inline void appendCharToValue(std::string &value);
 
-    [[nodiscard]] inline bool isPlusORMinus(char c) const noexcept;  // NOLINT(*-identifier-length)
-    [[nodiscard]] inline bool isOperator(char c) const noexcept;     // NOLINT(*-identifier-length)
+    [[nodiscard]] inline bool isPlusORMinus(char c) const noexcept;  // NOLINT(*-identifier-length) NOLINT(functionStatic)
+    [[nodiscard]] inline bool isOperator(char c) const noexcept;     // NOLINT(*-identifier-length) NOLINT(functionStatic)
     Token extractIdentifier();
     void extractDigits(std::string &value);
     void extractExponent(std::string &value);
