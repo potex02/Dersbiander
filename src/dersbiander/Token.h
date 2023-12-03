@@ -34,6 +34,8 @@ struct Token {
             using enum TokenType;
         case IDENTIFIER:
             return "IDENTIFIER";
+        case BOOLEAN:
+            return "BOOLEAN";
         case INTEGER:
             return "INTEGER";
         case DOUBLE:
