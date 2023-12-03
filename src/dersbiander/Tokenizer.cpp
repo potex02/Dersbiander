@@ -21,14 +21,6 @@ std::vector<Token> Tokenizer::tokenize() {
             tokens.emplace_back(extractnumber());
         } else if(isOperator(currentChar)) {
             tokens.emplace_back(extractOperator());
-        } else if(currentChar == ',') {
-            tokens.emplace_back(TokenType::COMMA, ",", currentLine, currentColumn - 1);
-            ++currentPosition;
-            ++currentColumn;
-        } else if(currentChar == ':') {
-            tokens.emplace_back(TokenType::COLON, ":", currentLine, currentColumn - 1);
-            ++currentPosition;
-            ++currentColumn;
         } else if(std::isspace(currentChar)) {
             handleWhitespace(currentChar);
             continue;  // Continue the loop to get the next token
@@ -70,7 +62,9 @@ void Tokenizer::appendCharToValue(std::string &value) {
 // NOLINTBEGIN
 bool Tokenizer::isPlusORMinus(char c) const noexcept { return (c == '+' || c == '-'); }
 
-bool Tokenizer::isOperator(char c) const noexcept { return (isPlusORMinus(c) || c == '*' || c == '/' || c == '='); }
+bool Tokenizer::isOperator(char c) const noexcept {
+    return (isPlusORMinus(c) || c == '*' || c == '/' || c == '=' || c == ',' || c == ':');
+}
 // NOLINTEND
 
 Token Tokenizer::extractIdentifier() {
@@ -114,15 +108,33 @@ Token Tokenizer::extractnumber() {
     }
     return {TokenType::INTEGER, value, currentLine, currentColumn - value.length()};
 }
-
 Token Tokenizer::extractOperator() {
     using enum TokenType;
     auto value = input.substr(currentPosition, 1);
     ++currentPosition;
     ++currentColumn;
-    if(value == "-") { return {MINUS_OPERATOR, value, currentLine, currentColumn - 1}; }
-    if(value == "=") { return {EQUAL_OPERATOR, value, currentLine, currentColumn - 1}; }
-    return {OPERATOR, value, currentLine, currentColumn - 1};
+
+    TokenType type = UNKNOWN;
+
+    switch(value[0]) {
+    case '-':
+        type = MINUS_OPERATOR;
+        break;
+    case '=':
+        type = EQUAL_OPERATOR;
+        break;
+    case ',':
+        type = COMMA;
+        break;
+    case ':':
+        type = COLON;
+        break;
+    default:
+        type = OPERATOR;
+        break;
+    }
+
+    return {type, value, currentLine, currentColumn - 1};
 }
 
 void Tokenizer::handleWhitespace(char currentChar) noexcept {
