@@ -17,15 +17,14 @@ std::string Instruction::validate() {
 }
 
 [[nodiscard]] std::string Instruction::unexpected(const Token &token) const {
-
     std::string value;
 
-    if (token.type != TokenType::EOFT) {
+    if(token.type != TokenType::EOFT) {
         value = token.value;
     } else {
         value = "EOFT";
     }
-    return D_FORMAT("Unexpected token: {}", value);
+    return D_FORMAT("Unexpected token: {} line {} column {}", value, token.line, token.column);
 }
 
 [[nodiscard]] std::string Instruction::typeToString() const noexcept {
@@ -102,14 +101,14 @@ void Instruction::checkIdentifier() noexcept {
         return;
     }
     if(this->instructionType == DECLARATION) {
-        if (!this->ispreviousEmpty() && this->previousTokensLast() == TokenType::COLON) {
+        if(!this->ispreviousEmpty() && this->previousTokensLast() == TokenType::COLON) {
             this->allowedTokens = {EQUAL_OPERATOR, EOFT};
             return;
         }
         this->allowedTokens = {COMMA, COLON};
         return;
     }
-    if (this->instructionType == INITIALIZATION) {
+    if(this->instructionType == INITIALIZATION) {
         this->allowedTokens = {OPERATOR, MINUS_OPERATOR, COMMA, EOFT};
         return;
     }
@@ -158,7 +157,7 @@ void Instruction::checkEqualOperator() {
         this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, MINUS_OPERATOR};
         return;
     }
-    if (this->instructionType == DECLARATION) {
+    if(this->instructionType == DECLARATION) {
         this->instructionType = INITIALIZATION;
         this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, MINUS_OPERATOR};
         return;
