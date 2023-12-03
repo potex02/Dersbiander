@@ -65,7 +65,7 @@ public:
                                       long double target_time = 1) {  // NOLINT(*-identifier-length)
         const time_point start = start_;
         // NOLINTNEXTLINE(clang-analyzer-cplusplus.InnerPointer)
-        [[maybe_unused]] long double total_time = NAN;
+        [[maybe_unused]] auto total_time = C_LD(NAN);
 
         start_ = clock::now();
         std::size_t n = 0;  // NOLINT(*-identifier-length)
