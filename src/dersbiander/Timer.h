@@ -85,13 +85,14 @@ public:
         return elapsed.count();
     }
 
-    // NOLINTNEXTLINE(clang-diagnostic-*)
+    // NOLINTBEGIN
     [[nodiscard]] times make_named_times(long double time) const {  // NOLINT(*-identifier-length)
         auto secondsTime = time / SENCONDSFACTOR;
         auto millisTime = time / MILLISENCONDSFACTOR;
         auto microTime = time / MICROSENCONDSFACTOR;
         return {secondsTime, millisTime, microTime, time, "s", "ms", "us", "ns"};
     }
+    // NOLINTEND
 
     [[nodiscard]] times multi_time() const { return make_named_times(make_time()); }
 
