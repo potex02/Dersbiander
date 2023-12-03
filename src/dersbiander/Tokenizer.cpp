@@ -61,10 +61,15 @@ void Tokenizer::appendCharToValue(std::string &value) {
 }
 // NOLINTBEGIN
 bool Tokenizer::isPlusORMinus(char c) const noexcept { return (c == '+' || c == '-'); }
-
 bool Tokenizer::isOperator(char c) const noexcept {
-    return (isPlusORMinus(c) || c == '*' || c == '/' || c == '=' || c == ',' || c == ':');
+    return (isPlusORMinus(c) || c == '*' || c == '/' || c == '=' || c == ',' || c == ':' || c == '<' || c == '>' || c == '(' ||
+            c == ')' || c == '!');
 }
+bool Tokenizer::isVarLenOperator(const std::string &val) const noexcept {
+    if(val.length() == 1) { return isOperator(val[0]); }
+    return (val == "+=" || val == "-=" || val == "*=" || val == "/=" || val == ">=" || val == "<=" || val == "!=");
+}
+
 // NOLINTEND
 
 Token Tokenizer::extractIdentifier() {
@@ -112,32 +117,50 @@ Token Tokenizer::extractnumber() {
     }
     return {TokenType::INTEGER, value, currentLine, currentColumn - value.length()};
 }
+void Tokenizer::extractVarLenOperator(std::string &value) {
+    while((currentPosition < inputSize && isOperator(inputSpan[currentPosition])) && isVarLenOperator(value)) {
+        appendCharToValue(value);
+    }
+}
 Token Tokenizer::extractOperator() {
     using enum TokenType;
     TokenType type = UNKNOWN;
-    auto value = input.substr(currentPosition, 1);
-    ++currentPosition;
-    ++currentColumn;
+    std::string value;
+    extractVarLenOperator(value);
 
-    switch(value[0]) {
-    case '-':
-        type = MINUS_OPERATOR;
-        break;
-    case '=':
-        type = EQUAL_OPERATOR;
-        break;
-    case ',':
-        type = COMMA;
-        break;
-    case ':':
-        type = COLON;
-        break;
-    default:
-        type = OPERATOR;
-        break;
+    if(value.size() == 1) {
+        switch(value[0]) {
+        case '-':
+            type = MINUS_OPERATOR;
+            break;
+        case '=':
+            type = EQUAL_OPERATOR;
+            break;
+        case ',':
+            type = COMMA;
+            break;
+        case ':':
+            type = COLON;
+            break;
+        default:
+            type = OPERATOR;
+            break;
+        }
+    } else {
+        if(value == "+=") {
+            type = INCREMENT_EQUAL;
+        } else if(value == "-=") {
+            type = DECREMENT_EQUAL;
+        } else if(value == "*=") {
+            type = MULTIPLY_EQUAL;
+        } else if(value == "/=") {
+            type = DIVIDE_EQUAL;
+        } else if(value == ">=" || value == "<=" || value == "!=") {
+            type = BOOLEAN_OPERATOR;
+        }
     }
 
-    return {type, value, currentLine, currentColumn - 1};
+    return {type, value, currentLine, currentColumn - value.length()};
 }
 
 void Tokenizer::handleWhitespace(char currentChar) noexcept {

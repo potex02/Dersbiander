@@ -33,9 +33,11 @@ private:
     // NOLINTNEXTLINE(clang-diagnostic-*)
     [[nodiscard]] inline bool isPlusORMinus(char c) const noexcept;  // NOLINT(*-identifier-length)
     [[nodiscard]] inline bool isOperator(char c) const noexcept;     // NOLINT(*-identifier-length) NOLINT(functionStatic)
+    [[nodiscard]] inline bool isVarLenOperator(const std::string &val) const noexcept;
     Token extractIdentifier();
     void extractDigits(std::string &value);
     void extractExponent(std::string &value);
+    void extractVarLenOperator(std::string &value);
     Token extractnumber();
     Token extractOperator();
     void handleWhitespace(char currentChar) noexcept;

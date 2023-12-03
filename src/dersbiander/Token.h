@@ -13,12 +13,18 @@ enum class TokenType : int {
     OPERATOR,
     MINUS_OPERATOR,
     EQUAL_OPERATOR,
+    INCREMENT_EQUAL,
+    DECREMENT_EQUAL,
+    MULTIPLY_EQUAL,
+    DIVIDE_EQUAL,
+    BOOLEAN_OPERATOR,
     COMMA,
     COLON,
     KEYWORD,
     EOFT,
     ERROR,
     UNKNOWN
+
 };
 
 static inline constexpr TokenType eofTokenType = TokenType::EOFT;
@@ -46,6 +52,16 @@ struct Token {
             return "MINUS_OPERATOR";
         case EQUAL_OPERATOR:
             return "EQUAL_OPERATOR";
+        case INCREMENT_EQUAL:
+            return "INCREMENT_EQUAL";
+        case DECREMENT_EQUAL:
+            return "DECREMENT_EQUAL";
+        case MULTIPLY_EQUAL:
+            return "MULTIPLY_EQUAL";
+        case DIVIDE_EQUAL:
+            return "DIVIDE_OPERATOR";
+        case BOOLEAN_OPERATOR:
+            return "BOOLEAN_OPERATOR";
         case COMMA:
             return "COMMA";
         case COLON:
