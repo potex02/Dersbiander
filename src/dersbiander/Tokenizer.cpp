@@ -62,8 +62,8 @@ void Tokenizer::appendCharToValue(std::string &value) {
 // NOLINTBEGIN
 bool Tokenizer::isPlusORMinus(char c) const noexcept { return c == '+' || c == '-'; }
 bool Tokenizer::isOperator(char c) const noexcept {
-    return isPlusORMinus(c) || c == '*' || c == '/' || c == '=' || c == ',' || c == ':' || c == '<' || c == '>' || c == '(' ||
-           c == ')' || c == '!' || c == '|' || c == '&';
+    static const std::unordered_set<char> operators = {'*', '/', '=', ',', ':', '<', '>', '(', ')', '!', '|', '&', '+', '-'};
+    return operators.find(c) != operators.end();
 }
 bool Tokenizer::isOperationEqualOperator(const std::string &value) const noexcept {
     return value == "+=" || value == "-=" || value == "*=" || value == "/=";
@@ -125,38 +125,39 @@ Token Tokenizer::extractnumber() {
 void Tokenizer::extractVarLenOperator(std::string &value) {
     while((currentPosition < inputSize && isOperator(inputSpan[currentPosition]))) { appendCharToValue(value); }
 }
-Token Tokenizer::extractOperator() {
+
+TokenType Tokenizer::typeBySingleCharacter(char c) {
+    switch(c) {
+        using enum TokenType;
+    case '-':
+        return MINUS_OPERATOR;
+    case '=':
+        return EQUAL_OPERATOR;
+    case ',':
+        return COMMA;
+    case ':':
+        return COLON;
+    default:
+        return OPERATOR;
+    }
+}
+
+TokenType Tokenizer::typeByValue(const std::string &value) {
     using enum TokenType;
-    TokenType type = UNKNOWN;
+    if(isOperationEqualOperator(value)) {
+        return OPERATION_EQUAL;
+    } else if(isBooleanOperator(value)) {
+        return BOOLEAN_OPERATOR;
+    } else {
+        return UNKNOWN;
+    }
+}
+
+Token Tokenizer::extractOperator() {
     std::string value;
     extractVarLenOperator(value);
 
-    if(value.size() == 1) {
-        switch(value[0]) {
-        case '-':
-            type = MINUS_OPERATOR;
-            break;
-        case '=':
-            type = EQUAL_OPERATOR;
-            break;
-        case ',':
-            type = COMMA;
-            break;
-        case ':':
-            type = COLON;
-            break;
-        default:
-            type = OPERATOR;
-            break;
-        }
-    } else {
-        if(isOperationEqualOperator(value)) {
-            type = OPERATION_EQUAL;
-        } else if(isBooleanOperator(value)) {
-            type = BOOLEAN_OPERATOR;
-        }
-    }
-
+    TokenType type = value.size() == 1 ? typeBySingleCharacter(value[0]) : typeByValue(value);
     return {type, value, currentLine, currentColumn - value.length()};
 }
 
