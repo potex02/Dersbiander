@@ -148,6 +148,10 @@ Token Tokenizer::extractOperator() {
         case ':':
             type = COLON;
             break;
+        case '<':
+        case '>':
+            type = BOOLEAN_OPERATOR;
+            break;
         case '!':
             type = NOT_OPERATOR;
             break;
