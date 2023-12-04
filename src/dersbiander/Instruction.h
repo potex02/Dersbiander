@@ -33,7 +33,7 @@ private:
     void checkBooleanAndLogicalOperator(TokenType type);
     void checkComma();
     void checkColon();
-    void checkKeyword(const Token &token);
+    void checkKeywordVar();
     [[nodiscard]] TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }
     [[nodiscard]] bool ispreviousEmpty() const noexcept { return this->previousTokens.empty(); }
 };

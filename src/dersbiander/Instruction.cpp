@@ -4,7 +4,7 @@ DISABLE_WARNINGS_PUSH(26461 26821)
 
 Instruction::Instruction(const std::vector<Token> &_tokens)
   : tokens(_tokens), instructionType(InstructionType::BLANK),
-    allowedTokens({TokenType::KEYWORD, TokenType::IDENTIFIER, TokenType::EOFT}) {
+    allowedTokens({TokenType::KEYWORD_VAR, TokenType::IDENTIFIER, TokenType::EOFT}) {
     booleanOperatorPresent = false;
     previousTokens.reserve(tokens.size());
 }
@@ -85,8 +85,8 @@ std::string Instruction::validate() {
     case COLON:
         this->checkColon();
         break;
-    case KEYWORD:
-        this->checkKeyword(token);
+    case KEYWORD_VAR:
+        this->checkKeywordVar();
         break;
     case EOFT:
     case ERROR:
@@ -209,8 +209,8 @@ void Instruction::checkColon() {
     this->allowedTokens = {};
 }
 
-void Instruction::checkKeyword(const Token &token) {
-    if(token.value == "var" && this->instructionType == InstructionType::BLANK) {
+void Instruction::checkKeywordVar() {
+    if(this->instructionType == InstructionType::BLANK) {
         this->instructionType = InstructionType::DECLARATION;
         this->allowedTokens = {TokenType::IDENTIFIER};
         return;

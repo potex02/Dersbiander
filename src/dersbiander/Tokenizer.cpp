@@ -86,11 +86,7 @@ Token Tokenizer::extractIdentifier() {
     while(currentPosition < inputSize && (std::isalnum(inputSpan[currentPosition]) || inputSpan[currentPosition] == '_')) {
         appendCharToValue(value);
     }
-    if(std::ranges::find(KEYWORDS, value) != KEYWORDS.end()) {
-        type = TokenType::KEYWORD;
-    } else if(value == "true" || value == "false") {
-        type = TokenType::BOOLEAN;
-    };
+    if(value == "var") { type = TokenType::KEYWORD_VAR; };
     return {type, value, currentLine, currentColumn - value.length()};
 }
 
