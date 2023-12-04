@@ -83,6 +83,9 @@ std::string Instruction::validate() {
     case EOFT:
     case ERROR:
     case UNKNOWN:
+    case BOOLEAN:
+    case OPERATION_EQUAL:
+    case BOOLEAN_OPERATOR:
         break;
     }
     return true;
