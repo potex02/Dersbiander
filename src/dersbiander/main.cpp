@@ -27,16 +27,12 @@ static const std::array<std::string, 14> code = {
     "variable += -4",
     "variable -= -4",
     "variable *= -4",
-<<<<<<< HEAD
     "variable /= -4",
     "variable && -4",
-    "!variable"};
-=======
     "variable /= -4"};
 static const std::array<std::string, 6> codeBooleanOperators = {"variable = !false",         "variable = !true",
                                                                 "variable = !false || true", "variable = !true || false",
                                                                 "variable = !false && true", "variable = !true && false"};
->>>>>>> upstream/main
 
 DISABLE_WARNINGS_PUSH(26461 26821)
 
