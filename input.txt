@@ -6,13 +6,8 @@ variable = -4
 
 var variable2, variable3: type = variable == -4, !variable && 7.2
 variable = variable < -4
-variable = 4 >= variable
 variable += 4
 variable -= -4.
-variable *= -4e-1
-variable /= 4
 variable = variable && -4.5
-variable = !false
 variable = true
 variable = !false || !true
-variable = !false && true

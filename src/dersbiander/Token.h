@@ -17,6 +17,8 @@ enum class TokenType : int {
     LOGICAL_OPERATOR,
     COMMA,
     COLON,
+    OPEN_BRACKETS,
+    CLOSED_BRACKETS,
     KEYWORD_VAR,
     EOFT,
     ERROR,
@@ -61,6 +63,10 @@ struct Token {
             return "COMMA";
         case COLON:
             return "COLON";
+        case OPEN_BRACKETS:
+            return "OPEN_BRACKETS";
+        case CLOSED_BRACKETS:
+            return "CLOSED_BRACKETS";
         case KEYWORD_VAR:
             return "KEYWORD_VAR";
         case EOFT:
