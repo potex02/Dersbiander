@@ -14,13 +14,14 @@ std::vector<Token> Tokenizer::tokenize() {
     std::vector<Token> tokens;
     while(currentPosition < inputSize) {
         const char currentChar = inputSpan[currentPosition];
-
         if(std::isalpha(currentChar)) {
             tokens.emplace_back(extractIdentifier());
         } else if(std::isdigit(currentChar)) {
             tokens.emplace_back(extractnumber());
         } else if(isOperator(currentChar)) {
             tokens.emplace_back(extractOperator());
+        } else if(isBrackets(currentChar)) {
+            tokens.emplace_back(extractBrackets(currentChar));
         } else if(std::isspace(currentChar)) {
             handleWhitespace(currentChar);
             continue;  // Continue the loop to get the next token
@@ -62,17 +63,23 @@ void Tokenizer::appendCharToValue(std::string &value) {
 // NOLINTBEGIN
 bool Tokenizer::isPlusORMinus(char c) const noexcept { return c == '+' || c == '-'; }
 bool Tokenizer::isOperator(char c) const noexcept {
-    static const std::unordered_set<char> operators = {'*', '/', '=', ',', ':', '<', '>', '(', ')', '!', '|', '&', '+', '-'};
+    static const std::unordered_set<char> operators = {'*', '/', '=', ',', ':', '<', '>', '!', '|', '&', '+', '-'};
     return operators.find(c) != operators.end();
 }
 bool Tokenizer::isOperationEqualOperator(const std::string &value) const noexcept {
     return value == "+=" || value == "-=" || value == "*=" || value == "/=";
 }
 bool Tokenizer::isBooleanOperator(const std::string &value) const noexcept {
-    return value == ">=" || value == "<=" || value == "!=" || value == "||" || value == "&&";
+    return value == "==" || value == ">=" || value == "<=" || value == "!=";
+}
+bool Tokenizer::isLogicalOperator(const std::string &value) const noexcept {
+    return value == "&&" || value == "||";
 }
 bool Tokenizer::isVarLenOperator(const std::string &val) const noexcept {
     return isOperator(val[0]) || isOperationEqualOperator(val) || isBooleanOperator(val);
+}
+bool Tokenizer::isBrackets(char c) const noexcept {
+    return c == '(' || c == ')';
 }
 
 // NOLINTEND
@@ -83,11 +90,7 @@ Token Tokenizer::extractIdentifier() {
     while(currentPosition < inputSize && (std::isalnum(inputSpan[currentPosition]) || inputSpan[currentPosition] == '_')) {
         appendCharToValue(value);
     }
-    if(std::ranges::find(KEYWORDS, value) != KEYWORDS.end()) {
-        type = TokenType::KEYWORD;
-    } else if(value == "true" || value == "false") {
-        type = TokenType::BOOLEAN;
-    };
+    if(value == "var" || value == "const") { type = TokenType::KEYWORD_VAR; };
     return {type, value, currentLine, currentColumn - value.length()};
 }
 
@@ -137,6 +140,13 @@ TokenType Tokenizer::typeBySingleCharacter(char c) {
         return COMMA;
     case ':':
         return COLON;
+    case '<':
+    case '>':
+        return BOOLEAN_OPERATOR;
+        break;
+    case '!':
+        return NOT_OPERATOR;
+        break;
     default:
         return OPERATOR;
     }
@@ -146,19 +156,34 @@ TokenType Tokenizer::typeByValue(const std::string &value) {
     using enum TokenType;
     if(isOperationEqualOperator(value)) {
         return OPERATION_EQUAL;
-    } else if(isBooleanOperator(value)) {
-        return BOOLEAN_OPERATOR;
-    } else {
-        return UNKNOWN;
     }
+    if(isBooleanOperator(value)) {
+        return BOOLEAN_OPERATOR;
+    }
+    if(isLogicalOperator(value)) {
+        return LOGICAL_OPERATOR;
+    }
+    return UNKNOWN;
 }
 
 Token Tokenizer::extractOperator() {
     std::string value;
     extractVarLenOperator(value);
-
     TokenType type = value.size() == 1 ? typeBySingleCharacter(value[0]) : typeByValue(value);
     return {type, value, currentLine, currentColumn - value.length()};
+}
+
+Token Tokenizer::extractBrackets(char c) {
+    using enum TokenType;
+    TokenType type = UNKNOWN;
+    if(c == '(') {
+        type = OPEN_BRACKETS;
+    } else if(c == ')') {
+        type = CLOSED_BRACKETS;
+    }
+    ++currentPosition;
+    ++currentColumn;
+    return {type, std::string(1, c), currentLine, currentColumn - 1};
 }
 
 void Tokenizer::handleWhitespace(char currentChar) noexcept {

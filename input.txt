@@ -1,0 +1,13 @@
+var variable: type
+const constant: type
+var num1, num2: type = 1 + 1, variable * -5
+variable = 42 * -y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1
+variable = -4
+
+var variable2, variable3: type = variable == -4, !variable && 7.2
+variable = variable < -4
+variable += 4
+variable -= -4.
+variable = variable && -4.5
+variable = true
+variable = !false || !true

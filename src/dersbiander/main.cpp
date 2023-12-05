@@ -1,6 +1,7 @@
 ﻿#include "Instruction.h"
 #include "Tokenizer.h"
 #include "headers.h"
+#include<string>
 
 #define ONLY_TOKEN_TYPE
 
@@ -15,25 +16,21 @@ DISABLE_WARNINGS_POP()
 // the source template at `configured_files/config.hpp.in`.
 #include <internal_use_only/config.hpp>
 
-static const std::array<std::string, 10> code = {
-    "var variable: type",
-    "var num1, num2: type = 1 + 1, variable * -5",
-    "variable = 42 * -y + 1. + 1.0 + 1e+1 + 1E+1 + 1.1e+1 + 1.1E+1 + 1e-1 + 1E-1 + 1.1e-1 + 1.1E-1",
-    "",
-    "true false",
-    "variable = -4",
-    "variable += -4",
-    "variable -= -4",
-    "variable *= -4",
-    "variable /= -4"};
-static const std::array<std::string, 6> codeBooleanOperators = {"variable = !false",         "variable = !true",
-                                                                "variable = !false || true", "variable = !true || false",
-                                                                "variable = !false && true", "variable = !true && false"};
-
 DISABLE_WARNINGS_PUSH(26461 26821)
 
 // NOLINTNEXTLINE(bugprone-exception-escape)
 int main(int argc, const char **argv) {
+
+    std::ifstream file("../../../input.txt");
+    std::vector<std::string> lines;
+
+    if(file.is_open()) {
+
+        std::string str;
+
+        while(std::getline(file, str)) { lines.push_back(str); }
+        file.close();
+    }
     spdlog::set_pattern(R"(%^[%T] [%l] %v%$)");
     const auto console = spdlog::stdout_color_mt(R"(console)");
     spdlog::set_default_logger(console);
@@ -60,7 +57,7 @@ int main(int argc, const char **argv) {
             // }
         } else {
             Timer tim("tokenizer total time");
-            for(const std::string &str : code) {
+            for(const std::string &str : lines) {
                 if(str.size() < 93) {
                     LINFO("code'{}',code length {}",str, str.length());
                 } else {
@@ -83,27 +80,6 @@ int main(int argc, const char **argv) {
                 const std::string valiadation = instruction.validate();
                 LINFO(time.to_string());
                 LINFO("{}", valiadation);
-            }
-            LINFO("-------------------------------------------------------------------------");
-            for(const std::string &str : codeBooleanOperators) {
-                if(str.size() < 93) {
-                    LINFO("code'{}',code length {}",str, str.length());
-                } else {
-                    LINFO("code'{}'",str);
-                    LINFO("code length {}", str.length());
-                }
-                Tokenizer tokenizer(str);
-                Timer timer("tokenizer.tokenize()");
-                std::vector<Token> tokens = tokenizer.tokenize();
-                LINFO(timer.to_string());
-                Instruction instruction(tokens);
-                for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
-#ifdef ONLY_TOKEN_TYPE
-                    LINFO("Token {}", token.typeToString());
-#else
-                    LINFO("{}", token.toString());
-#endif  // ONLY_TOKEN_TYPE
-                }
             }
             LINFO(tim.to_string());
         }

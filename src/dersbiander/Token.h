@@ -3,8 +3,6 @@
 #include "headers.h"
 #include <string>
 
-static const std::array<const std::string, 1> KEYWORDS = {"var"};
-
 enum class TokenType : int {
     IDENTIFIER,
     INTEGER,
@@ -15,9 +13,13 @@ enum class TokenType : int {
     EQUAL_OPERATOR,
     OPERATION_EQUAL,
     BOOLEAN_OPERATOR,
+    NOT_OPERATOR,
+    LOGICAL_OPERATOR,
     COMMA,
     COLON,
-    KEYWORD,
+    OPEN_BRACKETS,
+    CLOSED_BRACKETS,
+    KEYWORD_VAR,
     EOFT,
     ERROR,
     UNKNOWN
@@ -53,12 +55,20 @@ struct Token {
             return "OPERATION_EQUAL";
         case BOOLEAN_OPERATOR:
             return "BOOLEAN_OPERATOR";
+        case NOT_OPERATOR:
+            return "NOT_OPERATOR";
+        case LOGICAL_OPERATOR:
+            return "LOGICAL_OPERATOR";
         case COMMA:
             return "COMMA";
         case COLON:
             return "COLON";
-        case KEYWORD:
-            return "KEYWORD";
+        case OPEN_BRACKETS:
+            return "OPEN_BRACKETS";
+        case CLOSED_BRACKETS:
+            return "CLOSED_BRACKETS";
+        case KEYWORD_VAR:
+            return "KEYWORD_VAR";
         case EOFT:
             return "EOFT";
         case ERROR:

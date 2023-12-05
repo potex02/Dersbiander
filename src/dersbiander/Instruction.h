@@ -19,6 +19,7 @@ private:
     std::vector<Token> previousTokens;
     InstructionType instructionType;
     std::vector<TokenType> allowedTokens;
+    bool booleanOperatorPresent;
 
     // NOLINTBEGIN
     [[nodiscard]] std::string unexpected(const Token &token) const; // NOLINT(*-identifier-length) NOLINT(functionStatic)
@@ -29,9 +30,10 @@ private:
     void checkOperator();
     void checkMinusOperator();
     void checkEqualOperator();
+    void checkBooleanAndLogicalOperator(TokenType type);
     void checkComma();
     void checkColon();
-    void checkKeyword(const Token &token);
+    void checkKeywordVar();
     [[nodiscard]] TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }
     [[nodiscard]] bool ispreviousEmpty() const noexcept { return this->previousTokens.empty(); }
 };
