@@ -30,13 +30,16 @@ private:
 
     inline void appendCharToValue(std::string &value);
 
-    // NOLINTNEXTLINE(clang-diagnostic-*)
-    [[nodiscard]] inline bool isPlusORMinus(char c) const noexcept;  // NOLINT(*-identifier-length)
-    [[nodiscard]] inline bool isOperator(char c) const noexcept;     // NOLINT(*-identifier-length) NOLINT(functionStatic)
+    // NOLINTBEGIN
+    [[nodiscard]] inline bool isPlusORMinus(char c) const noexcept;
+    [[nodiscard]] inline bool isOperator(char c) const noexcept;
     [[nodiscard]] inline bool isOperationEqualOperator(const std::string &value) const noexcept;
     [[nodiscard]] inline bool isBooleanOperator(const std::string &value) const noexcept;
     [[nodiscard]] inline bool isLogicalOperator(const std::string &value) const noexcept;
     [[nodiscard]] inline bool isVarLenOperator(const std::string &val) const noexcept;
+    TokenType typeBySingleCharacter(char c);
+    TokenType typeByValue(const std::string &value);
+    // NOLINTEND
     Token extractIdentifier();
     void extractDigits(std::string &value);
     void extractExponent(std::string &value);
