@@ -3,7 +3,7 @@
 DISABLE_WARNINGS_PUSH(26461 26821)
 
 Instruction::Instruction(const std::vector<Token> &_tokens)
-  : tokens(_tokens), instructionType(InstructionType::BLANK),
+  : tokens(_tokens), instructionTypes({ InstructionType::BLANK }),
     allowedTokens({TokenType::KEYWORD_VAR, TokenType::IDENTIFIER, TokenType::EOFT}) {
     booleanOperatorPresent = false;
     previousTokens.reserve(tokens.size());
@@ -29,27 +29,43 @@ std::string Instruction::validate() {
 }
 
 [[nodiscard]] std::string Instruction::typeToString() const noexcept {
-    switch(this->instructionType) {
-        using enum InstructionType;
-    case PROCEDURE_CALL:
-        return "PROCEDURE_CALL";
-    case OPERATION:
-        return "OPERATION";
-    case ASSIGNATION:
-        return "ASSIGNATION";
-    case CONDITION:
-        return "CONDITION";
-    case DECLARATION:
-        return "DECLARATION";
-    case INITIALIZATION:
-        return "INITIALIZATION";
-    case DEFINITION:
-        return "DEFINITION";
-    case BLANK:
-        return "BLANK";
-    default:
-        return "UNKNOWN";
+
+    std::string result = "";
+
+    for(InstructionType i : this->instructionTypes) {
+        switch(i) {
+            using enum InstructionType;
+        case PROCEDURE_CALL:
+            result += "PROCEDURE_CALL";
+            break;
+        case OPERATION:
+            result += "OPERATION";
+            break;
+        case ASSIGNATION:
+            result += "ASSIGNATION";
+            break;
+        case CONDITION:
+            result += "CONDITION";
+            break;
+        case DECLARATION:
+            result += "DECLARATION";
+            break;
+        case INITIALIZATION:
+            result += "INITIALIZATION";
+            break;
+        case DEFINITION:
+            result += "DEFINITION";
+            break;
+        case BLANK:
+            result += "BLANK";
+            break;
+        default:
+            result += "UNKNOWN";
+            break;
+        }
+        result += "\n";
     }
+    return result;
 }
 
 [[nodiscard]] bool Instruction::checkToken(const Token &token) {
@@ -99,20 +115,20 @@ std::string Instruction::validate() {
 void Instruction::checkIdentifier() noexcept {
     using enum TokenType;
     using enum InstructionType;
-    if(this->instructionType == ASSIGNATION || this->instructionType == INITIALIZATION) {
+    if(this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION) {
         this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR, EOFT};
         if (!this->booleanOperatorPresent) {
             this->allowedTokens.emplace_back(BOOLEAN_OPERATOR);
         }
-        if(this->instructionType == INITIALIZATION) { this->allowedTokens.emplace_back(COMMA); }
+        if(this->lastInstructionType() == INITIALIZATION) { this->allowedTokens.emplace_back(COMMA); }
         return;
     }
-    if(this->instructionType == BLANK) {
-        this->instructionType = OPERATION;
+    if(this->lastInstructionType() == BLANK) {
+        this->lastInstructionType() = OPERATION;
         this->allowedTokens = {EQUAL_OPERATOR, OPERATION_EQUAL};
         return;
     }
-    if(this->instructionType == DECLARATION) {
+    if(this->lastInstructionType() == DECLARATION) {
         if(!this->ispreviousEmpty() && this->previousTokensLast() == TokenType::COLON) {
             this->allowedTokens = {EQUAL_OPERATOR, EOFT};
             return;
@@ -126,12 +142,12 @@ void Instruction::checkIdentifier() noexcept {
 void Instruction::checkNumber() noexcept {
     using enum TokenType;
     using enum InstructionType;
-    if(this->instructionType == ASSIGNATION || this->instructionType == INITIALIZATION) {
+    if(this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION) {
         this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR, EOFT};
         if(!this->booleanOperatorPresent) {
             this->allowedTokens.emplace_back(BOOLEAN_OPERATOR);
         }
-        if(this->instructionType == INITIALIZATION) { this->allowedTokens.emplace_back(COMMA); }
+        if(this->lastInstructionType() == INITIALIZATION) { this->allowedTokens.emplace_back(COMMA); }
         return;
     }
     this->allowedTokens = {};
@@ -140,7 +156,7 @@ void Instruction::checkNumber() noexcept {
 void Instruction::checkOperator() {
     using enum TokenType;
     using enum InstructionType;
-    if(this->instructionType == ASSIGNATION || this->instructionType == INITIALIZATION) {
+    if(this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION) {
         this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, BOOLEAN, MINUS_OPERATOR};
         return;
     }
@@ -150,7 +166,7 @@ void Instruction::checkOperator() {
 void Instruction::checkMinusOperator() {
     using enum TokenType;
     using enum InstructionType;
-    if(this->instructionType == ASSIGNATION || this->instructionType == INITIALIZATION) {
+    if(this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION) {
         this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, BOOLEAN};
         return;
     }
@@ -160,11 +176,11 @@ void Instruction::checkMinusOperator() {
 void Instruction::checkEqualOperator() {
     using enum TokenType;
     using enum InstructionType;
-    if(this->instructionType == OPERATION || this->instructionType == DECLARATION) {
-        if(this->instructionType == OPERATION) {
-            this->instructionType = ASSIGNATION;
+    if(this->lastInstructionType() == OPERATION || this->lastInstructionType() == DECLARATION) {
+        if(this->lastInstructionType() == OPERATION) {
+            this->lastInstructionType() = ASSIGNATION;
         } else {
-            this->instructionType = INITIALIZATION;
+            this->lastInstructionType() = INITIALIZATION;
         }
         this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR};
         return;
@@ -176,7 +192,7 @@ void Instruction::checkBooleanAndLogicalOperator(TokenType type) {
     using enum TokenType;
     using enum InstructionType;
     this->booleanOperatorPresent = true;
-    if(this->instructionType == ASSIGNATION || this->instructionType == INITIALIZATION) {
+    if(this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION) {
         this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR};
         if(type != NOT_OPERATOR) {
             this->allowedTokens.emplace_back(NOT_OPERATOR);
@@ -190,11 +206,11 @@ void Instruction::checkBooleanAndLogicalOperator(TokenType type) {
 void Instruction::checkComma() {
     using enum TokenType;
     using enum InstructionType;
-    if(this->instructionType == DECLARATION) {
+    if(this->lastInstructionType() == DECLARATION) {
         this->allowedTokens = {IDENTIFIER};
         return;
     }
-    if(this->instructionType == INITIALIZATION) {
+    if(this->lastInstructionType() == INITIALIZATION) {
         this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR};
         return;
     }
@@ -202,7 +218,7 @@ void Instruction::checkComma() {
 }
 
 void Instruction::checkColon() {
-    if(this->instructionType == InstructionType::DECLARATION) {
+    if(this->lastInstructionType() == InstructionType::DECLARATION) {
         this->allowedTokens = {TokenType::IDENTIFIER};
         return;
     }
@@ -210,8 +226,8 @@ void Instruction::checkColon() {
 }
 
 void Instruction::checkKeywordVar() {
-    if(this->instructionType == InstructionType::BLANK) {
-        this->instructionType = InstructionType::DECLARATION;
+    if(this->lastInstructionType() == InstructionType::BLANK) {
+        this->lastInstructionType() = InstructionType::DECLARATION;
         this->allowedTokens = {TokenType::IDENTIFIER};
         return;
     }

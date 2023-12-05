@@ -17,7 +17,7 @@ public:
 private:
     std::vector<Token> tokens;
     std::vector<Token> previousTokens;
-    InstructionType instructionType;
+    std::vector<InstructionType> instructionTypes;
     std::vector<TokenType> allowedTokens;
     bool booleanOperatorPresent;
 
@@ -36,4 +36,5 @@ private:
     void checkKeywordVar();
     [[nodiscard]] TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }
     [[nodiscard]] bool ispreviousEmpty() const noexcept { return this->previousTokens.empty(); }
+    [[nodiscard]] InstructionType &lastInstructionType() noexcept { return this->instructionTypes.back(); }
 };
