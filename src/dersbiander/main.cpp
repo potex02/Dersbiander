@@ -78,13 +78,13 @@ int main(int argc, const char **argv) {
                 LINFO("Empty tokens");
                 return 0;
             }
-            /* for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
+            for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
 #ifdef ONLY_TOKEN_TYPE
                 LINFO("Token {}", token.typeToString());
 #else
                 LINFO("{}", token.toString());
 #endif  // ONLY_TOKEN_TYPE
-            }*/
+            }
             line = tokens[0].line;
             for(const Token &token : tokens) {
                 if(token.line >= line) {
