@@ -2,19 +2,11 @@
 
 DISABLE_WARNINGS_PUSH(26461 26821)
 
-Instruction::Instruction(const std::vector<Token> &_tokens)
-  : tokens(_tokens), instructionTypes({ InstructionType::BLANK }),
+Instruction::Instruction()
+  : tokens({}), instructionTypes({InstructionType::BLANK}),
     allowedTokens({TokenType::KEYWORD_VAR, TokenType::IDENTIFIER, TokenType::EOFT}) {
     booleanOperatorPresent = {false};
     previousTokens.reserve(tokens.size());
-}
-
-std::string Instruction::validate() {
-    for(const Token &inst : tokens) {
-        if(!this->checkToken(inst)) { return this->unexpected(inst); }
-        this->previousTokens.emplace_back(inst);
-    }
-    return D_FORMAT("OK: {}", this->typeToString());
 }
 
 [[nodiscard]] std::string Instruction::unexpected(const Token &token) const {
@@ -70,8 +62,9 @@ std::string Instruction::validate() {
     return result;
 }
 
-[[nodiscard]] bool Instruction::checkToken(const Token &token) {
-    if(std::ranges::find(this->allowedTokens, token.type) == this->allowedTokens.end()) { return false; }
+[[nodiscard]] std::pair<bool, std::string> Instruction::checkToken(const Token &token) {
+    std::string msg = token.toString();
+    if(std::ranges::find(this->allowedTokens, token.type) == this->allowedTokens.end()) { return {false, msg}; }
     switch(token.type) {
         using enum TokenType;
     case IDENTIFIER:
@@ -113,11 +106,13 @@ std::string Instruction::validate() {
         this->checkKeywordVar();
         break;
     case EOFT:
+        break;
     case ERROR:
     case UNKNOWN:
         break;
     }
-    return true;
+    this->previousTokens.emplace_back(token);
+    return {true, msg};
 }
 
 void Instruction::checkIdentifier() noexcept {

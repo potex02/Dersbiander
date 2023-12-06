@@ -9,10 +9,12 @@ enum class InstructionType : short {
 
 class Instruction {
 public:
-    explicit Instruction(const std::vector<Token> &_tokens);
-
-    std::string validate();
+    explicit Instruction();
     [[nodiscard]] std::string typeToString() const noexcept;
+    [[nodiscard]] std::pair<bool, std::string> checkToken(const Token &token);
+    [[nodiscard]] inline bool canTerminate() { 
+        return std::ranges::find(this->allowedTokens, eofTokenType) != this->allowedTokens.end();
+    }
 
 private:
     std::vector<Token> tokens;
@@ -24,7 +26,6 @@ private:
     // NOLINTBEGIN
     [[nodiscard]] std::string unexpected(const Token &token) const; // NOLINT(*-identifier-length) NOLINT(functionStatic)
     // NOLINTEND
-    [[nodiscard]] bool checkToken(const Token &token);
     void checkIdentifier() noexcept;
     void checkNumber() noexcept;
     void checkOperator();
