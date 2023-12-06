@@ -88,10 +88,11 @@ int main(int argc, const char **argv) {
             line = tokens[0].line;
             for(const Token &token : tokens) {
                 if(token.line >= line) {
-                    if(!instructions.empty()) {
-                        if (!instructions.back().canTerminate()) { LINFO("Unexpected token: ENDL"); }
+                    if(instructions.empty() || instructions.back().canTerminate()) {
+                        instructions.emplace_back(Instruction());
+                    } else if(instructions.back().typeToString() != "EXPRESSION") {
+                        LINFO("Unexpected token: ENDL");
                     }
-                    instructions.emplace_back(Instruction{});
                     line = token.line + 1;
                 }
                 auto [verify, token_s] = instructions.back().checkToken(token);
