@@ -64,7 +64,7 @@ void Tokenizer::appendCharToValue(std::string &value) {
 bool Tokenizer::isPlusORMinus(char c) const noexcept { return c == '+' || c == '-'; }
 bool Tokenizer::isOperator(char c) const noexcept {
     static const std::unordered_set<char> operators = {'*', '/', '=', ',', ':', '<', '>', '!', '|', '&', '+', '-'};
-    return operators.find(c) != operators.end();
+    return operators.contains(c);
 }
 bool Tokenizer::isOperationEqualOperator(const std::string &value) const noexcept {
     return value == "+=" || value == "-=" || value == "*=" || value == "/=";
@@ -72,14 +72,11 @@ bool Tokenizer::isOperationEqualOperator(const std::string &value) const noexcep
 bool Tokenizer::isBooleanOperator(const std::string &value) const noexcept {
     return value == "==" || value == ">=" || value == "<=" || value == "!=";
 }
-bool Tokenizer::isLogicalOperator(const std::string &value) const noexcept {
-    return value == "&&" || value == "||";
-}
+bool Tokenizer::isBrackets(char c) const noexcept { return c == '(' || c == ')'; }
+bool Tokenizer::isLogicalOperator(const std::string &value) const noexcept { return value == "&&" || value == "||"; }
 bool Tokenizer::isVarLenOperator(const std::string &val) const noexcept {
-    return isOperator(val[0]) || isOperationEqualOperator(val) || isBooleanOperator(val);
-}
-bool Tokenizer::isBrackets(char c) const noexcept {
-    return c == '(' || c == ')';
+    return isOperator(val[0]) || isBrackets(val[0]) || isOperationEqualOperator(val) || isBooleanOperator(val) ||
+           isLogicalOperator(val);
 }
 
 // NOLINTEND
@@ -129,7 +126,7 @@ void Tokenizer::extractVarLenOperator(std::string &value) {
     while((currentPosition < inputSize && isOperator(inputSpan[currentPosition]))) { appendCharToValue(value); }
 }
 
-TokenType Tokenizer::typeBySingleCharacter(char c) {
+TokenType Tokenizer::typeBySingleCharacter(char c) const {
     switch(c) {
         using enum TokenType;
     case '-':
@@ -152,17 +149,11 @@ TokenType Tokenizer::typeBySingleCharacter(char c) {
     }
 }
 
-TokenType Tokenizer::typeByValue(const std::string &value) {
+TokenType Tokenizer::typeByValue(const std::string &value) const {
     using enum TokenType;
-    if(isOperationEqualOperator(value)) {
-        return OPERATION_EQUAL;
-    }
-    if(isBooleanOperator(value)) {
-        return BOOLEAN_OPERATOR;
-    }
-    if(isLogicalOperator(value)) {
-        return LOGICAL_OPERATOR;
-    }
+    if(isOperationEqualOperator(value)) { return OPERATION_EQUAL; }
+    if(isBooleanOperator(value)) { return BOOLEAN_OPERATOR; }
+    if(isLogicalOperator(value)) { return LOGICAL_OPERATOR; }
     return UNKNOWN;
 }
 

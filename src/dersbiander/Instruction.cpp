@@ -12,7 +12,7 @@ Instruction::Instruction() noexcept
 [[nodiscard]] std::string Instruction::unexpected(const Token &token) const {
     std::string value;
 
-    if(token.type != TokenType::EOFT) {
+    if(token.type != eofTokenType) {
         value = token.value;
     } else {
         value = "EOFT";
@@ -105,7 +105,6 @@ Instruction::Instruction() noexcept
         this->checkKeywordVar();
         break;
     case EOFT:
-        break;
     case ERROR:
     case UNKNOWN:
         break;

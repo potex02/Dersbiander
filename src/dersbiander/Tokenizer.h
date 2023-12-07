@@ -38,8 +38,8 @@ private:
     [[nodiscard]] inline bool isLogicalOperator(const std::string &value) const noexcept;
     [[nodiscard]] inline bool isVarLenOperator(const std::string &val) const noexcept;
     [[nodiscard]] inline bool isBrackets(char c) const noexcept;
-    TokenType typeBySingleCharacter(char c);
-    TokenType typeByValue(const std::string &value);
+    TokenType typeBySingleCharacter(char c) const;
+    TokenType typeByValue(const std::string &value) const;
     // NOLINTEND
     Token extractIdentifier();
     void extractDigits(std::string &value);
