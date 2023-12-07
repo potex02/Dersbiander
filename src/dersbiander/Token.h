@@ -5,6 +5,7 @@
 
 enum class TokenType : int {
     IDENTIFIER,
+    CHAR,
     INTEGER,
     BOOLEAN,
     DOUBLE,
@@ -39,6 +40,8 @@ struct Token {
             using enum TokenType;
         case IDENTIFIER:
             return "IDENTIFIER";
+        case CHAR:
+            return "CHAR";
         case BOOLEAN:
             return "BOOLEAN";
         case INTEGER:

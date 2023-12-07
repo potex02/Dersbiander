@@ -38,6 +38,7 @@ private:
     [[nodiscard]] inline bool isLogicalOperator(const std::string &value) const noexcept;
     [[nodiscard]] inline bool isVarLenOperator(const std::string &val) const noexcept;
     [[nodiscard]] inline bool isBrackets(char c) const noexcept;
+    [[nodiscard]] inline bool isApostrophe(char c) const noexcept;
     TokenType typeBySingleCharacter(char c) const;
     TokenType typeByValue(const std::string &value) const;
     // NOLINTEND
@@ -48,5 +49,6 @@ private:
     Token extractnumber();
     Token extractOperator();
     Token extractBrackets(char c);
+    Token extractChar();
     void handleWhitespace(char currentChar) noexcept;
 };

@@ -22,6 +22,8 @@ std::vector<Token> Tokenizer::tokenize() {
             tokens.emplace_back(extractOperator());
         } else if(isBrackets(currentChar)) {
             tokens.emplace_back(extractBrackets(currentChar));
+        } else if(isApostrophe(currentChar)) {
+            tokens.emplace_back(extractChar());
         } else if(std::isspace(currentChar)) {
             handleWhitespace(currentChar);
             continue;  // Continue the loop to get the next token
@@ -87,9 +89,11 @@ Token Tokenizer::extractIdentifier() {
     while(currentPosition < inputSize && (std::isalnum(inputSpan[currentPosition]) || inputSpan[currentPosition] == '_')) {
         appendCharToValue(value);
     }
-    if(value == "var" || value == "const") { type = TokenType::KEYWORD_VAR; };
+    if(value == "var" || value == "const") { type = TokenType::KEYWORD_VAR; }
     return {type, value, currentLine, currentColumn - value.length()};
 }
+
+bool Tokenizer::isApostrophe(char c) const noexcept { return c == '\''; }
 
 void Tokenizer::extractDigits(std::string &value) {
     while(currentPosition < inputSize && std::isdigit(inputSpan[currentPosition])) { appendCharToValue(value); }
@@ -173,6 +177,17 @@ Token Tokenizer::extractBrackets(char c) {
     ++currentPosition;
     ++currentColumn;
     return {type, std::string(1, c), currentLine, currentColumn - 1};
+}
+
+Token Tokenizer::extractChar() {
+    std::size_t startcol = currentColumn;
+    ++currentPosition;
+    ++currentColumn;
+    std::string value;
+    while(!isApostrophe(inputSpan[currentPosition])) { appendCharToValue(value); }
+    ++currentPosition;
+    ++currentColumn;
+    return {TokenType::CHAR, value, currentLine, currentColumn - startcol};
 }
 
 void Tokenizer::handleWhitespace(char currentChar) noexcept {
