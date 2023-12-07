@@ -71,6 +71,7 @@ Instruction::Instruction() noexcept
         break;
     case INTEGER:
     case DOUBLE:
+    case CHAR:
     case BOOLEAN:
         this->checkNumber();
         break;
@@ -167,7 +168,7 @@ void Instruction::checkOperator() {
     using enum InstructionType;
     if(this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION ||
        this->lastInstructionType() == EXPRESSION) {
-        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, BOOLEAN, MINUS_OPERATOR, OPEN_BRACKETS};
+        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, OPEN_BRACKETS};
         return;
     }
     this->allowedTokens = {};
@@ -178,7 +179,7 @@ void Instruction::checkMinusOperator() {
     using enum InstructionType;
     if(this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION ||
        this->lastInstructionType() == EXPRESSION) {
-        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, BOOLEAN, OPEN_BRACKETS};
+        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, BOOLEAN, OPEN_BRACKETS};
         return;
     }
     this->allowedTokens = {};
@@ -194,7 +195,7 @@ void Instruction::checkEqualOperator() {
         } else {
             this->setLastInstructionType(INITIALIZATION);
         }
-        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS};
+        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS};
         return;
     }
     this->allowedTokens = {};
@@ -205,7 +206,7 @@ void Instruction::checkBooleanAndLogicalOperator(TokenType type) {
     using enum InstructionType;
     if(this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION ||
        this->lastInstructionType() == EXPRESSION) {
-        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS};
+        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS};
         if(type != NOT_OPERATOR) {
             this->allowedTokens.emplace_back(NOT_OPERATOR);
             this->setLastBooleanOperatorPresent(type == BOOLEAN_OPERATOR);
@@ -223,7 +224,7 @@ void Instruction::checkComma() {
         return;
     }
     if(this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION) {
-        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS};
+        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS};
         return;
     }
     this->allowedTokens = {};
@@ -244,7 +245,7 @@ void Instruction::checkOpenBrackets() {
     using enum InstructionType;
     this->addInstructionType(EXPRESSION);
     this->addBooleanOperatorPresent();
-    this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS, CLOSED_BRACKETS};
+    this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS, CLOSED_BRACKETS};
 }
 
 void Instruction::checkClosedBrackets() {
