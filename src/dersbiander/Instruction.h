@@ -45,6 +45,7 @@ private:
     void checkOpenBrackets();
     void checkClosedBrackets();
     void checkKeywordVar();
+    void emplaceCommaEoft() noexcept;
     [[nodiscard]] TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }
     [[nodiscard]] bool ispreviousEmpty() const noexcept { return this->previousTokens.empty(); }
     [[nodiscard]] InstructionType &lastInstructionType() noexcept { return this->instructionTypes.back(); }

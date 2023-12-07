@@ -113,6 +113,11 @@ Instruction::Instruction() noexcept
     return {true, msg};
 }
 
+void Instruction::emplaceCommaEoft() noexcept {
+    this->allowedTokens.emplace_back(TokenType::COMMA);
+    this->allowedTokens.emplace_back(TokenType::EOFT);
+}
+
 void Instruction::checkIdentifier() noexcept {
     using enum TokenType;
     using enum InstructionType;
@@ -121,10 +126,7 @@ void Instruction::checkIdentifier() noexcept {
         this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR};
         if(!this->lastBooleanOperatorPresent()) { this->allowedTokens.emplace_back(BOOLEAN_OPERATOR); }
         if(this->lastInstructionType() == EXPRESSION) { this->allowedTokens.emplace_back(CLOSED_BRACKETS); }
-        if(this->lastInstructionType() != EXPRESSION) {
-            this->allowedTokens.emplace_back(COMMA);
-            this->allowedTokens.emplace_back(EOFT);
-        }
+        if(this->lastInstructionType() != EXPRESSION) { emplaceCommaEoft(); }
         return;
     }
     if(this->lastInstructionType() == BLANK || this->lastInstructionType() == OPERATION) {
@@ -255,8 +257,7 @@ void Instruction::checkClosedBrackets() {
         if(this->lastInstructionType() == EXPRESSION) {
             this->allowedTokens.emplace_back(CLOSED_BRACKETS);
         } else {
-            this->allowedTokens.emplace_back(COMMA);
-            this->allowedTokens.emplace_back(EOFT);
+            emplaceCommaEoft();
         }
         return;
     }

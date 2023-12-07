@@ -31,7 +31,7 @@ std::vector<Token> Tokenizer::tokenize() {
         }
     }
 
-    tokens.emplace_back(TokenType::EOFT, "", currentLine, currentColumn - 1);
+    tokens.emplace_back(eofTokenType, "", currentLine, currentColumn - 1);
 
     return tokens;
 }
@@ -123,7 +123,7 @@ Token Tokenizer::extractnumber() {
     return {TokenType::INTEGER, value, currentLine, currentColumn - value.length()};
 }
 void Tokenizer::extractVarLenOperator(std::string &value) {
-    while((currentPosition < inputSize && isOperator(inputSpan[currentPosition]))) { appendCharToValue(value); }
+    while(currentPosition < inputSize && isOperator(inputSpan[currentPosition])) { appendCharToValue(value); }
 }
 
 TokenType Tokenizer::typeBySingleCharacter(char c) const {
@@ -140,10 +140,8 @@ TokenType Tokenizer::typeBySingleCharacter(char c) const {
     case '<':
     case '>':
         return BOOLEAN_OPERATOR;
-        break;
     case '!':
         return NOT_OPERATOR;
-        break;
     default:
         return OPERATOR;
     }
