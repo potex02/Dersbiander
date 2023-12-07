@@ -74,7 +74,7 @@ bool Tokenizer::isOperationEqualOperator(const std::string &value) const noexcep
 bool Tokenizer::isBooleanOperator(const std::string &value) const noexcept {
     return value == "==" || value == ">=" || value == "<=" || value == "!=";
 }
-bool Tokenizer::isBrackets(char c) const noexcept { return c == '(' || c == ')'; }
+bool Tokenizer::isBrackets(char c) const noexcept { return c == '(' || c == ')' || c == '{' || c == '}'; }
 bool Tokenizer::isLogicalOperator(const std::string &value) const noexcept { return value == "&&" || value == "||"; }
 bool Tokenizer::isVarLenOperator(const std::string &val) const noexcept {
     return isOperator(val[0]) || isBrackets(val[0]) || isOperationEqualOperator(val) || isBooleanOperator(val) ||
@@ -173,6 +173,10 @@ Token Tokenizer::extractBrackets(char c) {
         type = OPEN_BRACKETS;
     } else if(c == ')') {
         type = CLOSED_BRACKETS;
+    } else if(c == '{') {
+        type = OPEN_CURLY_BRACKETS;
+    } else if(c == '}') {
+        type = CLOSED_CURLY_BRACKETS;
     }
     ++currentPosition;
     ++currentColumn;

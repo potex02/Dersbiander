@@ -4,7 +4,7 @@ DISABLE_WARNINGS_PUSH(26461 26821)
 
 Instruction::Instruction() noexcept
   : tokens({}), instructionTypes({InstructionType::BLANK}),
-    allowedTokens({TokenType::KEYWORD_VAR, TokenType::IDENTIFIER, TokenType::EOFT}) {
+    allowedTokens({TokenType::KEYWORD_VAR, TokenType::IDENTIFIER, TokenType::OPEN_CURLY_BRACKETS, TokenType::CLOSED_CURLY_BRACKETS, TokenType::EOFT}) {
     booleanOperatorPresent = {false};
     previousTokens.reserve(tokens.size());
 }
@@ -20,43 +20,47 @@ Instruction::Instruction() noexcept
     return D_FORMAT("Unexpected token: {} line {} column {}", value, token.line, token.column);
 }
 
-[[nodiscard]] std::string Instruction::typeToString() const noexcept {
-    std::string result = "";
+[[nodiscard]] std::vector<std::string> Instruction::typeToString() const noexcept {
+
+    std::vector<std::string> result = {};
 
     for(const InstructionType &i : this->instructionTypes) {
         switch(i) {
             using enum InstructionType;
         case PROCEDURE_CALL:
-            result += "PROCEDURE_CALL";
+            result.emplace_back("PROCEDURE_CALL");
             break;
         case OPERATION:
-            result += "OPERATION";
+            result.emplace_back("OPERATION");
             break;
         case ASSIGNATION:
-            result += "ASSIGNATION";
+            result.emplace_back("ASSIGNATION");
             break;
         case EXPRESSION:
-            return "EXPRESSION";
-        case CONDITION:
-            result += "CONDITION";
+            result.emplace_back("EXPRESSION");
             break;
         case DECLARATION:
-            result += "DECLARATION";
+            result.emplace_back("DECLARATION");
             break;
         case INITIALIZATION:
-            result += "INITIALIZATION";
+            result.emplace_back("INITIALIZATION");
             break;
         case DEFINITION:
-            result += "DEFINITION";
+            result.emplace_back("DEFINITION");
+            break;
+        case OPEN_SCOPE:
+            result.emplace_back("OPEN_SCOPE");
+            break;
+        case CLOSE_SCOPE:
+            result.emplace_back("OPEN_SCOPE");
             break;
         case BLANK:
-            result += "BLANK";
+            result.emplace_back("BLANK");
             break;
         default:
-            result += "UNKNOWN";
+            result.emplace_back("UNKNOWN");
             break;
         }
-        result += "\n";
     }
     return result;
 }
@@ -101,6 +105,12 @@ Instruction::Instruction() noexcept
         break;
     case CLOSED_BRACKETS:
         this->checkClosedBrackets();
+        break;
+    case OPEN_CURLY_BRACKETS:
+        this->checkOpenCurlyBrackets();
+        break;
+    case CLOSED_CURLY_BRACKETS:
+        this->checkClosedCurlyBracktes();
         break;
     case KEYWORD_VAR:
         this->checkKeywordVar();
@@ -191,7 +201,6 @@ void Instruction::checkEqualOperator() {
     if(this->lastInstructionType() == OPERATION || this->lastInstructionType() == DECLARATION) {
         if(this->lastInstructionType() == OPERATION) {
             this->setLastInstructionType(ASSIGNATION);
-
         } else {
             this->setLastInstructionType(INITIALIZATION);
         }
@@ -263,6 +272,22 @@ void Instruction::checkClosedBrackets() {
         return;
     }
     this->allowedTokens = {};
+}
+
+void Instruction::checkOpenCurlyBrackets() {
+    using enum TokenType;
+    using enum InstructionType;
+    if(this->lastInstructionType() == BLANK) {
+        this->setLastInstructionType(OPEN_SCOPE);
+    }
+    this->allowedTokens = {EOFT};
+}
+
+void Instruction::checkClosedCurlyBracktes() {
+    using enum TokenType;
+    using enum InstructionType;
+    this->setLastInstructionType(CLOSE_SCOPE);
+    this->allowedTokens = {EOFT};
 }
 
 void Instruction::checkKeywordVar() {

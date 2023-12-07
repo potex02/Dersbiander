@@ -91,7 +91,7 @@ int main(int argc, const char **argv) {
                 if(token.line >= line) {
                     if(instructions.empty() || instructions.back().canTerminate()) {
                         instructions.emplace_back();
-                    } else if(instructions.back().typeToString() != "EXPRESSION") {
+                    } else if(instructions.back().typeToString().back() != "EXPRESSION") {
                         LINFO("Unexpected token: ENDL");
                     }
                     line = token.line + 1;
