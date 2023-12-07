@@ -2,7 +2,7 @@
 
 DISABLE_WARNINGS_PUSH(26461 26821)
 
-Instruction::Instruction()
+Instruction::Instruction() noexcept
   : tokens({}), instructionTypes({InstructionType::BLANK}),
     allowedTokens({TokenType::KEYWORD_VAR, TokenType::IDENTIFIER, TokenType::EOFT}) {
     booleanOperatorPresent = {false};
@@ -21,10 +21,9 @@ Instruction::Instruction()
 }
 
 [[nodiscard]] std::string Instruction::typeToString() const noexcept {
-
     std::string result = "";
 
-    for(InstructionType i : this->instructionTypes) {
+    for(const InstructionType &i : this->instructionTypes) {
         switch(i) {
             using enum InstructionType;
         case PROCEDURE_CALL:
@@ -119,7 +118,7 @@ void Instruction::checkIdentifier() noexcept {
     using enum TokenType;
     using enum InstructionType;
     if(this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION ||
-        this->lastInstructionType() == EXPRESSION) {
+       this->lastInstructionType() == EXPRESSION) {
         this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR};
         if(!this->lastBooleanOperatorPresent()) { this->allowedTokens.emplace_back(BOOLEAN_OPERATOR); }
         if(this->lastInstructionType() == EXPRESSION) { this->allowedTokens.emplace_back(CLOSED_BRACKETS); }

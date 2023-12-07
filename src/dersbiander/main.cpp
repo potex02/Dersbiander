@@ -1,9 +1,9 @@
 ﻿#include "Instruction.h"
 #include "Tokenizer.h"
 #include "headers.h"
-#include<string>
+#include <string>
 
-//#define ONLY_TOKEN_TYPE
+// #define ONLY_TOKEN_TYPE
 
 DISABLE_WARNINGS_PUSH(
     4005 4201 4459 4514 4625 4626 4820 6244 6285 6385 6386 26409 26415 26418 26429 26432 26437 26438 26440 26446 26447 26450 26451 26455 26457 26459 26460 26461 26467 26472 26473 26474 26475 26481 26482 26485 26490 26491 26493 26494 26495 26496 26497 26498 26800 26814 26818 26821 26826)
@@ -20,7 +20,6 @@ DISABLE_WARNINGS_PUSH(26461 26821)
 
 // NOLINTNEXTLINE(bugprone-exception-escape)
 int main(int argc, const char **argv) {
-
     std::ifstream file("../../../input.txt");
     std::string lines;
     std::size_t line;
@@ -33,7 +32,6 @@ int main(int argc, const char **argv) {
 
     // Extract the content as a string
     lines = buffer.str();
-
 
     spdlog::set_pattern(R"(%^[%T] [%l] %v%$)");
     const auto console = spdlog::stdout_color_mt(R"(console)");
@@ -61,7 +59,7 @@ int main(int argc, const char **argv) {
             // }
         } else {
             Timer tim("tokenizer total time");
-            //for(const std::string &str : lines) {
+            // for(const std::string &str : lines) {
             /* if(str.size() < 93) {
                     LINFO("code'{}',code length {}",str, str.length());
                 } else {
@@ -73,7 +71,7 @@ int main(int argc, const char **argv) {
             std::vector<Token> tokens = tokenizer.tokenize();
             std::vector<Instruction> instructions = {};
             LINFO(timer.to_string());
-            //Instruction instruction(tokens);
+            // Instruction instruction(tokens);
             if(tokens.empty()) {
                 LINFO("Empty tokens");
                 return 0;
@@ -89,7 +87,7 @@ int main(int argc, const char **argv) {
             for(const Token &token : tokens) {
                 if(token.line >= line) {
                     if(instructions.empty() || instructions.back().canTerminate()) {
-                        instructions.emplace_back(Instruction());
+                        instructions.emplace_back();
                     } else if(instructions.back().typeToString() != "EXPRESSION") {
                         LINFO("Unexpected token: ENDL");
                     }
