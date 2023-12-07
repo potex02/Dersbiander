@@ -184,10 +184,18 @@ Token Tokenizer::extractChar() {
     ++currentPosition;
     ++currentColumn;
     std::string value;
-    while(!isApostrophe(inputSpan[currentPosition])) { appendCharToValue(value); }
+    while(!isApostrophe(inputSpan[currentPosition])) { 
+        if (currentPosition + 1 == inputSpan.size() || inputSpan[currentPosition] == CNL) {
+            return {TokenType::UNKNOWN, "'" + value + "'", currentLine, currentColumn - startcol};
+        }
+        appendCharToValue(value);
+    }
     ++currentPosition;
     ++currentColumn;
-    return {TokenType::CHAR, value, currentLine, currentColumn - startcol};
+    if(value.size() == 0 || (value.size() == 1 && value != "\\") || (value.size() == 2 && value[0] == '\\')) {
+        return {TokenType::CHAR, value, currentLine, currentColumn - startcol};
+    }
+    return {TokenType::UNKNOWN, "'" + value + "'", currentLine, currentColumn - startcol};
 }
 
 void Tokenizer::handleWhitespace(char currentChar) noexcept {

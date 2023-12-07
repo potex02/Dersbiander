@@ -15,7 +15,7 @@ variable -= -4. + (
 variable = variable && -4.5
 variable = true
 variable = !false || !true
-variable = ' '
+variable = ''
 variable = '\n'
 variable = 'n'
 variable, variable2 = !l > 2 && l <= !10 || !10 && 4 > 10, -2 && true
