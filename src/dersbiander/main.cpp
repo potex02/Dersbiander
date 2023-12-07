@@ -17,6 +17,10 @@ DISABLE_WARNINGS_POP()
 #include <internal_use_only/config.hpp>
 
 DISABLE_WARNINGS_PUSH(26461 26821)
+static void timeTokenizer(Tokenizer &tokenizer, std::vector<Token> &tokens) {
+    AutoTimer timer("tokenizer.tokenize()");
+    tokens = tokenizer.tokenize();
+}
 
 // NOLINTNEXTLINE(bugprone-exception-escape)
 int main(int argc, const char **argv) {
@@ -58,7 +62,7 @@ int main(int argc, const char **argv) {
             // } else {
             // }
         } else {
-            Timer tim("tokenizer total time");
+            AutoTimer tim("tokenizer total time");
             // for(const std::string &str : lines) {
             /* if(str.size() < 93) {
                     LINFO("code'{}',code length {}",str, str.length());
@@ -67,10 +71,9 @@ int main(int argc, const char **argv) {
                     LINFO("code length {}", str.length());
                 }*/
             Tokenizer tokenizer(lines);
-            Timer timer("tokenizer.tokenize()");
-            std::vector<Token> tokens = tokenizer.tokenize();
-            std::vector<Instruction> instructions = {};
-            LINFO(timer.to_string());
+            std::vector<Token> tokens{};
+            timeTokenizer(tokenizer, tokens);
+            std::vector<Instruction> instructions{};
             // Instruction instruction(tokens);
             if(tokens.empty()) {
                 LINFO("Empty tokens");
@@ -96,10 +99,7 @@ int main(int argc, const char **argv) {
                 auto [verify, token_s] = instructions.back().checkToken(token);
                 LINFO("{} {}", verify, token_s);
             }
-            Timer time("instruction.validate()");
-            LINFO(time.to_string());
             //}
-            LINFO(tim.to_string());
         }
     } catch(const std::exception &e) {
         LERROR("Unhandled exception in main: {}", e.what());
