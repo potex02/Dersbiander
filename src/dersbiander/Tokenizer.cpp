@@ -84,12 +84,14 @@ bool Tokenizer::isVarLenOperator(const std::string &val) const noexcept {
 // NOLINTEND
 
 Token Tokenizer::extractIdentifier() {
+    using enum TokenType;
     std::string value;
-    TokenType type = TokenType::IDENTIFIER;
+    TokenType type = IDENTIFIER;
     while(currentPosition < inputSize && (std::isalnum(inputSpan[currentPosition]) || inputSpan[currentPosition] == '_')) {
         appendCharToValue(value);
     }
-    if(value == "var" || value == "const") { type = TokenType::KEYWORD_VAR; }
+    if(value == "var" || value == "const") { type = KEYWORD_VAR; }
+    if(value == "if" || value == "while") { type = KEYWORD_STRUCTURE; }
     return {type, value, currentLine, currentColumn - value.length()};
 }
 

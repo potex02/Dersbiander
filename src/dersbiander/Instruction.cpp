@@ -275,19 +275,17 @@ void Instruction::checkClosedBrackets() {
 }
 
 void Instruction::checkOpenCurlyBrackets() {
-    using enum TokenType;
     using enum InstructionType;
     if(this->lastInstructionType() == BLANK) {
         this->setLastInstructionType(OPEN_SCOPE);
     }
-    this->allowedTokens = {EOFT};
+    this->allowedTokens = {eofTokenType};
 }
 
 void Instruction::checkClosedCurlyBracktes() {
-    using enum TokenType;
     using enum InstructionType;
     this->setLastInstructionType(CLOSE_SCOPE);
-    this->allowedTokens = {EOFT};
+    this->allowedTokens = {eofTokenType};
 }
 
 void Instruction::checkKeywordVar() {
