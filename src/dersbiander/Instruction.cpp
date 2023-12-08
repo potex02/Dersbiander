@@ -120,6 +120,7 @@ Instruction::Instruction() noexcept
         break;
     case KEYWORD_STRUCTURE:
         this->checkKeywordStructure();
+        break;
     case EOFT:
     case ERROR:
     case UNKNOWN:

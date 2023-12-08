@@ -88,6 +88,7 @@ int main(int argc, const char **argv) {
             }
             line = tokens[0].line;
             for(const Token &token : tokens) {
+                if (token.type == TokenType::COMMENT) { continue; }
                 if(token.line >= line) {
                     if(instructions.empty() || instructions.back().canTerminate()) {
                         instructions.emplace_back();

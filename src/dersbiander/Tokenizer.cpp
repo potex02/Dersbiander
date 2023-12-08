@@ -18,6 +18,8 @@ std::vector<Token> Tokenizer::tokenize() {
             tokens.emplace_back(extractIdentifier());
         } else if(std::isdigit(currentChar)) {
             tokens.emplace_back(extractnumber());
+        } else if(isComment(currentPosition)) {
+            tokens.emplace_back(extractComment());
         } else if(isOperator(currentChar)) {
             tokens.emplace_back(extractOperator());
         } else if(isBrackets(currentChar)) {
@@ -64,6 +66,10 @@ void Tokenizer::appendCharToValue(std::string &value) {
 }
 // NOLINTBEGIN
 bool Tokenizer::isPlusORMinus(char c) const noexcept { return c == '+' || c == '-'; }
+bool Tokenizer::isComment(size_t position) const noexcept {
+    return position != inputSpan.size() && input[position] == '/' &&
+           (inputSpan[position + 1] == '/' || inputSpan[position + 1] == '*');
+}
 bool Tokenizer::isOperator(char c) const noexcept {
     static const std::unordered_set<char> operators = {'*', '/', '=', ',', ':', '<', '>', '!', '|', '&', '+', '-'};
     return operators.contains(c);
@@ -203,6 +209,28 @@ Token Tokenizer::extractChar() {
     }
     return {TokenType::UNKNOWN, "'" + value + "'", currentLine, currentColumn - startcol};
 }
+
+Token Tokenizer::extractComment() {
+    currentPosition++;
+    if(inputSpan[currentPosition] == '/') {
+        return {TokenType::COMMENT, handleWithSingleLineComment(), currentLine, currentColumn};
+    }
+    if(inputSpan[currentPosition] == '*') {
+        auto [result, value] = this->handleWithMultilineComment();
+        if(result) { return {TokenType::COMMENT, value, currentLine, currentColumn}; }
+    }
+    return {TokenType::UNKNOWN, "", currentLine, currentColumn};
+}
+
+std::string Tokenizer::handleWithSingleLineComment() {
+
+    std::string value = "/";
+
+    while(inputSpan[currentPosition] != CNL) { appendCharToValue(value); }
+    return value;
+}
+
+std::pair<bool, std::string> Tokenizer::handleWithMultilineComment() { return {true, ""}; }
 
 void Tokenizer::handleWhitespace(char currentChar) noexcept {
     if(currentChar == CNL) {
