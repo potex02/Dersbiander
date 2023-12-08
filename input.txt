@@ -8,12 +8,15 @@ var variable2, variable3: type = variable == -4, !variable && 7.2
 variable = variable < -4
 variable += 4
 //Comment
-variable -= -4. + ( //Comment
+variable -= -4. + ( // Single line comment
 	12 + 56 &&
 	variable2 == true ||
 	!variable >= 10
 )
-variable = variable && -4.5
+variable = variable && /*|| f*/ -4.5
+/*multi-
+line
+comment*/
 variable = true
 {
 	variable = !false || !true

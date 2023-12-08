@@ -211,26 +211,45 @@ Token Tokenizer::extractChar() {
 }
 
 Token Tokenizer::extractComment() {
-    currentPosition++;
-    if(inputSpan[currentPosition] == '/') {
+    if(inputSpan[currentPosition + 1] == '/') {
         return {TokenType::COMMENT, handleWithSingleLineComment(), currentLine, currentColumn};
     }
-    if(inputSpan[currentPosition] == '*') {
+    if(inputSpan[currentPosition + 1] == '*') {
         auto [result, value] = this->handleWithMultilineComment();
-        if(result) { return {TokenType::COMMENT, value, currentLine, currentColumn}; }
+        if(!result) { return {TokenType::UNKNOWN, value, currentLine, currentColumn}; }
+        { return {TokenType::COMMENT, value, currentLine, currentColumn}; }
     }
     return {TokenType::UNKNOWN, "", currentLine, currentColumn};
 }
 
 std::string Tokenizer::handleWithSingleLineComment() {
 
-    std::string value = "/";
+    std::string value = "";
 
     while(inputSpan[currentPosition] != CNL) { appendCharToValue(value); }
     return value;
 }
 
-std::pair<bool, std::string> Tokenizer::handleWithMultilineComment() { return {true, ""}; }
+std::pair<bool, std::string> Tokenizer::handleWithMultilineComment() {
+
+    std::string value = "";
+
+    while(currentPosition + 1 != inputSize &&
+          (inputSpan[currentPosition] != '*' || inputSpan[currentPosition + 1] != '/')) {
+        if(inputSpan[currentPosition] == CNL) {
+            ++currentLine;
+            currentColumn = 1;
+        }
+        appendCharToValue(value);
+    }
+    if(currentPosition + 1 == inputSize) {
+        return {false, value};
+    }
+    appendCharToValue(value);
+    appendCharToValue(value);
+    return {true, value};
+
+}
 
 void Tokenizer::handleWhitespace(char currentChar) noexcept {
     if(currentChar == CNL) {
