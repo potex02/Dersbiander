@@ -266,17 +266,20 @@ void Instruction::checkOpenBrackets() {
 void Instruction::checkClosedBrackets() {
     using enum TokenType;
     using enum InstructionType;
-    if(this->lastInstructionType() == EXPRESSION) {
-        this->removeInstructionType();
+    this->removeInstructionType();
+    if(this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION ||
+       this->lastInstructionType() == EXPRESSION) {
         this->removeBooleanOperatorPresent();
         this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR};
         if(this->lastInstructionType() == EXPRESSION) {
             this->allowedTokens.emplace_back(CLOSED_BRACKETS);
-        } else if(this->lastInstructionType() == STRUCTURE) {
-            this->allowedTokens = {OPEN_CURLY_BRACKETS};
         } else {
             emplaceCommaEoft();
         }
+        return;
+    }
+    if(this->lastInstructionType() == STRUCTURE) {
+        this->allowedTokens = {OPEN_CURLY_BRACKETS};
         return;
     }
     this->allowedTokens = {};
