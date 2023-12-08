@@ -40,21 +40,44 @@ std::vector<Token> Tokenizer::tokenize() {
 
 void Tokenizer::handleError(const std::string &values, const std::string &errorMsg) {
     Timer timer(errorMsg);
-    std::ostringstream errorMessage;
-    errorMessage << D_FORMAT("{} '{}' (line {}, column {}):\n", errorMsg, values, currentLine, currentColumn);
 
-    errorMessage << "Context:" << NEWL;
+    const auto lineStart = findLineStart();
+    const auto lineEnd = findLineEnd();
 
+    std::string contextLine = getContextLine(lineStart, lineEnd);
+    std::string highlighting = getHighlighting(lineStart, values.length());
+    std::string errorMessage = getErrorMessage(values, errorMsg, contextLine, highlighting);
+
+    LERROR("{}{}", errorMessage, timer.to_string());
+}
+
+std::size_t Tokenizer::findLineStart() {
     std::size_t lineStart = currentPosition;
-    std::size_t lineEnd = currentPosition;
-
     while(lineStart > 0 && inputSpan[lineStart - 1] != CNL) { --lineStart; }
-    while(lineEnd < inputSize && inputSpan[lineEnd] != CNL) { ++lineEnd; }
-    errorMessage << std::string_view(input.data() + lineStart, lineEnd - lineStart) << NEWL;
+    return lineStart;
+}
 
-    errorMessage << std::string(currentPosition - lineStart, ' ') << std::string(values.length(), '^') << NEWL;
-    auto time = timer.to_string();
-    LERROR("{}{}", std::move(errorMessage).str(), std::move(time));
+std::size_t Tokenizer::findLineEnd() {
+    std::size_t lineEnd = currentPosition;
+    while(lineEnd < inputSize && inputSpan[lineEnd] != CNL) { ++lineEnd; }
+    return lineEnd;
+}
+
+std::string Tokenizer::getContextLine(std::size_t lineStart, std::size_t lineEnd) const {
+    return std::string(input.begin() + lineStart, input.begin() + lineEnd) + NEWL;
+}
+
+std::string Tokenizer::getHighlighting(std::size_t lineStart, std::size_t length) const {
+    return std::string(currentPosition - lineStart, ' ') + std::string(length, '^') + NEWL;
+}
+
+std::string Tokenizer::getErrorMessage(const std::string &values, const std::string &errorMsg, const std::string &contextLine, const std::string &highlighting) const {
+    std::ostringstream errorMessageStream;
+    errorMessageStream << D_FORMAT("{} '{}' (line {}, column {}):\n", errorMsg, values, currentLine, currentColumn);
+    errorMessageStream << "Context:" << NEWL;
+    errorMessageStream << contextLine;
+    errorMessageStream << highlighting;
+    return errorMessageStream.str();
 }
 
 void Tokenizer::appendCharToValue(std::string &value) {
