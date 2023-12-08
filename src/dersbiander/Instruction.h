@@ -10,6 +10,7 @@ enum class InstructionType : short {
     EXPRESSION,
     DECLARATION,
     INITIALIZATION,
+    STRUCTURE,
     DEFINITION,
     OPEN_SCOPE,
     CLOSE_SCOPE,
@@ -48,6 +49,7 @@ private:
     void checkOpenCurlyBrackets();
     void checkClosedCurlyBracktes();
     void checkKeywordVar();
+    void checkKeywordStructure();
     void emplaceCommaEoft() noexcept;
     [[nodiscard]] TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }
     [[nodiscard]] bool ispreviousEmpty() const noexcept { return this->previousTokens.empty(); }

@@ -93,11 +93,13 @@ int main(int argc, const char **argv) {
                         instructions.emplace_back();
                     } else if(instructions.back().typeToString().back() != "EXPRESSION") {
                         LINFO("Unexpected token: ENDL");
+                        break;
                     }
                     line = token.line + 1;
                 }
                 auto [verify, token_s] = instructions.back().checkToken(token);
                 LINFO("{} {}", verify, token_s);
+                if(!verify) { break; }
             }
             //}
         }

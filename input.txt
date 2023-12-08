@@ -25,3 +25,8 @@ variable = true
 	}
 	const variable, variable2: type = 7 * 5 != (1 <= (4 == !5) * 1 && (12 != b)), 12
 }
+if(a + (b * C) || (a >= v)) {
+	a = a + (!b && c)
+}
+while(true) {
+}
