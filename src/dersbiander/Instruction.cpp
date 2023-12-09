@@ -4,7 +4,8 @@ DISABLE_WARNINGS_PUSH(26461 26821)
 
 Instruction::Instruction() noexcept
   : tokens({}), instructionTypes({InstructionType::BLANK}),
-    allowedTokens({TokenType::KEYWORD_VAR, TokenType::KEYWORD_STRUCTURE, TokenType::IDENTIFIER, TokenType::OPEN_CURLY_BRACKETS, TokenType::CLOSED_CURLY_BRACKETS, TokenType::EOFT}) {
+    allowedTokens({TokenType::KEYWORD_VAR, TokenType::KEYWORD_STRUCTURE, TokenType::IDENTIFIER, TokenType::OPEN_CURLY_BRACKETS,
+                   TokenType::CLOSED_CURLY_BRACKETS, TokenType::EOFT}) {
     booleanOperatorPresent = {false};
     previousTokens.reserve(tokens.size());
 }
@@ -21,7 +22,6 @@ Instruction::Instruction() noexcept
 }
 
 [[nodiscard]] std::vector<std::string> Instruction::typeToString() const noexcept {
-
     std::vector<std::string> result = {};
 
     for(const InstructionType &i : this->instructionTypes) {
@@ -124,6 +124,7 @@ Instruction::Instruction() noexcept
     case EOFT:
     case ERROR:
     case UNKNOWN:
+    case COMMENT:
         break;
     }
     this->previousTokens.emplace_back(token);
@@ -260,7 +261,8 @@ void Instruction::checkOpenBrackets() {
     using enum InstructionType;
     this->addInstructionType(EXPRESSION);
     this->addBooleanOperatorPresent();
-    this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS, CLOSED_BRACKETS};
+    this->allowedTokens = {IDENTIFIER,     INTEGER,      DOUBLE,        CHAR,           BOOLEAN,
+                           MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS, CLOSED_BRACKETS};
 }
 
 void Instruction::checkClosedBrackets() {
@@ -287,17 +289,13 @@ void Instruction::checkClosedBrackets() {
 
 void Instruction::checkOpenCurlyBrackets() {
     using enum InstructionType;
-    if(this->lastInstructionType() == BLANK) {
-        this->setLastInstructionType(OPEN_SCOPE);
-    }
+    if(this->lastInstructionType() == BLANK) { this->setLastInstructionType(OPEN_SCOPE); }
     this->allowedTokens = {eofTokenType};
 }
 
 void Instruction::checkClosedCurlyBracktes() {
     using enum InstructionType;
-    if (this->lastInstructionType() == BLANK) {
-        this->setLastInstructionType(CLOSE_SCOPE);
-    }
+    if(this->lastInstructionType() == BLANK) { this->setLastInstructionType(CLOSE_SCOPE); }
     this->allowedTokens = {eofTokenType};
 }
 

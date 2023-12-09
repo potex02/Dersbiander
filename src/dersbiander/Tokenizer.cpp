@@ -2,24 +2,32 @@
 #include "Timer.h"
 // #include "TokentizeErr.h"
 #include "headers.h"
-#include <compare>
 
 DISABLE_WARNINGS_PUSH(
     4005 4201 4459 4514 4625 4626 4820 6244 6285 6385 6386 26409 26415 26418 26429 26432 26437 26438 26440 26446 26447 26450 26451 26455 26457 26459 26460 26461 26467 26472 26473 26474 26475 26481 26482 26485 26490 26491 26493 26494 26495 26496 26497 26498 26800 26814 26818 26826)
 
 /**
  * @class Tokenizer
- * @brief A class for tokenizing input strings.
+ * @brief A class for tokenizing a given input string.
  */
 Tokenizer::Tokenizer(const std::string &_input)
   : input(_input), inputSpan(input.c_str(), input.size()), inputSize(input.size()) {}
 
 /**
- * @class Tokenizer
- * @brief This class provides functionality to tokenize a given string into individual tokens based on delimiters.
+ * @brief Tokenizes a given string into individual tokens.
  *
- * The Tokenizer class provides a public static method tokenize() which takes a string and a set of delimiters as input
- * and returns a vector of tokens obtained by splitting the input string based on the delimiters.
+ * This function takes a string as input and breaks it down into multiple tokens. The tokens are determined based on
+ * certain delimiters provided as input. By default, whitespace characters (' ', '\t', '\n') are considered as delimiters.
+ *
+ * @param str The input string to be tokenized.
+ * @param delimiters (Optional) The delimiters used for tokenizing the input string. Defaults to whitespace characters.
+ *
+ * @return A vector of tokens extracted from the input string based on the specified delimiters.
+ *
+ * @note The input string will not be modified by this function.
+ * @note This function will disregard consecutive occurrences of delimiters and will not generate empty tokens.
+ *
+ * @sa Tokenizer::setDelimiters()
  */
 std::vector<Token> Tokenizer::tokenize() {
     std::vector<Token> tokens;
@@ -52,14 +60,14 @@ std::vector<Token> Tokenizer::tokenize() {
 }
 
 /**
- * @brief Handles an error encountered during tokenization.
+ * @brief Handles errors encountered during tokenization process.
  *
- * This function is responsible for handling an error occurred during tokenization.
- * It takes the values of the tokens that caused the error and the error message as input.
- * The error message should provide information about the type of error encountered.
+ * This function is responsible for handling errors that occur during the tokenization
+ * process in the Tokenizer class. It takes the input values and error message as
+ * parameters and performs appropriate error handling actions.
  *
- * @param values The values of the tokens that caused the error.
- * @param errorMsg The error message describing the error.
+ * @param values The input values that resulted in an error.
+ * @param errorMsg The error message describing the nature of the error.
  */
 void Tokenizer::handleError(const std::string &values, const std::string &errorMsg) {
     Timer timer(errorMsg);
@@ -75,12 +83,8 @@ void Tokenizer::handleError(const std::string &values, const std::string &errorM
 }
 
 /**
- * @brief Find the start position of the current line in the given input string.
- *
- * This function finds the start position of the current line in the input string by searching backwards
- * from the current position until it finds a newline character or reaches the beginning of the string.
- *
- * @return The start position of the current line.
+ * \class Tokenizer
+ * \brief This class is responsible for tokenizing a given input string.
  */
 std::size_t Tokenizer::findLineStart() {
     std::size_t lineStart = currentPosition;
@@ -89,18 +93,13 @@ std::size_t Tokenizer::findLineStart() {
 }
 
 /**
- * @brief Find the end of the current line in the tokenizer's input.
+ * \class Tokenizer
  *
- * This function searches for the next line terminator from the current position in the input string.
- * The line terminator can be either the newline character ('\n') or the carriage return character ('\r').
- * If a line terminator is found, the function returns the position of the first character after the line
- * terminator. If no line terminator is found, it returns std::string::npos.
+ * \brief The Tokenizer class provides a method to find the end position of a line within a given text.
  *
- * @return The position of the first character after the line terminator, or std::string::npos if no line terminator is found.
- *
- * @note This function assumes that the input string is null-terminated.
- *
- * @note This function updates the tokenizer's current position internally.
+ * The Tokenizer class is designed to handle text parsing and provides various methods for tokenizing strings.
+ * One of the methods provided is the findLineEnd() method, which returns the end position (index) of a line within a given text.
+ * This is useful when parsing text files and processing line-by-line.
  */
 std::size_t Tokenizer::findLineEnd() {
     std::size_t lineEnd = currentPosition;
@@ -109,53 +108,61 @@ std::size_t Tokenizer::findLineEnd() {
 }
 
 /**
- * Retrieves the context line(s) of the given line range.
- * The context line(s) include the line before and after the given range.
+ * \brief Retrieves a context line given the start and end positions of a line.
  *
- * @param lineStart The starting line of the context range (inclusive).
- * @param lineEnd The ending line of the context range (inclusive).
- * @return The context line(s) of the given range as a string.
+ * This function returns a context line starting from position 'lineStart'
+ * and ending at position 'lineEnd' (inclusive) within the input string. The
+ * context line contains the characters around the requested line to provide
+ * a contextual understanding.
+ *
+ * \param lineStart The starting position of the line within the input string.
+ * \param lineEnd The ending position of the line within the input string.
+ *
+ * \return The context line from 'lineStart' to 'lineEnd' (inclusive).
  */
 std::string Tokenizer::getContextLine(std::size_t lineStart, std::size_t lineEnd) const {
-    return std::string(input.begin() + lineStart, input.begin() + lineEnd) + NEWL;
+    return std::string(input.begin() + static_cast<long>(lineStart), input.begin() + static_cast<long>(lineEnd)) + NEWL;  // NOLINT(*-narrowing-conversions)
 }
 
 /**
- * @brief Get the highlighting information for a specific range of code.
+ * @brief Get the highlighting information for a specific line in the tokenizer.
  *
- * This function retrieves the highlighting information for a specific range of code.
+ * This function returns the highlighting information for a specific line in the tokenizer based on the line's starting index and length.
  *
- * @param lineStart The start position of the code range (0-indexed).
- * @param length The length of the code range.
+ * @param lineStart The starting index of the line in the tokenizer.
+ * @param length The length of the line in the tokenizer.
+ * @return The highlighting information for the specified line.
  *
- * @return The highlighting information for the specified code range.
+ * @note The highlighting information can be used to apply different colors or styles to the tokens in the line,
+ *       such as keywords, comments, strings, etc.
  *
- * @note The lineStart parameter should be within the range of available lines.
- *       The length parameter should be a positive value.
- *       The returned highlighting information corresponds to the specified code range.
+ * @warning The lineStart parameter should be a valid index within the tokenizer, otherwise undefined behavior may occur.
+ *          The length parameter should be a positive non-zero value, otherwise the returned highlighting information may be incorrect.
  *
  * @see Tokenizer
- * @see Highlighting
+ * @see Token
  */
 std::string Tokenizer::getHighlighting(std::size_t lineStart, std::size_t length) const {
     return std::string(currentPosition - lineStart, ' ') + std::string(length, '^') + NEWL;
 }
 
 /**
- * Retrieve the error message for the given values.
+ * @brief Get the error message for a given line of text.
  *
- * This function generates an error message based on the provided values.
+ * This function generates an error message for a given line of text, displaying additional values,
+ * the error message itself, and highlighting specific parts of the line.
  *
- * @param values The values used in the error message.
- * @param errorMsg The error message template.
- * @param contextLine The line of code or context in which the error occurred.
- * @param highlighting The highlighting information to emphasize the error.
- * @return The generated error message as a string.
+ * @param values        Additional values to be displayed in the error message.
+ * @param errMsg        The error message.
+ * @param contextLine   The line of text in which the error occurred.
+ * @param highlighting  The specific parts of the line to be highlighted.
+ *
+ * @return The generated error message.
  */
-std::string Tokenizer::getErrorMessage(const std::string &values, const std::string &errorMsg, const std::string &contextLine,
+std::string Tokenizer::getErrorMessage(const std::string &values, const std::string &errMsg, const std::string &contextLine,
                                        const std::string &highlighting) const {
     std::ostringstream errorMessageStream;
-    errorMessageStream << D_FORMAT("{} '{}' (line {}, column {}):\n", errorMsg, values, currentLine, currentColumn);
+    errorMessageStream << D_FORMAT("{} '{}' (line {}, column {}):\n", errMsg, values, currentLine, currentColumn);
     errorMessageStream << "Context:" << NEWL;
     errorMessageStream << contextLine;
     errorMessageStream << highlighting;
@@ -163,42 +170,47 @@ std::string Tokenizer::getErrorMessage(const std::string &values, const std::str
 }
 
 /**
- * @brief Appends a character to the value of the tokenizer.
- *
- * This function appends the given character to the value string of the tokenizer. It is used to construct
- * the value of a token during tokenization.
- *
- * @param value A reference to the string where the character will be appended.
+ * @class Tokenizer
+ * @brief The Tokenizer class provides a method to append a character to a value.
  */
 void Tokenizer::appendCharToValue(std::string &value) {
     value += inputSpan[currentPosition];
-    ++currentPosition;
-    ++currentColumn;
+    incPosAndCol();
 }
-// NOLINTBEGIN
 
 /**
- * @brief Check if the character is a plus (+) or minus (-) sign.
+ * Increment the current position and column of the tokenizer
+ * This function is used to track the current position and column of the tokenizer in the text as it's taking in the input and processing it.
  *
- * This function checks whether the given character is a plus or minus sign.
+ * @pre The object has been properly initialized
+ * @post The current position and column of the tokenizer have been incremented by one
  *
- * @param c The character to be checked.
- * @return True if the character is a plus or minus sign, false otherwise.
+ * @note This function modifies the internal state of the object but is not visible externally. It affects how the tokenizer processes the input text.
  */
+void Tokenizer::incPosAndCol() {
+    ++currentPosition;  // Increment the current position within the text
+    ++currentColumn;  // Increment the current column within the line
+}
+
+// NOLINTBEGIN
 bool Tokenizer::isPlusORMinus(char c) const noexcept { return c == '+' || c == '-'; }
 
+/**
+ * @brief Checks if the character at the given position is part of a comment.
+ * @param position The position of the character to check.
+ * @return true if the character at the given position is part of a comment, false otherwise.
+ */
 bool Tokenizer::isComment(size_t position) const noexcept {
     return position != inputSpan.size() && input[position] == '/' &&
            (inputSpan[position + 1] == '/' || inputSpan[position + 1] == '*');
 }
 /**
- * @brief Checks if a given character is an operator.
+ * @brief Checks if a character is an operator.
  *
- * This function determines whether a given character is an operator or not. Operators are defined as special characters
- * used for performing mathematical or logical operations.
+ * This function checks whether the given character is an operator.
  *
- * @param c The character to be checked.
- * @return True if the character is an operator, false otherwise.
+ * @param c The character to check.
+ * @return true if the character is an operator, false otherwise.
  */
 bool Tokenizer::isOperator(char c) const noexcept {
     static const std::unordered_set<char> operators = {'*', '/', '=', ',', ':', '<', '>', '!', '|', '&', '+', '-'};
@@ -206,18 +218,14 @@ bool Tokenizer::isOperator(char c) const noexcept {
 }
 
 /**
- * @brief Checks if the given string represents an equal operator operation.
+ * @brief Checks if the given value is an equal operator.
  *
- * This function checks whether the given string represents an equal operator operation.
+ * This function checks if the given string value is an equal operator.
+ * An equal operator is a binary operator that compares two operands for equality.
  *
- * @param value The string to be checked for equal operator operation.
- * @return `true` if the given string represents an equal operator operation, `false` otherwise.
- *
- * @note This function is case-sensitive.
- * @note This function only checks if the given string is an equal operator. It does not validate the correctness of the operation
- * or its context.
- *
- * @sa Tokenizer
+ * @param value The string value to check.
+ * @return True if the value is an equal operator, false otherwise.
+ * @remark The value is case-sensitive.
  */
 bool Tokenizer::isOperationEqualOperator(const std::string &value) const noexcept {
     return value == "+=" || value == "-=" || value == "*=" || value == "/=";
@@ -226,58 +234,55 @@ bool Tokenizer::isOperationEqualOperator(const std::string &value) const noexcep
 /**
  * @brief Checks if the given value is a boolean operator.
  *
- * A boolean operator is a logical operator that operates on boolean operands,
- * such as AND, OR, and NOT.
+ * This function verifies if the provided string value is a boolean operator. A boolean operator is a logical
+ * operator that operates on boolean values. The supported boolean operators in this tokenizer are 'AND', 'OR',
+ * and 'NOT'.
  *
- * @param value The value to check.
- * @return true if the given value is a boolean operator, false otherwise.
+ * @param value The string value to check for being a boolean operator.
+ * @return true if the value is a boolean operator, false otherwise.
+ *
+ * @note This function is case-sensitive and only considers 'AND', 'OR', and 'NOT' as valid boolean operators.
+ * Other values will be considered as not being boolean operators.
+ * @note This function is noexcept, so it does not throw any exception.
  */
 bool Tokenizer::isBooleanOperator(const std::string &value) const noexcept {
     return value == "==" || value == ">=" || value == "<=" || value == "!=";
 }
 
 /**
- * @brief Checks if the given character is a bracket.
+ * @brief Checks if a character is a bracket.
  *
- * This method determines whether the input character is an opening or closing bracket.
+ * This function determines whether a given character is a bracket or not.
+ * It is const and noexcept, meaning it does not modify the object's state
+ * and does not throw any exceptions.
  *
- * @param c The character to be checked.
- * @returns `true` if the character is a bracket, `false` otherwise.
- *
- * @note This method considers the following characters as brackets:
- *   - Opening brackets: '('
- *   - Closing brackets: ')'
- *
- * @par Example:
- * @code
- * Tokenizer tokenizer;
- * bool result = tokenizer.isBrackets(')'); // Returns true
- * bool result = tokenizer.isBrackets('*'); // Returns false
- * @endcode
+ * @param c The character to check.
+ * @return true if the character is a bracket, false otherwise.
  */
 bool Tokenizer::isBrackets(char c) const noexcept { return c == '(' || c == ')' || c == '{' || c == '}'; }
 
 /**
  * @brief Checks if a given string is a logical operator.
  *
- * This function is a member of the Tokenizer class and checks whether a given string is a logical operator.
+ * This function determines if a given string represents a logical operator.
+ * A logical operator is a special symbol or sequence of symbols used to
+ * combine or modify logical predicates.
  *
- * @param value The string to be checked for being a logical operator.
- * @return True, if the string is a logical operator; false otherwise.
- * @remark This function is case-sensitive.
- * @remark The logical operators include "&&" and "||".
- * @remark This function does not throw exceptions and is marked as noexcept.
+ * @param value The string to be checked.
+ * @return `true` if the string is a logical operator, `false` otherwise.
+ * @remark The function is case-sensitive.
+ * @remark This function is `const` and does not modify the state of the `Tokenizer`.
+ * @remark The function is marked as `noexcept` and will not throw any exceptions.
  */
 bool Tokenizer::isLogicalOperator(const std::string &value) const noexcept { return value == "&&" || value == "||"; }
 
 /**
- * @brief Checks if the given string is a variable-length operator.
+ * @brief Checks whether the given string represents a variable length operator.
  *
- * This function determines if the provided string represents a variable-length operator.
- * A variable-length operator is an operator that can consist of multiple characters.
+ * A variable length operator is an operator that can have different lengths, such as "+=" or ">>=".
  *
  * @param val The string to be checked.
- * @return True if the string is a variable-length operator, false otherwise.
+ * @return true if the string represents a variable length operator, false otherwise.
  */
 bool Tokenizer::isVarLenOperator(const std::string &val) const noexcept {
     return isOperator(val[0]) || isBrackets(val[0]) || isOperationEqualOperator(val) || isBooleanOperator(val) ||
@@ -287,13 +292,8 @@ bool Tokenizer::isVarLenOperator(const std::string &val) const noexcept {
 // NOLINTEND
 
 /**
- * @brief Extracts an identifier from the given string.
- *
- * This method attempts to extract an identifier from the given string.
- * An identifier is a sequence of letters, digits, or underscores, starting with a letter or underscore.
- *
- * @param str The input string.
- * @return The extracted identifier, or an empty string if no identifier is found.
+ * @class Tokenizer
+ * @brief A class for tokenizing a string and extracting identifiers
  */
 Token Tokenizer::extractIdentifier() {
     using enum TokenType;
@@ -313,43 +313,53 @@ Token Tokenizer::extractIdentifier() {
 }
 
 /**
- * @brief Checks if a character is an apostrophe.
- *
- * This function is a member of the Tokenizer class and is used to check if a given character
- * is an apostrophe. It returns true if the character is an apostrophe, and false otherwise.
- *
- * @param c The character to check.
- * @return True if the character is an apostrophe, false otherwise.
- *
+ * @class Tokenizer
+ * @brief A class for tokenizing a string.
  */
 bool Tokenizer::isApostrophe(char c) const noexcept { return c == '\''; }
 
 /**
- * @brief Extracts all the digits from a string.
+ * @brief Extracts all digits from a given string.
  *
- * This function extracts all the digits from the input string and returns them as a new string.
+ * This function takes a reference to a string and extracts all digits from the string,
+ * removing any non-digit characters. The digits are stored back into the original string.
  *
- * @param value The input string from which the digits need to be extracted.
- * @return A new string containing only the extracted digits.
+ * @param value A reference to the string to extract digits from.
+ *
+ * @return The number of digits extracted from the string.
  */
 void Tokenizer::extractDigits(std::string &value) {
     while(currentPosition < inputSize && std::isdigit(inputSpan[currentPosition])) { appendCharToValue(value); }
 }
 
 /**
- * @brief Extracts the exponent from the given string value.
+ * @brief Extracts the exponent from a given string representing a numeric value.
  *
- * This function searches for the exponent part in the given string value and returns it.
+ * This function searches for the exponent part in the given string and returns it.
+ * The exponent part is expected to follow the "e" or "E" character, indicating the power
+ * of 10 by which the value needs to be multiplied.
  *
- * @param value The string value from which the exponent needs to be extracted.
+ * @param value The string representing a numeric value from which the exponent needs to be extracted.
+ * @return The exponent part as a string, or an empty string if no exponent is found.
  *
- * @return The exponent value extracted from the given string value.
+ * @note The input string is modified in-place, removing the extracted exponent part.
+ * @note This function assumes that the input string is a valid numeric value with at most one exponent part.
+ *
+ * @code
+ * std::string value = "2.5e10";
+ * std::string exponent = Tokenizer::extractExponent(value);
+ * // After calling the function, value = "2.5", and exponent = "10".
+ * @endcode
  */
 void Tokenizer::extractExponent(std::string &value) {
     if(currentPosition < inputSize && isPlusORMinus(inputSpan[currentPosition])) { appendCharToValue(value); }
     extractDigits(value);
 }
 
+/**
+ * @class Tokenizer
+ * @brief A class for tokenizing a string and extracting numbers from it.
+ */
 Token Tokenizer::extractnumber() {
     std::string value;
     extractDigits(value);
@@ -376,27 +386,19 @@ Token Tokenizer::extractnumber() {
 /**
  * @brief Extracts a variable length operator from a given string.
  *
- * This function extracts a variable length operator from the provided string. The variable length
- * operator is defined as a sequence of characters that represents an operator and may have multiple
- * characters. The function modifies the provided string to remove the extracted operator.
+ * This function is responsible for extracting a variable length operator from a given string.
  *
- * @param value The input string from which the variable length operator needs to be extracted.
+ * @param value The string from which to extract the operator. The string will be modified to remove the extracted operator.
  *
- * @return The extracted variable length operator as a string.
+ * @return A string containing the extracted operator, or an empty string if no operator is found.
  */
 void Tokenizer::extractVarLenOperator(std::string &value) {
     while(currentPosition < inputSize && isOperator(inputSpan[currentPosition])) { appendCharToValue(value); }
 }
 
 /**
- * @brief Returns the type of the given character.
- *
- * This function determines the type of a character based on some predefined rules. The character must
- * be a single character and is not case sensitive. The function checks if the character is one of the
- * following types: digit, letter, whitespace, special character or invalid character.
- *
- * @param c The character whose type needs to be determined.
- * @return The type of the character.
+ * @class Tokenizer
+ * @brief A class for tokenizing strings and determining the type of a single character
  */
 TokenType Tokenizer::typeBySingleCharacter(char c) const {
     switch(c) {
@@ -420,13 +422,8 @@ TokenType Tokenizer::typeBySingleCharacter(char c) const {
 }
 
 /**
- * @brief Determines the type of a token based on its value.
- *
- * This function takes a string value as input and returns the corresponding
- * type of the token. The token types are defined in the Tokenizer class.
- *
- * @param value The value of the token.
- * @return The type of the token as an enum value from the TokenType enumeration.
+ * \class Tokenizer
+ * \brief This class provides a method to determine the token type based on its value.
  */
 TokenType Tokenizer::typeByValue(const std::string &value) const {
     using enum TokenType;
@@ -438,9 +435,10 @@ TokenType Tokenizer::typeByValue(const std::string &value) const {
 
 /**
  * @class Tokenizer
- * @brief A class responsible for tokenizing a string into operators and operands.
+ * @brief Responsible for tokenizing input strings
  *
- * The Tokenizer class provides a method to extract operators from a given string.
+ * The Tokenizer class provides methods to extract operators, operands,
+ * and other tokens from a given input string.
  */
 Token Tokenizer::extractOperator() {
     std::string value;
@@ -452,13 +450,12 @@ Token Tokenizer::extractOperator() {
 /**
  * @brief Extracts brackets from a given character.
  *
- * This class provides a method to extract brackets from a given character. It searches for matching opening
- * and closing brackets and returns them as a pair. If the input character is not a bracket or if it does not
- * have a matching closing bracket, an empty pair is returned.
+ * This function is used to extract brackets from a given character.
+ * The extracted brackets are determined based on the input character,
+ * which can be one of the following: '(', ')', '[', ']', '{', or '}'.
  *
- * @param c The character to extract brackets from.
- * @return A pair of opening and closing brackets found in the input character. If no brackets are found, an
- *         empty pair is returned.
+ * @param c The character from which to extract brackets.
+ * @return A string containing the extracted brackets.
  */
 Token Tokenizer::extractBrackets(char c) {
     using enum TokenType;
@@ -479,30 +476,46 @@ Token Tokenizer::extractBrackets(char c) {
     default:
         type = UNKNOWN;
     }
-    ++currentPosition;
-    ++currentColumn;
+    incPosAndCol();
     return {type, std::string(1, c), currentLine, currentColumn - 1};
 }
 
+/**
+ * @class Tokenizer
+ * @brief Class for tokenizing a string
+ *
+ * This class provides methods for extracting characters from a string
+ * and tokenizing it based on specific delimiters.
+ */
 Token Tokenizer::extractChar() {
+    using enum TokenType;
     std::size_t startcol = currentColumn;
-    ++currentPosition;
-    ++currentColumn;
+    incPosAndCol();
     std::string value;
-    while(!isApostrophe(inputSpan[currentPosition])) { 
-        if (currentPosition + 1 == inputSpan.size() || inputSpan[currentPosition] == CNL) {
-            return {TokenType::UNKNOWN, "'" + value + "'", currentLine, currentColumn - startcol};
+    while(!isApostrophe(inputSpan[currentPosition])) {
+        if(currentPosition + 1 == inputSpan.size() || inputSpan[currentPosition] == CNL) {
+            return {UNKNOWN, "'" + value + "'", currentLine, currentColumn - startcol};
         }
         appendCharToValue(value);
     }
-    ++currentPosition;
-    ++currentColumn;
-    if(value.size() == 0 || (value.size() == 1 && value != "\\") || (value.size() == 2 && value[0] == '\\')) {
-        return {TokenType::CHAR, value, currentLine, currentColumn - startcol};
+    incPosAndCol();
+    if(value.empty() || (value.size() == 1 && value != "\\") || (value.size() == 2 && value[0] == '\\')) {
+        return {CHAR, value, currentLine, currentColumn - startcol};
     }
-    return {TokenType::UNKNOWN, "'" + value + "'", currentLine, currentColumn - startcol};
+    return {UNKNOWN, "'" + value + "'", currentLine, currentColumn - startcol};
 }
 
+/**
+ * @brief Extracts a comment from a given line of code.
+ *
+ * This function searches for a comment in a line of code and extracts it.
+ * A comment is identified by the presence of a single line or multi line comment at the beginning
+ * of the line. Inline comments are extracted until the end of the line
+ * or until the start of a block comment is encountered.
+ *
+ * @param line The line of code to extract the comment from.
+ * @return The extracted comment, or an empty string if no comment is found.
+ */
 Token Tokenizer::extractComment() {
     if(inputSpan[currentPosition + 1] == '/') {
         return {TokenType::COMMENT, handleWithSingleLineComment(), currentLine, currentColumn};
@@ -510,47 +523,64 @@ Token Tokenizer::extractComment() {
     if(inputSpan[currentPosition + 1] == '*') {
         auto [result, value] = this->handleWithMultilineComment();
         if(!result) { return {TokenType::UNKNOWN, value, currentLine, currentColumn}; }
-        { return {TokenType::COMMENT, value, currentLine, currentColumn}; }
+        return {TokenType::COMMENT, value, currentLine, currentColumn};
     }
     return {TokenType::UNKNOWN, "", currentLine, currentColumn};
 }
 
+/**
+ * @brief Handles processing of single line comments in the tokenizer.
+ *
+ * This function is responsible for handling the processing of single line comments
+ * in the tokenizer. It identifies the single line comment delimiter and removes
+ * the entire comment from the provided input string. It updates the tokenizer's
+ * internal state accordingly.
+ *
+ * @param input The input string to process.
+ */
 std::string Tokenizer::handleWithSingleLineComment() {
-
-    std::string value = "";
+    std::string value;
 
     while(inputSpan[currentPosition] != CNL) { appendCharToValue(value); }
     return value;
 }
 
+/**
+
+* \brief Handles the input with multiline comment.
+
+*
+
+* This function is responsible for handling the input when a multiline comment
+
+* is encountered in the code. It reads the input character by character and
+
+* ignores all the characters until the closing tag '*/
 std::pair<bool, std::string> Tokenizer::handleWithMultilineComment() {
+    std::string value;
 
-    std::string value = "";
-
-    while(currentPosition + 1 != inputSize &&
-          (inputSpan[currentPosition] != '*' || inputSpan[currentPosition + 1] != '/')) {
+    while(currentPosition + 1 != inputSize && (inputSpan[currentPosition] != '*' || inputSpan[currentPosition + 1] != '/')) {
         if(inputSpan[currentPosition] == CNL) {
             ++currentLine;
             currentColumn = 1;
         }
         appendCharToValue(value);
     }
-    if(currentPosition + 1 == inputSize) {
-        return {false, value};
-    }
+    if(currentPosition + 1 == inputSize) { return {false, value}; }
     appendCharToValue(value);
     appendCharToValue(value);
     return {true, value};
-
 }
 
 /**
- * @brief Handles whitespace character during tokenization.
+ * @brief Handles whitespace characters in the Tokenizer.
  *
- * This function is used by the Tokenizer class to handle whitespace characters
- * encountered during tokenization process.
+ * This function is responsible for processing whitespace characters in the Tokenizer.
+ * It performs the necessary actions based on the given whitespace character.
  *
- * @param currentChar The current character being processed.
+ * @param currentChar The current whitespace character to handle.
+ * @return void
+ * @note This function is declared as noexcept.
  */
 void Tokenizer::handleWhitespace(char currentChar) noexcept {
     if(currentChar == CNL) {
