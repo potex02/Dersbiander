@@ -32,6 +32,7 @@ private:
 
     // NOLINTBEGIN
     [[nodiscard]] inline bool isPlusORMinus(char c) const noexcept;
+    [[nodiscard]] inline bool isComment(size_t position) const noexcept;
     [[nodiscard]] inline bool isOperator(char c) const noexcept;
     [[nodiscard]] inline bool isOperationEqualOperator(const std::string &value) const noexcept;
     [[nodiscard]] inline bool isBooleanOperator(const std::string &value) const noexcept;
@@ -50,6 +51,9 @@ private:
     Token extractOperator();
     Token extractBrackets(char c);
     Token extractChar();
+    Token extractComment();
+    std::string handleWithSingleLineComment();
+    std::pair<bool, std::string> handleWithMultilineComment();
     void handleWhitespace(char currentChar) noexcept;
     [[nodiscard]] std::size_t findLineStart();
     [[nodiscard]] std::size_t findLineEnd();

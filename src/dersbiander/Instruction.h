@@ -8,17 +8,19 @@ enum class InstructionType : short {
     OPERATION,
     ASSIGNATION,
     EXPRESSION,
-    CONDITION,
     DECLARATION,
     INITIALIZATION,
+    STRUCTURE,
     DEFINITION,
+    OPEN_SCOPE,
+    CLOSE_SCOPE,
     BLANK
 };
 
 class Instruction {
 public:
     explicit Instruction() noexcept;
-    [[nodiscard]] std::string typeToString() const noexcept;
+    [[nodiscard]] std::vector<std::string> typeToString() const noexcept;
     [[nodiscard]] std::pair<bool, std::string> checkToken(const Token &token);
     [[nodiscard]] inline bool canTerminate() {
         return std::ranges::find(this->allowedTokens, eofTokenType) != this->allowedTokens.end();
@@ -44,7 +46,10 @@ private:
     void checkColon();
     void checkOpenBrackets();
     void checkClosedBrackets();
+    void checkOpenCurlyBrackets();
+    void checkClosedCurlyBracktes();
     void checkKeywordVar();
+    void checkKeywordStructure();
     void emplaceCommaEoft() noexcept;
     [[nodiscard]] TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }
     [[nodiscard]] bool ispreviousEmpty() const noexcept { return this->previousTokens.empty(); }

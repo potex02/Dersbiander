@@ -29,6 +29,8 @@ std::vector<Token> Tokenizer::tokenize() {
             tokens.emplace_back(extractIdentifier());
         } else if(std::isdigit(currentChar)) {
             tokens.emplace_back(extractnumber());
+        } else if(isComment(currentPosition)) {
+            tokens.emplace_back(extractComment());
         } else if(isOperator(currentChar)) {
             tokens.emplace_back(extractOperator());
         } else if(isBrackets(currentChar)) {
@@ -184,6 +186,11 @@ void Tokenizer::appendCharToValue(std::string &value) {
  * @return True if the character is a plus or minus sign, false otherwise.
  */
 bool Tokenizer::isPlusORMinus(char c) const noexcept { return c == '+' || c == '-'; }
+
+bool Tokenizer::isComment(size_t position) const noexcept {
+    return position != inputSpan.size() && input[position] == '/' &&
+           (inputSpan[position + 1] == '/' || inputSpan[position + 1] == '*');
+}
 /**
  * @brief Checks if a given character is an operator.
  *
@@ -248,7 +255,7 @@ bool Tokenizer::isBooleanOperator(const std::string &value) const noexcept {
  * bool result = tokenizer.isBrackets('*'); // Returns false
  * @endcode
  */
-bool Tokenizer::isBrackets(char c) const noexcept { return c == '(' || c == ')'; }
+bool Tokenizer::isBrackets(char c) const noexcept { return c == '(' || c == ')' || c == '{' || c == '}'; }
 
 /**
  * @brief Checks if a given string is a logical operator.
@@ -289,12 +296,14 @@ bool Tokenizer::isVarLenOperator(const std::string &val) const noexcept {
  * @return The extracted identifier, or an empty string if no identifier is found.
  */
 Token Tokenizer::extractIdentifier() {
+    using enum TokenType;
     std::string value;
-    TokenType type = TokenType::IDENTIFIER;
+    TokenType type = IDENTIFIER;
     while(currentPosition < inputSize && (std::isalnum(inputSpan[currentPosition]) || inputSpan[currentPosition] == '_')) {
         appendCharToValue(value);
     }
-    if(value == "var" || value == "const") { type = TokenType::KEYWORD_VAR; }
+    if(value == "var" || value == "const") { type = KEYWORD_VAR; }
+    if(value == "if" || value == "while") { type = KEYWORD_STRUCTURE; }
     return {type, value, currentLine, currentColumn - value.length()};
 }
 
@@ -456,6 +465,12 @@ Token Tokenizer::extractBrackets(char c) {
     case ')':
         type = CLOSED_BRACKETS;
         break;
+    case '{':
+        type = OPEN_CURLY_BRACKETS;
+        break;
+    case '}':
+        type = CLOSED_CURLY_BRACKETS;
+        break;
     default:
         type = UNKNOWN;
     }
@@ -469,10 +484,59 @@ Token Tokenizer::extractChar() {
     ++currentPosition;
     ++currentColumn;
     std::string value;
-    while(!isApostrophe(inputSpan[currentPosition])) { appendCharToValue(value); }
+    while(!isApostrophe(inputSpan[currentPosition])) { 
+        if (currentPosition + 1 == inputSpan.size() || inputSpan[currentPosition] == CNL) {
+            return {TokenType::UNKNOWN, "'" + value + "'", currentLine, currentColumn - startcol};
+        }
+        appendCharToValue(value);
+    }
     ++currentPosition;
     ++currentColumn;
-    return {TokenType::CHAR, value, currentLine, currentColumn - startcol};
+    if(value.size() == 0 || (value.size() == 1 && value != "\\") || (value.size() == 2 && value[0] == '\\')) {
+        return {TokenType::CHAR, value, currentLine, currentColumn - startcol};
+    }
+    return {TokenType::UNKNOWN, "'" + value + "'", currentLine, currentColumn - startcol};
+}
+
+Token Tokenizer::extractComment() {
+    if(inputSpan[currentPosition + 1] == '/') {
+        return {TokenType::COMMENT, handleWithSingleLineComment(), currentLine, currentColumn};
+    }
+    if(inputSpan[currentPosition + 1] == '*') {
+        auto [result, value] = this->handleWithMultilineComment();
+        if(!result) { return {TokenType::UNKNOWN, value, currentLine, currentColumn}; }
+        { return {TokenType::COMMENT, value, currentLine, currentColumn}; }
+    }
+    return {TokenType::UNKNOWN, "", currentLine, currentColumn};
+}
+
+std::string Tokenizer::handleWithSingleLineComment() {
+
+    std::string value = "";
+
+    while(inputSpan[currentPosition] != CNL) { appendCharToValue(value); }
+    return value;
+}
+
+std::pair<bool, std::string> Tokenizer::handleWithMultilineComment() {
+
+    std::string value = "";
+
+    while(currentPosition + 1 != inputSize &&
+          (inputSpan[currentPosition] != '*' || inputSpan[currentPosition + 1] != '/')) {
+        if(inputSpan[currentPosition] == CNL) {
+            ++currentLine;
+            currentColumn = 1;
+        }
+        appendCharToValue(value);
+    }
+    if(currentPosition + 1 == inputSize) {
+        return {false, value};
+    }
+    appendCharToValue(value);
+    appendCharToValue(value);
+    return {true, value};
+
 }
 
 /**
