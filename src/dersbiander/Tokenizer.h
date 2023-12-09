@@ -55,4 +55,10 @@ private:
     std::string handleWithSingleLineComment();
     std::pair<bool, std::string> handleWithMultilineComment();
     void handleWhitespace(char currentChar) noexcept;
+    [[nodiscard]] std::size_t findLineStart();
+    [[nodiscard]] std::size_t findLineEnd();
+    [[nodiscard]] std::string getContextLine(size_t lineStart, size_t lineEnd) const;
+    [[nodiscard]] std::string getHighlighting(size_t lineStart, size_t length) const;
+    [[nodiscard]] std::string getErrorMessage(const std::string &values, const std::string &errorMsg,
+                                              const std::string &contextLine, const std::string &highlighting) const;
 };
