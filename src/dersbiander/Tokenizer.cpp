@@ -504,7 +504,7 @@ Token Tokenizer::extractChar() {
  * @brief Extracts a comment from a given line of code.
  *
  * This function searches for a comment in a line of code and extracts it.
- * A comment is identified by the presence of "//" or "/*" at the beginning
+ * A comment is identified by the presence of a single line or multi line comment at the beginning
  * of the line. Inline comments are extracted until the end of the line
  * or until the start of a block comment is encountered.
  *
