@@ -8,6 +8,7 @@ enum class InstructionType : short {
     OPERATION,
     ASSIGNATION,
     EXPRESSION,
+    SQUARE_EXPRESSION,
     DECLARATION,
     INITIALIZATION,
     STRUCTURE,

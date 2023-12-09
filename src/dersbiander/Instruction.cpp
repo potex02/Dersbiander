@@ -39,6 +39,9 @@ Instruction::Instruction() noexcept
         case EXPRESSION:
             result.emplace_back("EXPRESSION");
             break;
+        case SQUARE_EXPRESSION:
+            result.emplace_back("SQUARE_EXPRESSION");
+            break;
         case DECLARATION:
             result.emplace_back("DECLARATION");
             break;
