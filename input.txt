@@ -10,10 +10,10 @@ variable += 4
 //Comment
 variable -= -4. + ( // Single line comment
 	12 + 56 &&
-	variable2 == true ||
+	variable2++ == true ||
 	!variable >= 10
 )
-variable = variable && /*|| f*/ -4.5
+variable = variable-- && /*|| f*/ -4.5
 /*multi-
 line
 comment*/
