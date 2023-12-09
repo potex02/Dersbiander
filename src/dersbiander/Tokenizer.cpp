@@ -121,7 +121,7 @@ std::size_t Tokenizer::findLineEnd() {
  * \return The context line from 'lineStart' to 'lineEnd' (inclusive).
  */
 std::string Tokenizer::getContextLine(std::size_t lineStart, std::size_t lineEnd) const {
-    return std::string(input.begin() + lineStart, input.begin() + lineEnd) + NEWL;  // NOLINT(*-narrowing-conversions)
+    return std::string(input.begin() + static_cast<long>(lineStart), input.begin() + static_cast<long>(lineEnd)) + NEWL;  // NOLINT(*-narrowing-conversions)
 }
 
 /**
