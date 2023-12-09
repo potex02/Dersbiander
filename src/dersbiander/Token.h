@@ -20,6 +20,8 @@ enum class TokenType : int {
     COLON,
     OPEN_BRACKETS,
     CLOSED_BRACKETS,
+    OPEN_SQUARE_BRACKETS,
+    CLOSED_SQUARE_BRACKETS,
     OPEN_CURLY_BRACKETS,
     CLOSED_CURLY_BRACKETS,
     KEYWORD_VAR,
@@ -74,6 +76,10 @@ struct Token {
             return "OPEN_BRACKETS";
         case CLOSED_BRACKETS:
             return "CLOSED_BRACKETS";
+        case OPEN_SQUARE_BRACKETS:
+            return "OPEN_SQAURE_BRACKETS";
+        case CLOSED_SQUARE_BRACKETS:
+            return "CLOSED_SQUARE_BRACKETS";
         case OPEN_CURLY_BRACKETS:
             return "OPEN_CURLY_BRACKETS";
         case CLOSED_CURLY_BRACKETS:
