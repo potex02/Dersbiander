@@ -48,6 +48,9 @@ Instruction::Instruction() noexcept
         case INITIALIZATION:
             result.emplace_back("INITIALIZATION");
             break;
+        case ARRAY_INIZIALIZATION:
+            result.emplace_back("ARRAY_INIZIALIZATION");
+            break;
         case STRUCTURE:
             result.emplace_back("STRUCTURE");
             break;
@@ -144,7 +147,8 @@ void Instruction::emplaceCommaEoft() noexcept {
 bool Instruction::isExpression() {
     using enum InstructionType;
     return this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION ||
-           this->lastInstructionType() == EXPRESSION || this->lastInstructionType() == SQUARE_EXPRESSION;
+           this->lastInstructionType() == ARRAY_INIZIALIZATION || this->lastInstructionType() == EXPRESSION ||
+           this->lastInstructionType() == SQUARE_EXPRESSION;
 }
 
 void Instruction::checkIdentifier() noexcept {
@@ -159,6 +163,11 @@ void Instruction::checkIdentifier() noexcept {
         }
         if(this->lastInstructionType() == EXPRESSION) {
             this->allowedTokens.emplace_back(CLOSED_BRACKETS);
+            return;
+        }
+        if(this->lastInstructionType() == ARRAY_INIZIALIZATION) {
+            this->allowedTokens.emplace_back(COMMA);
+            this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
             return;
         }
         this->emplaceCommaEoft();
@@ -192,6 +201,11 @@ void Instruction::checkNumber() noexcept {
         }
         if(this->lastInstructionType() == EXPRESSION) {
             this->allowedTokens.emplace_back(CLOSED_BRACKETS);
+            return;
+        }
+        if(this->lastInstructionType() == ARRAY_INIZIALIZATION) {
+            this->allowedTokens.emplace_back(COMMA);
+            this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
             return;
         }
         this->emplaceCommaEoft();
@@ -229,7 +243,7 @@ void Instruction::checkEqualOperator() {
         } else {
             this->setLastInstructionType(INITIALIZATION);
         }
-        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS};
+        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS, OPEN_SQUARE_BRACKETS};
         return;
     }
     this->allowedTokens = {};
@@ -256,11 +270,7 @@ void Instruction::checkComma() {
         this->allowedTokens = {IDENTIFIER};
         return;
     }
-    if(this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION) {
-        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS};
-        return;
-    }
-    this->allowedTokens = {};
+    this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS, OPEN_SQUARE_BRACKETS};
 }
 
 void Instruction::checkColon() {
@@ -283,6 +293,11 @@ void Instruction::checkOpenBrackets(const TokenType &type) {
         this->allowedTokens.emplace_back(CLOSED_BRACKETS);
         return;
     }
+    if(this->previousTokensLast() == EQUAL_OPERATOR || this->previousTokensLast() == COMMA || this->previousTokensLast() == OPEN_SQUARE_BRACKETS) {
+        this->addInstructionType(ARRAY_INIZIALIZATION);
+        this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS);
+        return;
+    }
     if(this->lastInstructionType() == DECLARATION) { this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS); }
     this->addInstructionType(SQUARE_EXPRESSION);
 }
@@ -301,6 +316,12 @@ void Instruction::checkClosedBrackets(const TokenType &type) {
             return;
         }
         if(this->lastInstructionType() == SQUARE_EXPRESSION) {
+            this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
+            return;
+        }
+
+        if(this->lastInstructionType() == ARRAY_INIZIALIZATION) {
+            this->allowedTokens.emplace_back(COMMA);
             this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
             return;
         }

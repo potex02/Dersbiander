@@ -11,6 +11,7 @@ enum class InstructionType : short {
     SQUARE_EXPRESSION,
     DECLARATION,
     INITIALIZATION,
+    ARRAY_INIZIALIZATION,
     STRUCTURE,
     DEFINITION,
     OPEN_SCOPE,
