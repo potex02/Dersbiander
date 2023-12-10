@@ -304,6 +304,7 @@ Token Tokenizer::extractIdentifier() {
     }
     if(value == "var" || value == "const") { type = KEYWORD_VAR; }
     if(value == "if" || value == "while") { type = KEYWORD_STRUCTURE; }
+    if(value == "true" || value == "false") { type = BOOLEAN; }
     if(currentPosition + 1 < inputSize && ((inputSpan[currentPosition] == '+' && inputSpan[currentPosition + 1] == '+') ||
                                            (inputSpan[currentPosition] == '-' && inputSpan[currentPosition + 1] == '-'))) {
         appendCharToValue(value);

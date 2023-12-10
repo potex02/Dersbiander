@@ -42,16 +42,17 @@ private:
     void checkOperator();
     void checkMinusOperator();
     void checkEqualOperator();
-    void checkBooleanAndLogicalOperator(TokenType type);
+    void checkBooleanAndLogicalOperator(const TokenType &type);
     void checkComma();
     void checkColon();
-    void checkOpenBrackets();
-    void checkClosedBrackets();
+    void checkOpenBrackets(const TokenType &type);
+    void checkClosedBrackets(const TokenType &type);
     void checkOpenCurlyBrackets();
     void checkClosedCurlyBracktes();
     void checkKeywordVar();
     void checkKeywordStructure();
     void emplaceCommaEoft() noexcept;
+    [[nodiscard]] inline bool isExpression();
     [[nodiscard]] TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }
     [[nodiscard]] bool ispreviousEmpty() const noexcept { return this->previousTokens.empty(); }
     [[nodiscard]] InstructionType &lastInstructionType() noexcept { return this->instructionTypes.back(); }
