@@ -319,8 +319,7 @@ void Instruction::checkClosedBrackets(const TokenType &type) {
         return;
     }
     if(this->lastInstructionType() == DECLARATION) {
-        this->allowedTokens.emplace_back(EQUAL_OPERATOR);
-        this->allowedTokens.emplace_back(EOFT);
+        this->allowedTokens = {EQUAL_OPERATOR, EOFT};
         if(type == CLOSED_SQUARE_BRACKETS) { this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS); }
         return;
     }

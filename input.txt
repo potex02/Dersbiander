@@ -1,5 +1,5 @@
 var variable: type
-const constant: type[] = [12, 45, true || 12 > variable + (12 / 3 * true), variable++], [[12, 5], [7, 6, 'b'], []]
+const constant: type[]
 var num1, num2: type[12 + a / 2][] = 1 + 1, variable * -5
 variable = 42 * -y + 1. + 1.0 + 1e+1
 variable[1] = -4
