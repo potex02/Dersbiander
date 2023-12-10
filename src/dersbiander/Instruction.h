@@ -80,4 +80,14 @@ private:
         this->booleanOperatorPresent.pop_back();
         this->booleanOperatorPresent.emplace_back(present);
     }
+    inline void emplaceBooleanOperator() {
+        if(!this->lastBooleanOperatorPresent()) { this->allowedTokens.emplace_back(TokenType::BOOLEAN_OPERATOR); }
+    }
+    [[nodiscard]] inline bool emplaceTokenType(const InstructionType& instruction, const TokenType token) {
+        if(this->lastInstructionType() == instruction) {
+            this->allowedTokens.emplace_back(token);
+            return true;
+        }
+        return false;
+    }
 };

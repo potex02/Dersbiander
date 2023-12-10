@@ -156,15 +156,9 @@ void Instruction::checkIdentifier() noexcept {
     using enum InstructionType;
     if(this->isExpression()) {
         this->allowedTokens = { OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR, OPEN_SQUARE_BRACKETS };
-        if(!this->lastBooleanOperatorPresent()) { this->allowedTokens.emplace_back(BOOLEAN_OPERATOR); }
-        if(this->lastInstructionType() == SQUARE_EXPRESSION) {
-            this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
-            return;
-        }
-        if(this->lastInstructionType() == EXPRESSION) {
-            this->allowedTokens.emplace_back(CLOSED_BRACKETS);
-            return;
-        }
+        this->emplaceBooleanOperator();
+        if(this->emplaceTokenType(SQUARE_EXPRESSION, CLOSED_SQUARE_BRACKETS)) { return; }
+        if(this->emplaceTokenType(EXPRESSION, CLOSED_BRACKETS)) { return; }
         if(this->lastInstructionType() == ARRAY_INIZIALIZATION) {
             this->allowedTokens.emplace_back(COMMA);
             this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
@@ -194,15 +188,9 @@ void Instruction::checkNumber() noexcept {
     using enum InstructionType;
     if(this->isExpression()) {
         this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR};
-        if(!this->lastBooleanOperatorPresent()) { this->allowedTokens.emplace_back(BOOLEAN_OPERATOR); }
-        if(this->lastInstructionType() == SQUARE_EXPRESSION) {
-            this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
-            return;
-        }
-        if(this->lastInstructionType() == EXPRESSION) {
-            this->allowedTokens.emplace_back(CLOSED_BRACKETS);
-            return;
-        }
+        this->emplaceBooleanOperator();
+        if(this->emplaceTokenType(SQUARE_EXPRESSION, CLOSED_SQUARE_BRACKETS)) { return; }
+        if(this->emplaceTokenType(EXPRESSION, CLOSED_BRACKETS)) { return; }
         if(this->lastInstructionType() == ARRAY_INIZIALIZATION) {
             this->allowedTokens.emplace_back(COMMA);
             this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
@@ -296,6 +284,7 @@ void Instruction::checkOpenBrackets(const TokenType &type) {
     if(this->previousTokensLast() == EQUAL_OPERATOR || this->previousTokensLast() == COMMA || this->previousTokensLast() == OPEN_SQUARE_BRACKETS) {
         this->addInstructionType(ARRAY_INIZIALIZATION);
         this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS);
+        this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
         return;
     }
     if(this->lastInstructionType() == DECLARATION) { this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS); }
@@ -305,21 +294,17 @@ void Instruction::checkOpenBrackets(const TokenType &type) {
 void Instruction::checkClosedBrackets(const TokenType &type) {
     using enum TokenType;
     using enum InstructionType;
+
+    InstructionType last = this->lastInstructionType();
+
     this->removeInstructionType();
     this->removeBooleanOperatorPresent();
     if(this->isExpression()) {
         this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR};
-        if(type == CLOSED_SQUARE_BRACKETS) { this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS); }
-        if(!this->lastBooleanOperatorPresent()) { this->allowedTokens.emplace_back(BOOLEAN_OPERATOR); }
-        if(this->lastInstructionType() == EXPRESSION) {
-            this->allowedTokens.emplace_back(CLOSED_BRACKETS);
-            return;
-        }
-        if(this->lastInstructionType() == SQUARE_EXPRESSION) {
-            this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
-            return;
-        }
-
+        if(type == CLOSED_SQUARE_BRACKETS && last != ARRAY_INIZIALIZATION ) { this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS); }
+        this->emplaceBooleanOperator();
+        if(this->emplaceTokenType(SQUARE_EXPRESSION, CLOSED_SQUARE_BRACKETS)) { return; }
+        if(this->emplaceTokenType(EXPRESSION, CLOSED_BRACKETS)) { return; }
         if(this->lastInstructionType() == ARRAY_INIZIALIZATION) {
             this->allowedTokens.emplace_back(COMMA);
             this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
