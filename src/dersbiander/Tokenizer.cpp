@@ -121,13 +121,15 @@ std::size_t Tokenizer::findLineEnd() {
  * \return The context line from 'lineStart' to 'lineEnd' (inclusive).
  */
 std::string Tokenizer::getContextLine(std::size_t lineStart, std::size_t lineEnd) const {
-    return std::string(input.begin() + static_cast<long>(lineStart), input.begin() + static_cast<long>(lineEnd)) + NEWL;  // NOLINT(*-narrowing-conversions)
+    return std::string(input.begin() + static_cast<long>(lineStart), input.begin() + static_cast<long>(lineEnd)) +
+           NEWL;  // NOLINT(*-narrowing-conversions)
 }
 
 /**
  * @brief Get the highlighting information for a specific line in the tokenizer.
  *
- * This function returns the highlighting information for a specific line in the tokenizer based on the line's starting index and length.
+ * This function returns the highlighting information for a specific line in the tokenizer based on the line's starting index and
+ * length.
  *
  * @param lineStart The starting index of the line in the tokenizer.
  * @param length The length of the line in the tokenizer.
@@ -137,7 +139,8 @@ std::string Tokenizer::getContextLine(std::size_t lineStart, std::size_t lineEnd
  *       such as keywords, comments, strings, etc.
  *
  * @warning The lineStart parameter should be a valid index within the tokenizer, otherwise undefined behavior may occur.
- *          The length parameter should be a positive non-zero value, otherwise the returned highlighting information may be incorrect.
+ *          The length parameter should be a positive non-zero value, otherwise the returned highlighting information may be
+ * incorrect.
  *
  * @see Tokenizer
  * @see Token
@@ -180,16 +183,18 @@ void Tokenizer::appendCharToValue(std::string &value) {
 
 /**
  * Increment the current position and column of the tokenizer
- * This function is used to track the current position and column of the tokenizer in the text as it's taking in the input and processing it.
+ * This function is used to track the current position and column of the tokenizer in the text as it's taking in the input and
+ * processing it.
  *
  * @pre The object has been properly initialized
  * @post The current position and column of the tokenizer have been incremented by one
  *
- * @note This function modifies the internal state of the object but is not visible externally. It affects how the tokenizer processes the input text.
+ * @note This function modifies the internal state of the object but is not visible externally. It affects how the tokenizer
+ * processes the input text.
  */
 void Tokenizer::incPosAndCol() {
     ++currentPosition;  // Increment the current position within the text
-    ++currentColumn;  // Increment the current column within the line
+    ++currentColumn;    // Increment the current column within the line
 }
 
 // NOLINTBEGIN
@@ -305,13 +310,17 @@ Token Tokenizer::extractIdentifier() {
     if(value == "var" || value == "const") { type = KEYWORD_VAR; }
     if(value == "if" || value == "while") { type = KEYWORD_STRUCTURE; }
     if(value == "true" || value == "false") { type = BOOLEAN; }
-    if(currentPosition + 1 < inputSize && ((inputSpan[currentPosition] == '+' && inputSpan[currentPosition + 1] == '+') ||
-                                           (inputSpan[currentPosition] == '-' && inputSpan[currentPosition + 1] == '-'))) {
+    if(currentPosition + 1 < inputSize && (isCurrentAndNextPlusOrMinus())) {
         appendCharToValue(value);
         appendCharToValue(value);
     }
     return {type, value, currentLine, currentColumn - value.length()};
 }
+bool Tokenizer::isCurrentAndNextPlusOrMinus() const noexcept { return isPlusPlus() || isMinusMinus(); }
+bool Tokenizer::isMinusMinus() const noexcept {
+    return inputSpan[currentPosition] == '-' && inputSpan[currentPosition + 1] == '-';
+}
+bool Tokenizer::isPlusPlus() const noexcept { return inputSpan[currentPosition] == '+' && inputSpan[currentPosition + 1] == '+'; }
 
 /**
  * @class Tokenizer
@@ -512,6 +521,10 @@ Token Tokenizer::extractChar() {
     return {UNKNOWN, "'" + value + "'", currentLine, currentColumn - startcol};
 }
 
+bool isEcapedChar(const std::string &val) noexcept {
+    return (val.size() == 1 && val != "\\") || (val.size() == 2 && val[0] == '\\');
+}
+
 /**
  * @brief Extracts a comment from a given line of code.
  *
@@ -524,15 +537,14 @@ Token Tokenizer::extractChar() {
  * @return The extracted comment, or an empty string if no comment is found.
  */
 Token Tokenizer::extractComment() {
-    if(inputSpan[currentPosition + 1] == '/') {
-        return {TokenType::COMMENT, handleWithSingleLineComment(), currentLine, currentColumn};
-    }
+    using enum TokenType;
+    if(inputSpan[currentPosition + 1] == '/') { return {COMMENT, handleWithSingleLineComment(), currentLine, currentColumn}; }
     if(inputSpan[currentPosition + 1] == '*') {
         auto [result, value] = this->handleWithMultilineComment();
-        if(!result) { return {TokenType::UNKNOWN, value, currentLine, currentColumn}; }
-        return {TokenType::COMMENT, value, currentLine, currentColumn};
+        if(!result) { return {UNKNOWN, value, currentLine, currentColumn}; }
+        return {COMMENT, value, currentLine, currentColumn};
     }
-    return {TokenType::UNKNOWN, "", currentLine, currentColumn};
+    return {UNKNOWN, "", currentLine, currentColumn};
 }
 
 /**
