@@ -259,7 +259,7 @@ bool Tokenizer::isBooleanOperator(const std::string &value) const noexcept {
  * @param c The character to check.
  * @return true if the character is a bracket, false otherwise.
  */
-bool Tokenizer::isBrackets(char c) const noexcept { return c == '(' || c == ')' || c == '{' || c == '}'; }
+bool Tokenizer::isBrackets(char c) const noexcept { return c == '(' || c == ')' || c == '[' || c == ']' || c == '{' || c == '}'; }
 
 /**
  * @brief Checks if a given string is a logical operator.
@@ -304,6 +304,12 @@ Token Tokenizer::extractIdentifier() {
     }
     if(value == "var" || value == "const") { type = KEYWORD_VAR; }
     if(value == "if" || value == "while") { type = KEYWORD_STRUCTURE; }
+    if(value == "true" || value == "false") { type = BOOLEAN; }
+    if(currentPosition + 1 < inputSize && ((inputSpan[currentPosition] == '+' && inputSpan[currentPosition + 1] == '+') ||
+                                           (inputSpan[currentPosition] == '-' && inputSpan[currentPosition + 1] == '-'))) {
+        appendCharToValue(value);
+        appendCharToValue(value);
+    }
     return {type, value, currentLine, currentColumn - value.length()};
 }
 
@@ -461,6 +467,12 @@ Token Tokenizer::extractBrackets(char c) {
         break;
     case ')':
         type = CLOSED_BRACKETS;
+        break;
+    case '[':
+        type = OPEN_SQUARE_BRACKETS;
+        break;
+    case ']':
+        type = CLOSED_SQUARE_BRACKETS;
         break;
     case '{':
         type = OPEN_CURLY_BRACKETS;
