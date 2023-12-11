@@ -155,7 +155,7 @@ void Instruction::checkIdentifier() noexcept {
     using enum TokenType;
     using enum InstructionType;
     if(this->isExpression()) {
-        this->allowedTokens = { OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR, OPEN_SQUARE_BRACKETS };
+        this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR, OPEN_SQUARE_BRACKETS};
         this->emplaceBooleanOperator();
         if(this->emplaceTokenType(SQUARE_EXPRESSION, CLOSED_SQUARE_BRACKETS)) { return; }
         if(this->emplaceTokenType(EXPRESSION, CLOSED_BRACKETS)) { return; }
@@ -167,18 +167,21 @@ void Instruction::checkIdentifier() noexcept {
         this->emplaceCommaEoft();
         return;
     }
-    if(this->lastInstructionType() == BLANK || this->lastInstructionType() == OPERATION) {
+    switch(this->lastInstructionType()) {
+    case BLANK:
+    case OPERATION:
         this->setLastInstructionType(OPERATION);
         this->allowedTokens = {EQUAL_OPERATOR, OPERATION_EQUAL, COMMA, OPEN_SQUARE_BRACKETS};
         return;
-    }
-    if(this->lastInstructionType() == DECLARATION) {
+    case DECLARATION:
         if(!this->ispreviousEmpty() && this->previousTokensLast() == COLON) {
             this->allowedTokens = {EQUAL_OPERATOR, OPEN_SQUARE_BRACKETS, EOFT};
             return;
         }
         this->allowedTokens = {COMMA, COLON};
         return;
+    default:
+        break;
     }
     this->allowedTokens = {};
 }
@@ -231,7 +234,8 @@ void Instruction::checkEqualOperator() {
         } else {
             this->setLastInstructionType(INITIALIZATION);
         }
-        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS, OPEN_SQUARE_BRACKETS};
+        this->allowedTokens = {IDENTIFIER,          INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS,
+                               OPEN_SQUARE_BRACKETS};
         return;
     }
     this->allowedTokens = {};
@@ -258,7 +262,8 @@ void Instruction::checkComma() {
         this->allowedTokens = {IDENTIFIER};
         return;
     }
-    this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS, OPEN_SQUARE_BRACKETS};
+    this->allowedTokens = {IDENTIFIER,          INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS,
+                           OPEN_SQUARE_BRACKETS};
 }
 
 void Instruction::checkColon() {
@@ -281,7 +286,9 @@ void Instruction::checkOpenBrackets(const TokenType &type) {
         this->allowedTokens.emplace_back(CLOSED_BRACKETS);
         return;
     }
-    if(this->previousTokensLast() == EQUAL_OPERATOR || this->previousTokensLast() == COMMA || this->previousTokensLast() == OPEN_SQUARE_BRACKETS) {
+
+    if(this->previousTokensLast() == EQUAL_OPERATOR || this->previousTokensLast() == COMMA ||
+       this->previousTokensLast() == OPEN_SQUARE_BRACKETS) {
         this->addInstructionType(ARRAY_INIZIALIZATION);
         this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS);
         this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
@@ -301,7 +308,9 @@ void Instruction::checkClosedBrackets(const TokenType &type) {
     this->removeBooleanOperatorPresent();
     if(this->isExpression()) {
         this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR};
-        if(type == CLOSED_SQUARE_BRACKETS && last != ARRAY_INIZIALIZATION ) { this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS); }
+        if(type == CLOSED_SQUARE_BRACKETS && last != ARRAY_INIZIALIZATION) {
+            this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS);
+        }
         this->emplaceBooleanOperator();
         if(this->emplaceTokenType(SQUARE_EXPRESSION, CLOSED_SQUARE_BRACKETS)) { return; }
         if(this->emplaceTokenType(EXPRESSION, CLOSED_BRACKETS)) { return; }
@@ -313,19 +322,20 @@ void Instruction::checkClosedBrackets(const TokenType &type) {
         this->emplaceCommaEoft();
         return;
     }
-    if (this->lastInstructionType() == OPERATION) {
+    switch(this->lastInstructionType()) {
+    case OPERATION:
         this->allowedTokens = {EQUAL_OPERATOR, OPERATION_EQUAL, COMMA};
         if(type == CLOSED_SQUARE_BRACKETS) { this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS); }
         return;
-    }
-    if(this->lastInstructionType() == DECLARATION) {
+    case DECLARATION:
         this->allowedTokens = {EQUAL_OPERATOR, EOFT};
         if(type == CLOSED_SQUARE_BRACKETS) { this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS); }
         return;
-    }
-    if(this->lastInstructionType() == STRUCTURE) {
+    case STRUCTURE:
         this->allowedTokens = {OPEN_CURLY_BRACKETS};
         return;
+    default:
+        break;
     }
     this->allowedTokens = {};
 }
