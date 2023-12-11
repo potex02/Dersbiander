@@ -55,7 +55,7 @@ private:
     void emplaceCommaEoft() noexcept;
     [[nodiscard]] inline bool isExpression() noexcept;
     [[nodiscard]] TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }
-    [[nodiscard]] bool ispreviousEmpty() const noexcept { return this->previousTokens.empty(); }
+    [[nodiscard]] bool isPreviousEmpty() const noexcept { return this->previousTokens.empty(); }
     [[nodiscard]] InstructionType &lastInstructionType() noexcept { return this->instructionTypes.back(); }
     inline void addInstructionType(InstructionType instructionType) noexcept {
         this->instructionTypes.emplace_back(instructionType);

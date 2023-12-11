@@ -174,7 +174,7 @@ void Instruction::checkIdentifier() noexcept {
         this->allowedTokens = {EQUAL_OPERATOR, OPERATION_EQUAL, COMMA, OPEN_SQUARE_BRACKETS};
         return;
     case DECLARATION:
-        if(!this->ispreviousEmpty() && this->previousTokensLast() == COLON) {
+        if(!this->isPreviousEmpty() && this->previousTokensLast() == COLON) {
             this->allowedTokens = {EQUAL_OPERATOR, OPEN_SQUARE_BRACKETS, EOFT};
             return;
         }
