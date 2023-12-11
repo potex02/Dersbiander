@@ -515,13 +515,11 @@ Token Tokenizer::extractChar() {
         appendCharToValue(value);
     }
     incPosAndCol();
-    if(value.empty() || (value.size() == 1 && value != "\\") || (value.size() == 2 && value[0] == '\\')) {
-        return {CHAR, value, currentLine, currentColumn - startcol};
-    }
+    if(value.empty() || isEcapedChar(value)) { return {CHAR, value, currentLine, currentColumn - startcol}; }
     return {UNKNOWN, "'" + value + "'", currentLine, currentColumn - startcol};
 }
 
-bool isEcapedChar(const std::string &val) noexcept {
+bool Tokenizer::isEcapedChar(const std::string &val) const noexcept {
     return (val.size() == 1 && val != "\\") || (val.size() == 2 && val[0] == '\\');
 }
 
