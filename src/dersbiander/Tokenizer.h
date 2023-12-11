@@ -65,5 +65,5 @@ private:
     [[nodiscard]] bool isCurrentAndNextPlusOrMinus() const noexcept;
     [[nodiscard]] bool isPlusPlus() const noexcept;
     [[nodiscard]] bool isMinusMinus() const noexcept;
-    [[nodiscard]] bool isEcapedChar(const std::string &val) noexcept;
+    [[nodiscard]] bool isEcapedChar(const std::string &val) const noexcept;
 };

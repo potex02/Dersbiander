@@ -53,7 +53,7 @@ private:
     void checkKeywordVar();
     void checkKeywordStructure();
     void emplaceCommaEoft() noexcept;
-    [[nodiscard]] inline bool isExpression();
+    [[nodiscard]] inline bool isExpression() noexcept;
     [[nodiscard]] TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }
     [[nodiscard]] bool ispreviousEmpty() const noexcept { return this->previousTokens.empty(); }
     [[nodiscard]] InstructionType &lastInstructionType() noexcept { return this->instructionTypes.back(); }
@@ -80,10 +80,10 @@ private:
         this->booleanOperatorPresent.pop_back();
         this->booleanOperatorPresent.emplace_back(present);
     }
-    inline void emplaceBooleanOperator() {
+    inline void emplaceBooleanOperator() noexcept {
         if(!this->lastBooleanOperatorPresent()) { this->allowedTokens.emplace_back(TokenType::BOOLEAN_OPERATOR); }
     }
-    [[nodiscard]] inline bool emplaceTokenType(const InstructionType& instruction, const TokenType token) {
+    [[nodiscard]] inline bool emplaceTokenType(const InstructionType &instruction, const TokenType token) noexcept {
         if(this->lastInstructionType() == instruction) {
             this->allowedTokens.emplace_back(token);
             return true;

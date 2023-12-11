@@ -144,7 +144,7 @@ void Instruction::emplaceCommaEoft() noexcept {
     this->allowedTokens.emplace_back(TokenType::EOFT);
 }
 
-bool Instruction::isExpression() {
+bool Instruction::isExpression() noexcept {
     using enum InstructionType;
     return this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION ||
            this->lastInstructionType() == ARRAY_INIZIALIZATION || this->lastInstructionType() == EXPRESSION ||
@@ -302,7 +302,7 @@ void Instruction::checkClosedBrackets(const TokenType &type) {
     using enum TokenType;
     using enum InstructionType;
 
-    InstructionType last = this->lastInstructionType();
+    const InstructionType last = this->lastInstructionType();
 
     this->removeInstructionType();
     this->removeBooleanOperatorPresent();
