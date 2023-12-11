@@ -29,6 +29,7 @@ private:
     std::size_t currentColumn = 1;
 
     inline void appendCharToValue(std::string &value);
+    [[nodiscard]] bool isPositionInText() const noexcept;
 
     // NOLINTBEGIN
     [[nodiscard]] inline bool isPlusORMinus(char c) const noexcept;
@@ -65,5 +66,5 @@ private:
     [[nodiscard]] bool isCurrentAndNextPlusOrMinus() const noexcept;
     [[nodiscard]] bool isPlusPlus() const noexcept;
     [[nodiscard]] bool isMinusMinus() const noexcept;
-    [[nodiscard]] bool isEcapedChar(const std::string &val) const noexcept;
+    [[nodiscard]] bool isEscapedChar(const std::string &val) const noexcept;
 };

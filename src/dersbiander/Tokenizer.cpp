@@ -13,6 +13,7 @@ DISABLE_WARNINGS_PUSH(
 Tokenizer::Tokenizer(const std::string &_input)
   : input(_input), inputSpan(input.c_str(), input.size()), inputSize(input.size()) {}
 
+bool Tokenizer::isPositionInText() const noexcept { return currentPosition < inputSize; }
 /**
  * @brief Tokenizes a given string into individual tokens.
  *
@@ -31,7 +32,7 @@ Tokenizer::Tokenizer(const std::string &_input)
  */
 std::vector<Token> Tokenizer::tokenize() {
     std::vector<Token> tokens;
-    while(currentPosition < inputSize) {
+    while(isPositionInText()) {
         const char currentChar = inputSpan[currentPosition];
         if(std::isalpha(currentChar)) {
             tokens.emplace_back(extractIdentifier());
@@ -304,7 +305,7 @@ Token Tokenizer::extractIdentifier() {
     using enum TokenType;
     std::string value;
     TokenType type = IDENTIFIER;
-    while(currentPosition < inputSize && (std::isalnum(inputSpan[currentPosition]) || inputSpan[currentPosition] == '_')) {
+    while(isPositionInText() && (std::isalnum(inputSpan[currentPosition]) || inputSpan[currentPosition] == '_')) {
         appendCharToValue(value);
     }
     if(value == "var" || value == "const") { type = KEYWORD_VAR; }
@@ -339,7 +340,7 @@ bool Tokenizer::isApostrophe(char c) const noexcept { return c == '\''; }
  * @return The number of digits extracted from the string.
  */
 void Tokenizer::extractDigits(std::string &value) {
-    while(currentPosition < inputSize && std::isdigit(inputSpan[currentPosition])) { appendCharToValue(value); }
+    while(isPositionInText() && std::isdigit(inputSpan[currentPosition])) { appendCharToValue(value); }
 }
 
 /**
@@ -362,7 +363,7 @@ void Tokenizer::extractDigits(std::string &value) {
  * @endcode
  */
 void Tokenizer::extractExponent(std::string &value) {
-    if(currentPosition < inputSize && isPlusORMinus(inputSpan[currentPosition])) { appendCharToValue(value); }
+    if(isPositionInText() && isPlusORMinus(inputSpan[currentPosition])) { appendCharToValue(value); }
     extractDigits(value);
 }
 
@@ -374,18 +375,18 @@ Token Tokenizer::extractnumber() {
     std::string value;
     extractDigits(value);
 
-    if(currentPosition < inputSize && inputSpan[currentPosition] == PNT) {
+    if(isPositionInText() && inputSpan[currentPosition] == PNT) {
         appendCharToValue(value);
         extractDigits(value);
 
-        if(currentPosition < inputSize && std::toupper(inputSpan[currentPosition]) == ECR) {
+        if(isPositionInText() && std::toupper(inputSpan[currentPosition]) == ECR) {
             appendCharToValue(value);
             extractExponent(value);
         }
         return {TokenType::DOUBLE, value, currentLine, currentColumn - value.length()};
     }
 
-    if(currentPosition < inputSize && std::toupper(inputSpan[currentPosition]) == ECR) {
+    if(isPositionInText() && std::toupper(inputSpan[currentPosition]) == ECR) {
         appendCharToValue(value);
         extractExponent(value);
         return {TokenType::DOUBLE, value, currentLine, currentColumn - value.length()};
@@ -403,7 +404,7 @@ Token Tokenizer::extractnumber() {
  * @return A string containing the extracted operator, or an empty string if no operator is found.
  */
 void Tokenizer::extractVarLenOperator(std::string &value) {
-    while(currentPosition < inputSize && isOperator(inputSpan[currentPosition])) { appendCharToValue(value); }
+    while(isPositionInText() && isOperator(inputSpan[currentPosition])) { appendCharToValue(value); }
 }
 
 /**
@@ -515,11 +516,11 @@ Token Tokenizer::extractChar() {
         appendCharToValue(value);
     }
     incPosAndCol();
-    if(value.empty() || isEcapedChar(value)) { return {CHAR, value, currentLine, currentColumn - startcol}; }
+    if(value.empty() || isEscapedChar(value)) { return {CHAR, value, currentLine, currentColumn - startcol}; }
     return {UNKNOWN, "'" + value + "'", currentLine, currentColumn - startcol};
 }
 
-bool Tokenizer::isEcapedChar(const std::string &val) const noexcept {
+bool Tokenizer::isEscapedChar(const std::string &val) const noexcept {
     return (val.size() == 1 && val != "\\") || (val.size() == 2 && val[0] == '\\');
 }
 
