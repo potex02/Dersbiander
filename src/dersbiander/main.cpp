@@ -22,9 +22,14 @@ static void timeTokenizer(Tokenizer &tokenizer, std::vector<Token> &tokens) {
     tokens = tokenizer.tokenize();
 }
 
+#ifdef _WIN32  // Windows
+constexpr std::string_view filename = "../../../input.txt";
+#elif defined __unix__  // Linux and Unix-like systems
+constexpr std::string_view filename = "input.txt";  // Linux and Unix
+#endif
 // NOLINTNEXTLINE(bugprone-exception-escape)
 int main(int argc, const char **argv) {
-    std::ifstream file("../../../input.txt");
+    std::ifstream file(filename.data());
     std::string lines;
     std::size_t line;
 
@@ -88,7 +93,7 @@ int main(int argc, const char **argv) {
             }
             line = tokens[0].line;
             for(const Token &token : tokens) {
-                if (token.type == TokenType::COMMENT) { continue; }
+                if(token.type == TokenType::COMMENT) { continue; }
                 if(token.line >= line) {
                     if(instructions.empty() || instructions.back().canTerminate()) {
                         instructions.emplace_back();
