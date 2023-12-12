@@ -1,4 +1,5 @@
 # Dersbiander
+[![CodeQL](https://github.com/cpp-best-practices/cmake_template/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/cpp-best-practices/cmake_template/actions/workflows/codeql-analysis.yml)
 
 ## About Dersbiander
 
@@ -8,5 +9,4 @@ a experimatal  project  to  build  programming language
 
 * [Dependency Setup](README_dependencies.md)
 * [Building Details](README_building.md)
-* [Troubleshooting](README_troubleshooting.md)
 * [Docker](README_docker.md)
