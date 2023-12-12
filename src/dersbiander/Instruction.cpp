@@ -22,7 +22,8 @@ Instruction::Instruction() noexcept
 }
 
 [[nodiscard]] std::vector<std::string> Instruction::typeToString() const noexcept {
-    std::vector<std::string> result = {};
+    std::vector<std::string> result;
+    result.reserve(this->instructionTypes.size());
 
     for(const InstructionType &i : this->instructionTypes) {
         switch(i) {
