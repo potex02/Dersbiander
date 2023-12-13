@@ -81,6 +81,7 @@ Instruction::Instruction() noexcept
     switch(token.type) {
         using enum TokenType;
     case IDENTIFIER:
+    case UNARY_OPERATOR:
         this->checkIdentifier();
         break;
     case INTEGER:
@@ -156,7 +157,7 @@ void Instruction::checkIdentifier() noexcept {
     using enum TokenType;
     using enum InstructionType;
     if(this->isExpression()) {
-        this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR, OPEN_SQUARE_BRACKETS};
+        this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR, UNARY_OPERATOR, OPEN_SQUARE_BRACKETS};
         this->emplaceBooleanOperator();
         if(this->emplaceTokenType(SQUARE_EXPRESSION, CLOSED_SQUARE_BRACKETS)) { return; }
         if(this->emplaceTokenType(EXPRESSION, CLOSED_BRACKETS)) { return; }
@@ -172,7 +173,7 @@ void Instruction::checkIdentifier() noexcept {
     case BLANK:
     case OPERATION:
         this->setLastInstructionType(OPERATION);
-        this->allowedTokens = {EQUAL_OPERATOR, OPERATION_EQUAL, COMMA, OPEN_SQUARE_BRACKETS};
+        this->allowedTokens = {EQUAL_OPERATOR, OPERATION_EQUAL, UNARY_OPERATOR, COMMA, OPEN_SQUARE_BRACKETS, EOFT};
         return;
     case DECLARATION:
         if(!this->isPreviousEmpty() && this->previousTokensLast() == COLON) {

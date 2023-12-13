@@ -41,7 +41,7 @@ std::vector<Token> Tokenizer::tokenize() {
         } else if(TokenizerUtils::isComment(inputSpan, currentPosition)) {
             tokens.emplace_back(extractComment());
         } else if(TokenizerUtils::isOperator(currentChar)) {
-            tokens.emplace_back(extractOperator());
+            extractOperator(tokens);
         } else if(TokenizerUtils::isBrackets(currentChar)) {
             tokens.emplace_back(extractBrackets(currentChar));
         } else if(TokenizerUtils::isApostrophe(currentChar)) {
@@ -212,17 +212,8 @@ Token Tokenizer::extractIdentifier() {
     if(value == "var" || value == "const") { type = KEYWORD_VAR; }
     if(value == "if" || value == "while") { type = KEYWORD_STRUCTURE; }
     if(value == "true" || value == "false") { type = BOOLEAN; }
-    if(currentPosition + 1 < inputSize && (isCurrentAndNextPlusOrMinus())) {
-        appendCharToValue(value);
-        appendCharToValue(value);
-    }
     return {type, value, currentLine, currentColumn - value.length()};
 }
-bool Tokenizer::isCurrentAndNextPlusOrMinus() const noexcept { return isPlusPlus() || isMinusMinus(); }
-bool Tokenizer::isMinusMinus() const noexcept {
-    return inputSpan[currentPosition] == '-' && inputSpan[currentPosition + 1] == '-';
-}
-bool Tokenizer::isPlusPlus() const noexcept { return inputSpan[currentPosition] == '+' && inputSpan[currentPosition + 1] == '+'; }
 
 /**
  * @brief Extracts all digits from a given string.
@@ -336,6 +327,7 @@ TokenType Tokenizer::typeByValue(const std::string &value) const {
     if(TokenizerUtils::isOperationEqualOperator(value)) { return OPERATION_EQUAL; }
     if(TokenizerUtils::isBooleanOperator(value)) { return BOOLEAN_OPERATOR; }
     if(TokenizerUtils::isLogicalOperator(value)) { return LOGICAL_OPERATOR; }
+    if(TokenizerUtils::isUnaryOperator(value)) { return UNARY_OPERATOR; }
     return UNKNOWN;
 }
 
@@ -346,11 +338,23 @@ TokenType Tokenizer::typeByValue(const std::string &value) const {
  * The Tokenizer class provides methods to extract operators, operands,
  * and other tokens from a given input string.
  */
-Token Tokenizer::extractOperator() {
+void Tokenizer::extractOperator(std::vector<Token> &tokens) {
+
     std::string value;
+
     extractVarLenOperator(value);
-    TokenType type = value.size() == 1 ? typeBySingleCharacter(value[0]) : typeByValue(value);
-    return {type, value, currentLine, currentColumn - value.length()};
+    while (value.size() != 0) {
+
+        Token token;
+        
+        if(value.size() == 1) {
+            token = Token{typeBySingleCharacter(value[0]), std::string(1, value[0]), currentLine, currentColumn - 1};
+        } else {
+            token = {typeByValue(value.substr(0, 2)), value.substr(0, 2), currentLine, currentColumn - 2};
+        }
+        tokens.emplace_back(token);
+        value.erase(0, token.value.size());
+    }
 }
 
 /**
