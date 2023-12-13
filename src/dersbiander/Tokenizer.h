@@ -42,7 +42,7 @@ private:
     void extractExponent(std::string &value);
     void extractVarLenOperator(std::string &value);
     Token extractnumber();
-    Token extractOperator();
+    void extractOperator(std::vector<Token> &tokens);
     Token extractBrackets(char c);
     Token extractChar();
     Token extractComment();
@@ -56,8 +56,5 @@ private:
     [[nodiscard]] std::string getErrorMessage(const std::string &values, const std::string &errMsg,
                                               const std::string &contextLine, const std::string &highlighting) const;
     void incPosAndCol();
-    [[nodiscard]] bool isCurrentAndNextPlusOrMinus() const noexcept;
-    [[nodiscard]] bool isPlusPlus() const noexcept;
-    [[nodiscard]] bool isMinusMinus() const noexcept;
     [[nodiscard]] bool isEscapedChar(const std::string &val) const noexcept;
 };

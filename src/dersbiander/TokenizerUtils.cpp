@@ -23,6 +23,8 @@ bool TokenizerUtils::isBooleanOperator(const std::string &value) noexcept {
 
 bool TokenizerUtils::isLogicalOperator(const std::string &value) noexcept { return value == "&&" || value == "||"; }
 
+bool TokenizerUtils::isUnaryOperator(const std::string &value) noexcept { return value == "++" || value == "--"; }
+
 bool TokenizerUtils::isVarLenOperator(const std::string &val) noexcept {
     return isOperator(val[0]) || isBrackets(val[0]) || isOperationEqualOperator(val) || isBooleanOperator(val) ||
            isLogicalOperator(val);
