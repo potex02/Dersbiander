@@ -82,7 +82,7 @@ Instruction::Instruction() noexcept
         using enum TokenType;
     case IDENTIFIER:
     case UNARY_OPERATOR:
-        this->checkIdentifier();
+        this->checkIdentifier(token.type);
         break;
     case INTEGER:
     case DOUBLE:
@@ -153,12 +153,13 @@ bool Instruction::isExpression() noexcept {
            this->lastInstructionType() == SQUARE_EXPRESSION;
 }
 
-void Instruction::checkIdentifier() noexcept {
+void Instruction::checkIdentifier(const TokenType &type) noexcept {
     using enum TokenType;
     using enum InstructionType;
     if(this->isExpression()) {
-        this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR, UNARY_OPERATOR, OPEN_SQUARE_BRACKETS};
+        this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR, OPEN_SQUARE_BRACKETS};
         this->emplaceBooleanOperator();
+        this->emplaceUnaryOperator(type);
         if(this->emplaceTokenType(SQUARE_EXPRESSION, CLOSED_SQUARE_BRACKETS)) { return; }
         if(this->emplaceTokenType(EXPRESSION, CLOSED_BRACKETS)) { return; }
         if(this->lastInstructionType() == ARRAY_INIZIALIZATION) {
@@ -173,19 +174,20 @@ void Instruction::checkIdentifier() noexcept {
     case BLANK:
     case OPERATION:
         this->setLastInstructionType(OPERATION);
-        this->allowedTokens = {EQUAL_OPERATOR, OPERATION_EQUAL, UNARY_OPERATOR, COMMA, OPEN_SQUARE_BRACKETS, EOFT};
-        return;
+        this->allowedTokens = {EQUAL_OPERATOR, OPERATION_EQUAL, COMMA, OPEN_SQUARE_BRACKETS, EOFT};
+        this->emplaceUnaryOperator(type);
+        break;
     case DECLARATION:
         if(!this->isPreviousEmpty() && this->previousTokensLast() == COLON) {
             this->allowedTokens = {EQUAL_OPERATOR, OPEN_SQUARE_BRACKETS, EOFT};
-            return;
+            break;
         }
         this->allowedTokens = {COMMA, COLON};
-        return;
+        break;
     default:
+        this->allowedTokens = {};
         break;
     }
-    this->allowedTokens = {};
 }
 
 void Instruction::checkNumber() noexcept {
@@ -312,6 +314,7 @@ void Instruction::checkClosedBrackets(const TokenType &type) {
         this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR};
         if(type == CLOSED_SQUARE_BRACKETS && last != ARRAY_INIZIALIZATION) {
             this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS);
+            this->allowedTokens.emplace_back(UNARY_OPERATOR);
         }
         this->emplaceBooleanOperator();
         if(this->emplaceTokenType(SQUARE_EXPRESSION, CLOSED_SQUARE_BRACKETS)) { return; }
@@ -328,18 +331,19 @@ void Instruction::checkClosedBrackets(const TokenType &type) {
     case OPERATION:
         this->allowedTokens = {EQUAL_OPERATOR, OPERATION_EQUAL, COMMA};
         if(type == CLOSED_SQUARE_BRACKETS) { this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS); }
-        return;
+        this->allowedTokens.emplace_back(UNARY_OPERATOR);
+        break;
     case DECLARATION:
         this->allowedTokens = {EQUAL_OPERATOR, EOFT};
         if(type == CLOSED_SQUARE_BRACKETS) { this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS); }
-        return;
+        break;
     case STRUCTURE:
         this->allowedTokens = {OPEN_CURLY_BRACKETS};
-        return;
+        break;;
     default:
+        this->allowedTokens = {};
         break;
     }
-    this->allowedTokens = {};
 }
 
 void Instruction::checkOpenCurlyBrackets() {

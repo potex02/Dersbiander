@@ -38,7 +38,7 @@ private:
     // NOLINTBEGIN
     [[nodiscard]] std::string unexpected(const Token &token) const;  // NOLINT(*-identifier-length) NOLINT(functionStatic)
     // NOLINTEND
-    void checkIdentifier() noexcept;
+    void checkIdentifier(const TokenType &type) noexcept;
     void checkNumber() noexcept;
     void checkOperator();
     void checkMinusOperator();
@@ -89,5 +89,8 @@ private:
             return true;
         }
         return false;
+    }
+    inline void emplaceUnaryOperator(const TokenType &type) noexcept {
+        if(type != TokenType::UNARY_OPERATOR) { this->allowedTokens.emplace_back(TokenType::UNARY_OPERATOR); }
     }
 };
