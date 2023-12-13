@@ -38,13 +38,13 @@ std::vector<Token> Tokenizer::tokenize() {
             tokens.emplace_back(extractIdentifier());
         } else if(std::isdigit(currentChar)) {
             tokens.emplace_back(extractnumber());
-        } else if(isComment(currentPosition)) {
+        } else if(TokenizerUtils::isComment(inputSpan, currentPosition)) {
             tokens.emplace_back(extractComment());
-        } else if(isOperator(currentChar)) {
+        } else if(TokenizerUtils::isOperator(currentChar)) {
             tokens.emplace_back(extractOperator());
-        } else if(isBrackets(currentChar)) {
+        } else if(TokenizerUtils::isBrackets(currentChar)) {
             tokens.emplace_back(extractBrackets(currentChar));
-        } else if(isApostrophe(currentChar)) {
+        } else if(TokenizerUtils::isApostrophe(currentChar)) {
             tokens.emplace_back(extractChar());
         } else if(std::isspace(currentChar)) {
             handleWhitespace(currentChar);
@@ -198,105 +198,6 @@ void Tokenizer::incPosAndCol() {
     ++currentColumn;    // Increment the current column within the line
 }
 
-// NOLINTBEGIN
-bool Tokenizer::isPlusORMinus(char c) const noexcept { return c == '+' || c == '-'; }
-
-/**
- * @brief Checks if the character at the given position is part of a comment.
- * @param position The position of the character to check.
- * @return true if the character at the given position is part of a comment, false otherwise.
- */
-bool Tokenizer::isComment(size_t position) const noexcept {
-    return position != inputSpan.size() && input[position] == '/' &&
-           (inputSpan[position + 1] == '/' || inputSpan[position + 1] == '*');
-}
-/**
- * @brief Checks if a character is an operator.
- *
- * This function checks whether the given character is an operator.
- *
- * @param c The character to check.
- * @return true if the character is an operator, false otherwise.
- */
-bool Tokenizer::isOperator(char c) const noexcept {
-    static const std::unordered_set<char> operators = {'*', '/', '=', ',', ':', '<', '>', '!', '|', '&', '+', '-'};
-    return operators.contains(c);
-}
-
-/**
- * @brief Checks if the given value is an equal operator.
- *
- * This function checks if the given string value is an equal operator.
- * An equal operator is a binary operator that compares two operands for equality.
- *
- * @param value The string value to check.
- * @return True if the value is an equal operator, false otherwise.
- * @remark The value is case-sensitive.
- */
-bool Tokenizer::isOperationEqualOperator(const std::string &value) const noexcept {
-    return value == "+=" || value == "-=" || value == "*=" || value == "/=";
-}
-
-/**
- * @brief Checks if the given value is a boolean operator.
- *
- * This function verifies if the provided string value is a boolean operator. A boolean operator is a logical
- * operator that operates on boolean values. The supported boolean operators in this tokenizer are 'AND', 'OR',
- * and 'NOT'.
- *
- * @param value The string value to check for being a boolean operator.
- * @return true if the value is a boolean operator, false otherwise.
- *
- * @note This function is case-sensitive and only considers 'AND', 'OR', and 'NOT' as valid boolean operators.
- * Other values will be considered as not being boolean operators.
- * @note This function is noexcept, so it does not throw any exception.
- */
-bool Tokenizer::isBooleanOperator(const std::string &value) const noexcept {
-    return value == "==" || value == ">=" || value == "<=" || value == "!=";
-}
-
-/**
- * @brief Checks if a character is a bracket.
- *
- * This function determines whether a given character is a bracket or not.
- * It is const and noexcept, meaning it does not modify the object's state
- * and does not throw any exceptions.
- *
- * @param c The character to check.
- * @return true if the character is a bracket, false otherwise.
- */
-bool Tokenizer::isBrackets(char c) const noexcept { return c == '(' || c == ')' || c == '[' || c == ']' || c == '{' || c == '}'; }
-
-/**
- * @brief Checks if a given string is a logical operator.
- *
- * This function determines if a given string represents a logical operator.
- * A logical operator is a special symbol or sequence of symbols used to
- * combine or modify logical predicates.
- *
- * @param value The string to be checked.
- * @return `true` if the string is a logical operator, `false` otherwise.
- * @remark The function is case-sensitive.
- * @remark This function is `const` and does not modify the state of the `Tokenizer`.
- * @remark The function is marked as `noexcept` and will not throw any exceptions.
- */
-bool Tokenizer::isLogicalOperator(const std::string &value) const noexcept { return value == "&&" || value == "||"; }
-
-/**
- * @brief Checks whether the given string represents a variable length operator.
- *
- * A variable length operator is an operator that can have different lengths, such as "+=" or ">>=".
- *
- * @param val The string to be checked.
- * @return true if the string represents a variable length operator, false otherwise.
- */
-bool Tokenizer::isVarLenOperator(const std::string &val) const noexcept {
-    return isOperator(val[0]) || isBrackets(val[0]) || isOperationEqualOperator(val) || isBooleanOperator(val) ||
-           isLogicalOperator(val);
-}
-
-// NOLINTEND
-
 /**
  * @class Tokenizer
  * @brief A class for tokenizing a string and extracting identifiers
@@ -322,12 +223,6 @@ bool Tokenizer::isMinusMinus() const noexcept {
     return inputSpan[currentPosition] == '-' && inputSpan[currentPosition + 1] == '-';
 }
 bool Tokenizer::isPlusPlus() const noexcept { return inputSpan[currentPosition] == '+' && inputSpan[currentPosition + 1] == '+'; }
-
-/**
- * @class Tokenizer
- * @brief A class for tokenizing a string.
- */
-bool Tokenizer::isApostrophe(char c) const noexcept { return c == '\''; }
 
 /**
  * @brief Extracts all digits from a given string.
@@ -363,7 +258,7 @@ void Tokenizer::extractDigits(std::string &value) {
  * @endcode
  */
 void Tokenizer::extractExponent(std::string &value) {
-    if(isPositionInText() && isPlusORMinus(inputSpan[currentPosition])) { appendCharToValue(value); }
+    if(isPositionInText() && TokenizerUtils::isPlusORMinus(inputSpan[currentPosition])) { appendCharToValue(value); }
     extractDigits(value);
 }
 
@@ -404,7 +299,7 @@ Token Tokenizer::extractnumber() {
  * @return A string containing the extracted operator, or an empty string if no operator is found.
  */
 void Tokenizer::extractVarLenOperator(std::string &value) {
-    while(isPositionInText() && isOperator(inputSpan[currentPosition])) { appendCharToValue(value); }
+    while(isPositionInText() && TokenizerUtils::isOperator(inputSpan[currentPosition])) { appendCharToValue(value); }
 }
 
 /**
@@ -438,9 +333,9 @@ TokenType Tokenizer::typeBySingleCharacter(char c) const {
  */
 TokenType Tokenizer::typeByValue(const std::string &value) const {
     using enum TokenType;
-    if(isOperationEqualOperator(value)) { return OPERATION_EQUAL; }
-    if(isBooleanOperator(value)) { return BOOLEAN_OPERATOR; }
-    if(isLogicalOperator(value)) { return LOGICAL_OPERATOR; }
+    if(TokenizerUtils::isOperationEqualOperator(value)) { return OPERATION_EQUAL; }
+    if(TokenizerUtils::isBooleanOperator(value)) { return BOOLEAN_OPERATOR; }
+    if(TokenizerUtils::isLogicalOperator(value)) { return LOGICAL_OPERATOR; }
     return UNKNOWN;
 }
 
@@ -509,7 +404,7 @@ Token Tokenizer::extractChar() {
     std::size_t startcol = currentColumn;
     incPosAndCol();
     std::string value;
-    while(!isApostrophe(inputSpan[currentPosition])) {
+    while(!TokenizerUtils::isApostrophe(inputSpan[currentPosition])) {
         if(currentPosition + 1 == inputSpan.size() || inputSpan[currentPosition] == CNL) {
             return {UNKNOWN, "'" + value + "'", currentLine, currentColumn - startcol};
         }

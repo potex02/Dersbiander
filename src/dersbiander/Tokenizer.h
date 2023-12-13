@@ -2,6 +2,7 @@
 
 #include "Timer.h"
 #include "Token.h"
+#include "TokenizerUtils.h"
 #include <span>
 #include <string>
 #include <vector>
@@ -33,15 +34,6 @@ private:
     [[nodiscard]] bool isPositionInText() const noexcept;
 
     // NOLINTBEGIN
-    [[nodiscard]] inline bool isPlusORMinus(char c) const noexcept;
-    [[nodiscard]] inline bool isComment(size_t position) const noexcept;
-    [[nodiscard]] inline bool isOperator(char c) const noexcept;
-    [[nodiscard]] inline bool isOperationEqualOperator(const std::string &value) const noexcept;
-    [[nodiscard]] inline bool isBooleanOperator(const std::string &value) const noexcept;
-    [[nodiscard]] inline bool isLogicalOperator(const std::string &value) const noexcept;
-    [[nodiscard]] inline bool isVarLenOperator(const std::string &val) const noexcept;
-    [[nodiscard]] inline bool isBrackets(char c) const noexcept;
-    [[nodiscard]] inline bool isApostrophe(char c) const noexcept;
     TokenType typeBySingleCharacter(char c) const;
     TokenType typeByValue(const std::string &value) const;
     // NOLINTEND
