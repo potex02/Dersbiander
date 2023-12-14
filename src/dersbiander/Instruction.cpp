@@ -136,6 +136,7 @@ Instruction::Instruction() noexcept
         break;
     case KEYWORD_FOR:
         this->checkKeywordFor();
+        break;
     case EOFT:
     case ERROR:
     case UNKNOWN:
@@ -188,6 +189,17 @@ void Instruction::checkIdentifier(const TokenType &type) noexcept {
             break;
         }
         this->allowedTokens = {COMMA, COLON};
+        break;
+    case FOR_STRUCTURE:
+        if(this->isPreviousEmpty()) {
+            this->allowedTokens = {};
+            break;
+        }
+        if(this->previousTokensLast() == KEYWORD_VAR) {
+            this->allowedTokens = {COLON};
+            break;
+        }
+        this->allowedTokens = {EQUAL_OPERATOR};
         break;
     default:
         this->allowedTokens = {};
@@ -247,6 +259,10 @@ void Instruction::checkEqualOperator() {
                                OPEN_SQUARE_BRACKETS};
         return;
     }
+    if(this->lastInstructionType() == FOR_STRUCTURE) {
+        this->allowedTokens = {EOFT};
+        return;
+    }
     this->allowedTokens = {};
 }
 
@@ -278,7 +294,7 @@ void Instruction::checkComma() {
 void Instruction::checkColon() {
     using enum TokenType;
     using enum InstructionType;
-    if(this->lastInstructionType() == DECLARATION) {
+    if(this->lastInstructionType() == DECLARATION || this->lastInstructionType() == FOR_STRUCTURE) {
         this->allowedTokens = {IDENTIFIER};
         return;
     }
@@ -371,6 +387,10 @@ void Instruction::checkKeywordVar() {
         this->allowedTokens = {IDENTIFIER};
         return;
     }
+    if(this->lastInstructionType() == FOR_STRUCTURE) {
+        this->allowedTokens = {IDENTIFIER};
+        return;
+    }
     this->allowedTokens = {};
 }
 
@@ -385,6 +405,15 @@ void Instruction::checkKeywordStructure() {
     this->allowedTokens = {};
 }
 
-void Instruction::checkKeywordFor() {}
+void Instruction::checkKeywordFor() {
+    using enum TokenType;
+    using enum InstructionType;
+    if(this->lastInstructionType() == BLANK) {
+        this->setLastInstructionType(FOR_STRUCTURE);
+        this->allowedTokens = {KEYWORD_VAR, IDENTIFIER};
+        return;
+    }
+    this->allowedTokens = {};
+}
 
 DISABLE_WARNINGS_POP()
