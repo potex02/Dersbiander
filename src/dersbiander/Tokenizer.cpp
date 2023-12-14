@@ -211,6 +211,7 @@ Token Tokenizer::extractIdentifier() {
     }
     if(value == "var" || value == "const") { type = KEYWORD_VAR; }
     if(value == "if" || value == "while") { type = KEYWORD_STRUCTURE; }
+    if(value == "for") { type = KEYWORD_FOR; }
     if(value == "true" || value == "false") { type = BOOLEAN; }
     return {type, value, currentLine, currentColumn - value.length()};
 }
