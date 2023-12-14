@@ -13,6 +13,7 @@ enum class InstructionType : short {
     INITIALIZATION,
     ARRAY_INIZIALIZATION,
     STRUCTURE,
+    FOR_STRUCTURE,
     DEFINITION,
     OPEN_SCOPE,
     CLOSE_SCOPE,
@@ -52,6 +53,7 @@ private:
     void checkClosedCurlyBracktes();
     void checkKeywordVar();
     void checkKeywordStructure();
+    void checkKeywordFor();
     void emplaceCommaEoft() noexcept;
     [[nodiscard]] inline bool isExpression() noexcept;
     [[nodiscard]] TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }

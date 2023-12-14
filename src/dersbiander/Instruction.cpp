@@ -4,7 +4,7 @@ DISABLE_WARNINGS_PUSH(26461 26821)
 
 Instruction::Instruction() noexcept
   : tokens({}), instructionTypes({InstructionType::BLANK}),
-    allowedTokens({TokenType::KEYWORD_VAR, TokenType::KEYWORD_STRUCTURE, TokenType::IDENTIFIER, TokenType::OPEN_CURLY_BRACKETS,
+    allowedTokens({TokenType::KEYWORD_VAR, TokenType::KEYWORD_STRUCTURE, TokenType::KEYWORD_FOR, TokenType::IDENTIFIER, TokenType::OPEN_CURLY_BRACKETS,
                    TokenType::CLOSED_CURLY_BRACKETS, TokenType::EOFT}) {
     booleanOperatorPresent = {false};
     previousTokens.reserve(tokens.size());
@@ -54,6 +54,9 @@ Instruction::Instruction() noexcept
             break;
         case STRUCTURE:
             result.emplace_back("STRUCTURE");
+            break;
+        case FOR_STRUCTURE:
+            result.emplace_back("FOR_STRUCTURE");
             break;
         case DEFINITION:
             result.emplace_back("DEFINITION");
@@ -131,6 +134,8 @@ Instruction::Instruction() noexcept
     case KEYWORD_STRUCTURE:
         this->checkKeywordStructure();
         break;
+    case KEYWORD_FOR:
+        this->checkKeywordFor();
     case EOFT:
     case ERROR:
     case UNKNOWN:
@@ -379,5 +384,7 @@ void Instruction::checkKeywordStructure() {
     }
     this->allowedTokens = {};
 }
+
+void Instruction::checkKeywordFor() {}
 
 DISABLE_WARNINGS_POP()
