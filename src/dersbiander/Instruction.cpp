@@ -58,6 +58,15 @@ Instruction::Instruction() noexcept
         case FOR_STRUCTURE:
             result.emplace_back("FOR_STRUCTURE");
             break;
+        case FOR_INITIALIZATION:
+            result.emplace_back("FOR_INITIALIZATION");
+            break;
+        case FOR_CONDITION:
+            result.emplace_back("FOR_CONDITION");
+            break;
+        case FOR_STEP:
+            result.emplace_back("FOR_STEP");
+            break;
         case DEFINITION:
             result.emplace_back("DEFINITION");
             break;
@@ -156,7 +165,14 @@ bool Instruction::isExpression() noexcept {
     using enum InstructionType;
     return this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION ||
            this->lastInstructionType() == ARRAY_INIZIALIZATION || this->lastInstructionType() == EXPRESSION ||
-           this->lastInstructionType() == SQUARE_EXPRESSION;
+           this->lastInstructionType() == SQUARE_EXPRESSION || this->lastInstructionType() == FOR_INITIALIZATION ||
+           this->lastInstructionType() == FOR_CONDITION || this->lastInstructionType() == FOR_STEP;
+}
+
+bool Instruction::isForExpression() noexcept {
+    using enum InstructionType;
+    return this->lastInstructionType() == FOR_INITIALIZATION || this->lastInstructionType() == FOR_CONDITION ||
+    this->lastInstructionType() == FOR_STEP;
 }
 
 void Instruction::checkIdentifier(const TokenType &type) noexcept {
@@ -173,6 +189,7 @@ void Instruction::checkIdentifier(const TokenType &type) noexcept {
             this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
             return;
         }
+        if(this->emplaceForTokens()) { return; }
         this->emplaceCommaEoft();
         return;
     }
@@ -220,6 +237,7 @@ void Instruction::checkNumber() noexcept {
             this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
             return;
         }
+        if(this->emplaceForTokens()) { return; }
         this->emplaceCommaEoft();
         return;
     }
@@ -249,18 +267,18 @@ void Instruction::checkMinusOperator() {
 void Instruction::checkEqualOperator() {
     using enum TokenType;
     using enum InstructionType;
+    this->allowedTokens = {IDENTIFIER,          INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS,
+                           OPEN_SQUARE_BRACKETS};
     if(this->lastInstructionType() == OPERATION || this->lastInstructionType() == DECLARATION) {
         if(this->lastInstructionType() == OPERATION) {
             this->setLastInstructionType(ASSIGNATION);
         } else {
             this->setLastInstructionType(INITIALIZATION);
         }
-        this->allowedTokens = {IDENTIFIER,          INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS,
-                               OPEN_SQUARE_BRACKETS};
         return;
     }
     if(this->lastInstructionType() == FOR_STRUCTURE) {
-        this->allowedTokens = {EOFT};
+        this->addInstructionType(FOR_INITIALIZATION);
         return;
     }
     this->allowedTokens = {};
@@ -286,6 +304,11 @@ void Instruction::checkComma() {
     if(this->lastInstructionType() == OPERATION || this->lastInstructionType() == DECLARATION) {
         this->allowedTokens = {IDENTIFIER};
         return;
+    }
+    if(this->lastInstructionType() == FOR_INITIALIZATION) {
+        this->setLastInstructionType(FOR_CONDITION);
+    } else if(this->lastInstructionType() == FOR_CONDITION) {
+        this->setLastInstructionType(FOR_STEP);
     }
     this->allowedTokens = {IDENTIFIER,          INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS,
                            OPEN_SQUARE_BRACKETS};
@@ -345,6 +368,7 @@ void Instruction::checkClosedBrackets(const TokenType &type) {
             this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
             return;
         }
+        if(this->emplaceForTokens()) { return; }
         this->emplaceCommaEoft();
         return;
     }

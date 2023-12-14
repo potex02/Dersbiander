@@ -81,7 +81,7 @@ struct Token {
         case CLOSED_BRACKETS:
             return "CLOSED_BRACKETS";
         case OPEN_SQUARE_BRACKETS:
-            return "OPEN_SQAURE_BRACKETS";
+            return "OPEN_SQUARE_BRACKETS";
         case CLOSED_SQUARE_BRACKETS:
             return "CLOSED_SQUARE_BRACKETS";
         case OPEN_CURLY_BRACKETS:
