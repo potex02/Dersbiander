@@ -38,6 +38,7 @@ private:
     TokenType typeByValue(const std::string &value) const;
     // NOLINTEND
     Token extractIdentifier();
+    void kewordType(const std::string &value, TokenType &type) const;
     void extractDigits(std::string &value);
     void extractExponent(std::string &value);
     void extractVarLenOperator(std::string &value);

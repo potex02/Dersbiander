@@ -122,11 +122,11 @@ std::size_t Tokenizer::findLineEnd() {
  * \return The context line from 'lineStart' to 'lineEnd' (inclusive).
  */
 std::string Tokenizer::getContextLine(std::size_t lineStart, std::size_t lineEnd) const {
-    return std::string(input.begin() + static_cast<long>(lineStart), input.begin() + static_cast<long>(lineEnd)) +
-           NEWL;  // NOLINT(*-narrowing-conversions)
+    return std::string(input.begin() + static_cast<long>(lineStart), input.begin() + static_cast<long>(lineEnd))
+        .append(NEWL);  // NOLINT(*-narrowing-conversions)
 }
 
-/**
+/*
  * @brief Get the highlighting information for a specific line in the tokenizer.
  *
  * This function returns the highlighting information for a specific line in the tokenizer based on the line's starting index and
@@ -178,7 +178,7 @@ std::string Tokenizer::getErrorMessage(const std::string &values, const std::str
  * @brief The Tokenizer class provides a method to append a character to a value.
  */
 void Tokenizer::appendCharToValue(std::string &value) {
-    value += inputSpan[currentPosition];
+    value.push_back(inputSpan[currentPosition]);
     incPosAndCol();
 }
 
@@ -209,11 +209,16 @@ Token Tokenizer::extractIdentifier() {
     while(isPositionInText() && (std::isalnum(inputSpan[currentPosition]) || inputSpan[currentPosition] == '_')) {
         appendCharToValue(value);
     }
+    kewordType(value, type);
+    return {type, value, currentLine, currentColumn - value.length()};
+}
+
+void Tokenizer::kewordType(const std::string &value, TokenType &type) const {
+    using enum TokenType;
     if(value == "var" || value == "const") { type = KEYWORD_VAR; }
     if(value == "if" || value == "while") { type = KEYWORD_STRUCTURE; }
     if(value == "for") { type = KEYWORD_FOR; }
     if(value == "true" || value == "false") { type = BOOLEAN; }
-    return {type, value, currentLine, currentColumn - value.length()};
 }
 
 /**
@@ -307,11 +312,11 @@ TokenType Tokenizer::typeBySingleCharacter(char c) const {
         return EQUAL_OPERATOR;
     case ',':
         return COMMA;
-    case ':':
-        return COLON;
     case '<':
     case '>':
         return BOOLEAN_OPERATOR;
+    case ':':
+        return COLON;
     case '!':
         return NOT_OPERATOR;
     default:
@@ -340,14 +345,11 @@ TokenType Tokenizer::typeByValue(const std::string &value) const {
  * and other tokens from a given input string.
  */
 void Tokenizer::extractOperator(std::vector<Token> &tokens) {
-
     std::string value;
 
     extractVarLenOperator(value);
-    while (value.size() != 0) {
-
+    while(value.size() != 0) {
         Token token;
-
         if(value.size() > 1) {
             token = {typeByValue(value.substr(0, 2)), value.substr(0, 2), currentLine, currentColumn - 2};
         }
