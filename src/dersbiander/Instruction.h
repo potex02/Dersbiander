@@ -101,9 +101,7 @@ private:
     }
     inline bool emplaceForTokens() {
         if(this->isForExpression()) {
-            if(this->lastInstructionType() != InstructionType::FOR_CONDITION) {
-                this->allowedTokens.emplace_back(TokenType::OPEN_CURLY_BRACKETS);
-            }
+            this->allowedTokens.emplace_back(TokenType::OPEN_CURLY_BRACKETS);
             if(this->lastInstructionType() != InstructionType::FOR_STEP) {
                 this->allowedTokens.emplace_back(TokenType::COMMA);
             };
