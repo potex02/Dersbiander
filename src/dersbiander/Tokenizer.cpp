@@ -217,6 +217,7 @@ void Tokenizer::kewordType(const std::string &value, TokenType &type) const {
     using enum TokenType;
     if(value == "var" || value == "const") { type = KEYWORD_VAR; }
     if(value == "if" || value == "while") { type = KEYWORD_STRUCTURE; }
+    if(value == "for") { type = KEYWORD_FOR; }
     if(value == "true" || value == "false") { type = BOOLEAN; }
 }
 
@@ -349,11 +350,11 @@ void Tokenizer::extractOperator(std::vector<Token> &tokens) {
     extractVarLenOperator(value);
     while(value.size() != 0) {
         Token token;
-
-        if(value.size() == 1) {
-            token = Token{typeBySingleCharacter(value[0]), std::string(1, value[0]), currentLine, currentColumn - 1};
-        } else {
+        if(value.size() > 1) {
             token = {typeByValue(value.substr(0, 2)), value.substr(0, 2), currentLine, currentColumn - 2};
+        }
+        if(token.type == TokenType::UNKNOWN || value.size() == 1) {
+            token = Token{typeBySingleCharacter(value[0]), std::string(1, value[0]), currentLine, currentColumn - 1};
         }
         tokens.emplace_back(token);
         value.erase(0, token.value.size());

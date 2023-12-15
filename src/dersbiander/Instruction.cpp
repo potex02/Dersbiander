@@ -4,7 +4,7 @@ DISABLE_WARNINGS_PUSH(26461 26821)
 
 Instruction::Instruction() noexcept
   : tokens({}), instructionTypes({InstructionType::BLANK}),
-    allowedTokens({TokenType::KEYWORD_VAR, TokenType::KEYWORD_STRUCTURE, TokenType::IDENTIFIER, TokenType::OPEN_CURLY_BRACKETS,
+    allowedTokens({TokenType::KEYWORD_VAR, TokenType::KEYWORD_STRUCTURE, TokenType::KEYWORD_FOR, TokenType::IDENTIFIER, TokenType::OPEN_CURLY_BRACKETS,
                    TokenType::CLOSED_CURLY_BRACKETS, TokenType::EOFT}) {
     booleanOperatorPresent = {false};
     previousTokens.reserve(tokens.size());
@@ -54,6 +54,18 @@ Instruction::Instruction() noexcept
             break;
         case STRUCTURE:
             result.emplace_back("STRUCTURE");
+            break;
+        case FOR_STRUCTURE:
+            result.emplace_back("FOR_STRUCTURE");
+            break;
+        case FOR_INITIALIZATION:
+            result.emplace_back("FOR_INITIALIZATION");
+            break;
+        case FOR_CONDITION:
+            result.emplace_back("FOR_CONDITION");
+            break;
+        case FOR_STEP:
+            result.emplace_back("FOR_STEP");
             break;
         case DEFINITION:
             result.emplace_back("DEFINITION");
@@ -131,6 +143,9 @@ Instruction::Instruction() noexcept
     case KEYWORD_STRUCTURE:
         this->checkKeywordStructure();
         break;
+    case KEYWORD_FOR:
+        this->checkKeywordFor();
+        break;
     case EOFT:
     case ERROR:
     case UNKNOWN:
@@ -150,7 +165,14 @@ bool Instruction::isExpression() noexcept {
     using enum InstructionType;
     return this->lastInstructionType() == ASSIGNATION || this->lastInstructionType() == INITIALIZATION ||
            this->lastInstructionType() == ARRAY_INIZIALIZATION || this->lastInstructionType() == EXPRESSION ||
-           this->lastInstructionType() == SQUARE_EXPRESSION;
+           this->lastInstructionType() == SQUARE_EXPRESSION || this->lastInstructionType() == FOR_INITIALIZATION ||
+           this->lastInstructionType() == FOR_CONDITION || this->lastInstructionType() == FOR_STEP;
+}
+
+bool Instruction::isForExpression() noexcept {
+    using enum InstructionType;
+    return this->lastInstructionType() == FOR_INITIALIZATION || this->lastInstructionType() == FOR_CONDITION ||
+    this->lastInstructionType() == FOR_STEP;
 }
 
 void Instruction::checkIdentifier(const TokenType &type) noexcept {
@@ -167,6 +189,7 @@ void Instruction::checkIdentifier(const TokenType &type) noexcept {
             this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
             return;
         }
+        if(this->emplaceForTokens()) { return; }
         this->emplaceCommaEoft();
         return;
     }
@@ -183,6 +206,17 @@ void Instruction::checkIdentifier(const TokenType &type) noexcept {
             break;
         }
         this->allowedTokens = {COMMA, COLON};
+        break;
+    case FOR_STRUCTURE:
+        if(this->isPreviousEmpty()) {
+            this->allowedTokens = {};
+            break;
+        }
+        if(this->previousTokensLast() == KEYWORD_VAR) {
+            this->allowedTokens = {COLON};
+            break;
+        }
+        this->allowedTokens = {EQUAL_OPERATOR};
         break;
     default:
         this->allowedTokens = {};
@@ -203,6 +237,7 @@ void Instruction::checkNumber() noexcept {
             this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
             return;
         }
+        if(this->emplaceForTokens()) { return; }
         this->emplaceCommaEoft();
         return;
     }
@@ -232,14 +267,18 @@ void Instruction::checkMinusOperator() {
 void Instruction::checkEqualOperator() {
     using enum TokenType;
     using enum InstructionType;
+    this->allowedTokens = {IDENTIFIER,          INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS,
+                           OPEN_SQUARE_BRACKETS};
     if(this->lastInstructionType() == OPERATION || this->lastInstructionType() == DECLARATION) {
         if(this->lastInstructionType() == OPERATION) {
             this->setLastInstructionType(ASSIGNATION);
         } else {
             this->setLastInstructionType(INITIALIZATION);
         }
-        this->allowedTokens = {IDENTIFIER,          INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS,
-                               OPEN_SQUARE_BRACKETS};
+        return;
+    }
+    if(this->lastInstructionType() == FOR_STRUCTURE) {
+        this->addInstructionType(FOR_INITIALIZATION);
         return;
     }
     this->allowedTokens = {};
@@ -266,6 +305,11 @@ void Instruction::checkComma() {
         this->allowedTokens = {IDENTIFIER};
         return;
     }
+    if(this->lastInstructionType() == FOR_INITIALIZATION) {
+        this->setLastInstructionType(FOR_CONDITION);
+    } else if(this->lastInstructionType() == FOR_CONDITION) {
+        this->setLastInstructionType(FOR_STEP);
+    }
     this->allowedTokens = {IDENTIFIER,          INTEGER, DOUBLE, CHAR, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS,
                            OPEN_SQUARE_BRACKETS};
 }
@@ -273,7 +317,7 @@ void Instruction::checkComma() {
 void Instruction::checkColon() {
     using enum TokenType;
     using enum InstructionType;
-    if(this->lastInstructionType() == DECLARATION) {
+    if(this->lastInstructionType() == DECLARATION || this->lastInstructionType() == FOR_STRUCTURE) {
         this->allowedTokens = {IDENTIFIER};
         return;
     }
@@ -324,6 +368,7 @@ void Instruction::checkClosedBrackets(const TokenType &type) {
             this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
             return;
         }
+        if(this->emplaceForTokens()) { return; }
         this->emplaceCommaEoft();
         return;
     }
@@ -366,6 +411,10 @@ void Instruction::checkKeywordVar() {
         this->allowedTokens = {IDENTIFIER};
         return;
     }
+    if(this->lastInstructionType() == FOR_STRUCTURE) {
+        this->allowedTokens = {IDENTIFIER};
+        return;
+    }
     this->allowedTokens = {};
 }
 
@@ -375,6 +424,17 @@ void Instruction::checkKeywordStructure() {
     if(this->lastInstructionType() == BLANK) {
         this->setLastInstructionType(STRUCTURE);
         this->allowedTokens = {OPEN_BRACKETS};
+        return;
+    }
+    this->allowedTokens = {};
+}
+
+void Instruction::checkKeywordFor() {
+    using enum TokenType;
+    using enum InstructionType;
+    if(this->lastInstructionType() == BLANK) {
+        this->setLastInstructionType(FOR_STRUCTURE);
+        this->allowedTokens = {KEYWORD_VAR, IDENTIFIER};
         return;
     }
     this->allowedTokens = {};

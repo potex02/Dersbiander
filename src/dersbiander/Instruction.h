@@ -13,6 +13,10 @@ enum class InstructionType : short {
     INITIALIZATION,
     ARRAY_INIZIALIZATION,
     STRUCTURE,
+    FOR_STRUCTURE,
+    FOR_INITIALIZATION,
+    FOR_CONDITION,
+    FOR_STEP,
     DEFINITION,
     OPEN_SCOPE,
     CLOSE_SCOPE,
@@ -52,8 +56,10 @@ private:
     void checkClosedCurlyBracktes();
     void checkKeywordVar();
     void checkKeywordStructure();
+    void checkKeywordFor();
     void emplaceCommaEoft() noexcept;
     [[nodiscard]] inline bool isExpression() noexcept;
+    [[nodiscard]] inline bool isForExpression() noexcept;
     [[nodiscard]] TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }
     [[nodiscard]] bool isPreviousEmpty() const noexcept { return this->previousTokens.empty(); }
     [[nodiscard]] InstructionType &lastInstructionType() noexcept { return this->instructionTypes.back(); }
@@ -92,5 +98,15 @@ private:
     }
     inline void emplaceUnaryOperator(const TokenType &type) noexcept {
         if(type != TokenType::UNARY_OPERATOR) { this->allowedTokens.emplace_back(TokenType::UNARY_OPERATOR); }
+    }
+    inline bool emplaceForTokens() {
+        if(this->isForExpression()) {
+            this->allowedTokens.emplace_back(TokenType::OPEN_CURLY_BRACKETS);
+            if(this->lastInstructionType() != InstructionType::FOR_STEP) {
+                this->allowedTokens.emplace_back(TokenType::COMMA);
+            };
+            return true;
+        }
+        return false;
     }
 };
