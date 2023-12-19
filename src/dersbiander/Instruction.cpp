@@ -4,8 +4,8 @@ DISABLE_WARNINGS_PUSH(26461 26821)
 
 Instruction::Instruction() noexcept
   : tokens({}), instructionTypes({InstructionType::BLANK}),
-    allowedTokens({TokenType::KEYWORD_VAR, TokenType::KEYWORD_STRUCTURE, TokenType::KEYWORD_FOR, TokenType::IDENTIFIER, TokenType::OPEN_CURLY_BRACKETS,
-                   TokenType::CLOSED_CURLY_BRACKETS, TokenType::EOFT}) {
+    allowedTokens({TokenType::KEYWORD_VAR, TokenType::KEYWORD_STRUCTURE, TokenType::KEYWORD_FOR, TokenType::IDENTIFIER,
+                   TokenType::OPEN_CURLY_BRACKETS, TokenType::CLOSED_CURLY_BRACKETS, TokenType::EOFT}) {
     booleanOperatorPresent = {false};
     previousTokens.reserve(tokens.size());
 }
@@ -93,12 +93,16 @@ Instruction::Instruction() noexcept
     switch(token.type) {
         using enum TokenType;
     case IDENTIFIER:
+        [[fallthrough]];
     case UNARY_OPERATOR:
         this->checkIdentifier(token.type);
         break;
     case INTEGER:
+        [[fallthrough]];
     case DOUBLE:
+        [[fallthrough]];
     case CHAR:
+        [[fallthrough]];
     case BOOLEAN:
         this->checkNumber();
         break;
@@ -109,11 +113,14 @@ Instruction::Instruction() noexcept
         this->checkMinusOperator();
         break;
     case EQUAL_OPERATOR:
+        [[fallthrough]];
     case OPERATION_EQUAL:
         this->checkEqualOperator();
         break;
     case BOOLEAN_OPERATOR:
+        [[fallthrough]];
     case NOT_OPERATOR:
+        [[fallthrough]];
     case LOGICAL_OPERATOR:
         this->checkBooleanAndLogicalOperator(token.type);
         break;
@@ -124,10 +131,12 @@ Instruction::Instruction() noexcept
         this->checkColon();
         break;
     case OPEN_BRACKETS:
+        [[fallthrough]];
     case OPEN_SQUARE_BRACKETS:
         this->checkOpenBrackets(token.type);
         break;
     case CLOSED_BRACKETS:
+        [[fallthrough]];
     case CLOSED_SQUARE_BRACKETS:
         this->checkClosedBrackets(token.type);
         break;
@@ -147,8 +156,11 @@ Instruction::Instruction() noexcept
         this->checkKeywordFor();
         break;
     case EOFT:
+        [[fallthrough]];
     case ERROR:
+        [[fallthrough]];
     case UNKNOWN:
+        [[fallthrough]];
     case COMMENT:
         break;
     }
@@ -172,7 +184,7 @@ bool Instruction::isExpression() noexcept {
 bool Instruction::isForExpression() noexcept {
     using enum InstructionType;
     return this->lastInstructionType() == FOR_INITIALIZATION || this->lastInstructionType() == FOR_CONDITION ||
-    this->lastInstructionType() == FOR_STEP;
+           this->lastInstructionType() == FOR_STEP;
 }
 
 void Instruction::checkIdentifier(const TokenType &type) noexcept {
@@ -384,7 +396,7 @@ void Instruction::checkClosedBrackets(const TokenType &type) {
         break;
     case STRUCTURE:
         this->allowedTokens = {OPEN_CURLY_BRACKETS};
-        break;;
+        break;
     default:
         this->allowedTokens = {};
         break;

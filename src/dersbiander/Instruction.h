@@ -1,27 +1,8 @@
 #pragma once
 
+#include "InstructionType.h"
 #include "Token.h"
 #include <vector>
-
-enum class InstructionType : short {
-    PROCEDURE_CALL,
-    OPERATION,
-    ASSIGNATION,
-    EXPRESSION,
-    SQUARE_EXPRESSION,
-    DECLARATION,
-    INITIALIZATION,
-    ARRAY_INIZIALIZATION,
-    STRUCTURE,
-    FOR_STRUCTURE,
-    FOR_INITIALIZATION,
-    FOR_CONDITION,
-    FOR_STEP,
-    DEFINITION,
-    OPEN_SCOPE,
-    CLOSE_SCOPE,
-    BLANK
-};
 
 class Instruction {
 public:
@@ -102,9 +83,7 @@ private:
     inline bool emplaceForTokens() {
         if(this->isForExpression()) {
             this->allowedTokens.emplace_back(TokenType::OPEN_CURLY_BRACKETS);
-            if(this->lastInstructionType() != InstructionType::FOR_STEP) {
-                this->allowedTokens.emplace_back(TokenType::COMMA);
-            };
+            if(this->lastInstructionType() != InstructionType::FOR_STEP) { this->allowedTokens.emplace_back(TokenType::COMMA); };
             return true;
         }
         return false;
