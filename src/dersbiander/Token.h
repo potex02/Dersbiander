@@ -106,6 +106,7 @@ struct Token {
     }
 
     [[nodiscard]] inline std::string toString() const {
+        if(type == eofTokenType) { return D_FORMAT("type: EOFT, line {}, column {}", line, column); }
         return D_FORMAT("type: {}, value: '{}', line {}, column {}", typeToString(), value, line, column);
     }
 

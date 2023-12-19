@@ -44,6 +44,7 @@ private:
     [[nodiscard]] TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }
     [[nodiscard]] bool isPreviousEmpty() const noexcept { return this->previousTokens.empty(); }
     [[nodiscard]] InstructionType &lastInstructionType() noexcept { return this->instructionTypes.back(); }
+    [[nodiscard]] inline bool lastInstructionTypeIs(const InstructionType &type) { return this->lastInstructionType() == type; }
     inline void addInstructionType(InstructionType instructionType) noexcept {
         this->instructionTypes.emplace_back(instructionType);
     }
