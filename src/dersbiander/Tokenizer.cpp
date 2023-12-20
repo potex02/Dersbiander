@@ -88,7 +88,7 @@ void Tokenizer::handleError(const std::string &values, const std::string &errorM
  * \class Tokenizer
  * \brief This class is responsible for tokenizing a given input string.
  */
-std::size_t Tokenizer::findLineStart() {
+std::size_t Tokenizer::findLineStart() const {
     std::size_t lineStart = currentPosition;
     while(lineStart > 0 && inputSpan[lineStart - 1] != CNL) { --lineStart; }
     return lineStart;
@@ -103,7 +103,7 @@ std::size_t Tokenizer::findLineStart() {
  * One of the methods provided is the findLineEnd() method, which returns the end position (index) of a line within a given text.
  * This is useful when parsing text files and processing line-by-line.
  */
-std::size_t Tokenizer::findLineEnd() {
+std::size_t Tokenizer::findLineEnd() const {
     std::size_t lineEnd = currentPosition;
     while(lineEnd < inputSize && inputSpan[lineEnd] != CNL) { ++lineEnd; }
     return lineEnd;
