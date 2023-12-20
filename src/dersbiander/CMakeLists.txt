@@ -8,9 +8,9 @@ target_link_libraries(
         Dersbiander::Dersbiander_warnings)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
-    target_compile_options(dersbiander PRIVATE -march=native -mtune=native)
+    target_compile_options(dersbiander PRIVATE -march=native)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    target_compile_options(dersbiander PRIVATE -march=native -mtune=native)
+    target_compile_options(dersbiander PRIVATE -march=native)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND MSVC_VERSION GREATER 1900)
     target_compile_options(dersbiander PRIVATE /arch:AVX2)
 else ()
