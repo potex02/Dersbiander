@@ -35,22 +35,22 @@ std::vector<Token> Tokenizer::tokenize() {
     std::vector<Token> tokens;
     while(isPositionInText()) {
         const char currentChar = inputSpan[currentPosition];
-        if(std::isalpha(currentChar)) {
+        if(std::isalpha(currentChar)) [[likely]] {
             tokens.emplace_back(extractIdentifier());
-        } else if(std::isdigit(currentChar)) {
+        } else if(std::isdigit(currentChar)) [[likely]] {
             tokens.emplace_back(extractnumber());
-        } else if(TokenizerUtils::isComment(inputSpan, currentPosition)) {
+        } else if(TokenizerUtils::isComment(inputSpan, currentPosition)) [[likely]] {
             tokens.emplace_back(extractComment());
-        } else if(TokenizerUtils::isOperator(currentChar)) {
+        } else if(TokenizerUtils::isOperator(currentChar)) [[likely]] {
             extractOperator(tokens);
-        } else if(TokenizerUtils::isBrackets(currentChar)) {
+        } else if(TokenizerUtils::isBrackets(currentChar)) [[likely]] {
             tokens.emplace_back(extractBrackets(currentChar));
-        } else if(TokenizerUtils::isApostrophe(currentChar)) {
+        } else if(TokenizerUtils::isApostrophe(currentChar)) [[likely]] {
             tokens.emplace_back(extractChar());
-        } else if(std::isspace(currentChar)) {
+        } else if(std::isspace(currentChar)) [[likely]] {
             handleWhitespace(currentChar);
             continue;  // Continue the loop to get the next token
-        } else {
+        } else [[unlikely]] {
             handleError(std::string(1, currentChar), "Unknown Character");
             std::exit(-1);  // Terminate the program with an error code
         }
@@ -74,8 +74,8 @@ std::vector<Token> Tokenizer::tokenize() {
 void Tokenizer::handleError(const std::string &values, const std::string &errorMsg) {
     Timer timer(errorMsg);
 
-    const auto lineStart = findLineStart();
-    const auto lineEnd = findLineEnd();
+    const auto &lineStart = findLineStart();
+    const auto &lineEnd = findLineEnd();
 
     std::string contextLine = getContextLine(lineStart, lineEnd);
     std::string highlighting = getHighlighting(lineStart, values.length());

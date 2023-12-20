@@ -1,5 +1,7 @@
 #include "Instruction.h"
 
+#define ONLY_TOKEN_TYPE
+
 DISABLE_WARNINGS_PUSH(26461 26821)
 
 Instruction::Instruction() noexcept
@@ -89,8 +91,12 @@ Instruction::Instruction() noexcept
 }
 
 [[nodiscard]] std::pair<bool, std::string> Instruction::checkToken(const Token &token) {
+#ifdef ONLY_TOKEN_TYPE
+    std::string msg = token.typeToString();
+#else
     std::string msg = token.toString();
-    if(std::ranges::find(this->allowedTokens, token.type) == this->allowedTokens.end()) { return {false, msg}; }
+#endif  // ONLY_TOKEN_TYPE
+    if(std::ranges::find(this->allowedTokens, token.type) == this->allowedTokens.end()) [[unlikely]] { return {false, msg}; }
     switch(token.type) {
         using enum TokenType;
     case IDENTIFIER:

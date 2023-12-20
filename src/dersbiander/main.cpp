@@ -64,11 +64,11 @@ int main(int argc, const char **argv) {
             return EXIT_SUCCESS;
         }
 
-        if(run_code_from_console) {
+        if(run_code_from_console) [[unlikely]] {
             // if(input.has_value()) {
             // } else {
             // }
-        } else {
+        } else [[likely]] {
             // for(const std::string &str : lines) {
             /* if(str.size() < 93) {
                     LINFO("code'{}',code length {}",str, str.length());
@@ -81,7 +81,7 @@ int main(int argc, const char **argv) {
             timeTokenizer(tokenizer, tokens);
             std::vector<Instruction> instructions{};
             // Instruction instruction(tokens);
-            if(tokens.empty()) {
+            if(tokens.empty()) [[unlikely]] {
                 LINFO("Empty tokens");
                 return 0;
             }
@@ -96,19 +96,19 @@ int main(int argc, const char **argv) {
             AutoTimer tim("tokenizer total time");
             line = tokens[0].line;
             for(const Token &token : tokens) {
-                if(token.type == TokenType::COMMENT) { continue; }
-                if(token.line >= line) {
-                    if(instructions.empty() || instructions.back().canTerminate()) {
+                if(token.type == TokenType::COMMENT) [[unlikely]] { continue; }
+                if(token.line >= line) [[likely]] {
+                    if(instructions.empty() || instructions.back().canTerminate()) [[likely]] {
                         instructions.emplace_back();
-                    } else if(instructions.back().typeToString().back() != "EXPRESSION") {
+                    } else if(instructions.back().typeToString().back() != "EXPRESSION") [[unlikely]] {
                         LINFO("Unexpected token: ENDL");
                         break;
                     }
                     line = token.line + 1;
                 }
-                const auto [verify, token_s] = instructions.back().checkToken(token);
+                const auto &[verify, token_s] = instructions.back().checkToken(token);
                 LINFO("{} {}", verify, token_s);
-                if(!verify) { break; }
+                if(!verify) [[unlikely]] { break; }
             }
             //}
         }

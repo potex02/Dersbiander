@@ -97,7 +97,7 @@ public:
     [[nodiscard]] times multi_time() const { return make_named_times(make_time()); }
 
     [[nodiscard]] std::pair<long double, std::string> make_named_time(long double time) const {
-        auto [ld1, ld2, ld3, ld4, str1, str2, str3, str4] = make_named_times(time);
+        const auto &[ld1, ld2, ld3, ld4, str1, str2, str3, str4] = make_named_times(time);
         // Accessing values
         if(ld1 > 1) [[likely]] {  // nano
             return {ld1, str1};
@@ -105,7 +105,7 @@ public:
             return {ld2, str2};
         } else if(ld3 > 1) [[likely]] {  // seconds
             return {ld3, str3};
-        } else {
+        } else [[unlikely]] {
             return {ld4, str4};
         }
     }
@@ -119,7 +119,7 @@ public:
     // LCOV_EXCL_START
     /// This prints out a time string from a time
     [[nodiscard]] inline std::string make_time_str(long double time) const {  // NOLINT(modernize-use-nodiscard)
-        const auto [titme, stime] = make_named_time(time);
+        const auto &[titme, stime] = make_named_time(time);
         return D_FORMAT("{:.f} {}", titme, stime);
     }
     // LCOV_EXCL_STOP
