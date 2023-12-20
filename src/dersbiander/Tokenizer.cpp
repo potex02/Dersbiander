@@ -10,6 +10,7 @@ DISABLE_WARNINGS_PUSH(
  * @class Tokenizer
  * @brief A class for tokenizing a given input string.
  */
+// NOLINTNEXTLINE
 Tokenizer::Tokenizer(const std::string &_input)
   : input(_input), inputSpan(input.c_str(), input.size()), inputSize(input.size()) {}
 
@@ -163,6 +164,7 @@ std::string Tokenizer::getHighlighting(std::size_t lineStart, std::size_t length
  *
  * @return The generated error message.
  */
+// NOLINTNEXTLINE
 std::string Tokenizer::getErrorMessage(const std::string &values, const std::string &errMsg, const std::string &contextLine,
                                        const std::string &highlighting) const {
     std::ostringstream errorMessageStream;
@@ -303,6 +305,7 @@ void Tokenizer::extractVarLenOperator(std::string &value) {
  * @class Tokenizer
  * @brief A class for tokenizing strings and determining the type of a single character
  */
+// NOLINTNEXTLINE
 TokenType Tokenizer::typeBySingleCharacter(char c) const {
     switch(c) {
         using enum TokenType;
@@ -348,11 +351,9 @@ void Tokenizer::extractOperator(std::vector<Token> &tokens) {
     std::string value;
 
     extractVarLenOperator(value);
-    while(value.size() != 0) {
+    while(!value.empty()) {
         Token token;
-        if(value.size() > 1) {
-            token = {typeByValue(value.substr(0, 2)), value.substr(0, 2), currentLine, currentColumn - 2};
-        }
+        if(value.size() > 1) { token = {typeByValue(value.substr(0, 2)), value.substr(0, 2), currentLine, currentColumn - 2}; }
         if(token.type == TokenType::UNKNOWN || value.size() == 1) {
             token = Token{typeBySingleCharacter(value[0]), std::string(1, value[0]), currentLine, currentColumn - 1};
         }
@@ -371,6 +372,7 @@ void Tokenizer::extractOperator(std::vector<Token> &tokens) {
  * @param c The character from which to extract brackets.
  * @return A string containing the extracted brackets.
  */
+// NOLINTNEXTLINE
 Token Tokenizer::extractBrackets(char c) {
     using enum TokenType;
     TokenType type{};

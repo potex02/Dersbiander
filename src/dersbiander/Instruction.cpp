@@ -25,6 +25,7 @@ Instruction::Instruction() noexcept
     std::vector<std::string> result;
     result.reserve(this->instructionTypes.size());
 
+    // NOLINTNEXTLINE
     for(const InstructionType &i : this->instructionTypes) {
         switch(i) {
             using enum InstructionType;
@@ -74,7 +75,7 @@ Instruction::Instruction() noexcept
             result.emplace_back("OPEN_SCOPE");
             break;
         case CLOSE_SCOPE:
-            result.emplace_back("OPEN_SCOPE");
+            result.emplace_back("CLOSE_SCOPE");
             break;
         case BLANK:
             result.emplace_back("BLANK");
@@ -97,10 +98,9 @@ Instruction::Instruction() noexcept
     case UNARY_OPERATOR:
         this->checkIdentifier(token.type);
         break;
+    // NOLINTNEXTLINE
     case INTEGER:
-        [[fallthrough]];
     case DOUBLE:
-        [[fallthrough]];
     case CHAR:
         [[fallthrough]];
     case BOOLEAN:
@@ -118,7 +118,6 @@ Instruction::Instruction() noexcept
         this->checkEqualOperator();
         break;
     case BOOLEAN_OPERATOR:
-        [[fallthrough]];
     case NOT_OPERATOR:
         [[fallthrough]];
     case LOGICAL_OPERATOR:
@@ -156,9 +155,7 @@ Instruction::Instruction() noexcept
         this->checkKeywordFor();
         break;
     case EOFT:
-        [[fallthrough]];
     case ERROR:
-        [[fallthrough]];
     case UNKNOWN:
         [[fallthrough]];
     case COMMENT:

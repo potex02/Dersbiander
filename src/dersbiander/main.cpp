@@ -17,6 +17,7 @@ DISABLE_WARNINGS_POP()
 #include <internal_use_only/config.hpp>
 
 DISABLE_WARNINGS_PUSH(26461 26821)
+// NOLINTNEXTLINE
 static void timeTokenizer(Tokenizer &tokenizer, std::vector<Token> &tokens) {
     AutoTimer timer("tokenizer.tokenize()");
     tokens = tokenizer.tokenize();
@@ -27,10 +28,11 @@ constexpr std::string_view filename = "../../../input.txt";
 #elif defined __unix__  // Linux and Unix-like systems
 constexpr std::string_view filename = "input.txt";  // Linux and Unix
 #endif
-// NOLINTNEXTLINE(bugprone-exception-escape)
+// NOLINTNEXTLINE(bugprone-exception-escape, readability-function-cognitive-complexity)
 int main(int argc, const char **argv) {
     std::ifstream file(filename.data());
     std::string lines;
+    // NOLINTNEXTLINE
     std::size_t line;
 
     std::stringstream buffer;
@@ -67,7 +69,6 @@ int main(int argc, const char **argv) {
             // } else {
             // }
         } else {
-            AutoTimer tim("tokenizer total time");
             // for(const std::string &str : lines) {
             /* if(str.size() < 93) {
                     LINFO("code'{}',code length {}",str, str.length());
@@ -91,6 +92,8 @@ int main(int argc, const char **argv) {
                 LINFO("{}", token.toString());
 #endif  // ONLY_TOKEN_TYPE
             }
+            instructions.reserve(tokens.size());
+            AutoTimer tim("tokenizer total time");
             line = tokens[0].line;
             for(const Token &token : tokens) {
                 if(token.type == TokenType::COMMENT) { continue; }
@@ -103,7 +106,7 @@ int main(int argc, const char **argv) {
                     }
                     line = token.line + 1;
                 }
-                auto [verify, token_s] = instructions.back().checkToken(token);
+                const auto [verify, token_s] = instructions.back().checkToken(token);
                 LINFO("{} {}", verify, token_s);
                 if(!verify) { break; }
             }
