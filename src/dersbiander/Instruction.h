@@ -40,6 +40,7 @@ private:
     void checkKeywordFor();
     void emplaceCommaEoft() noexcept;
     [[nodiscard]] inline bool isExpression() noexcept;
+    // NOLINTNEXTLINE
     [[nodiscard]] inline bool isForExpression() noexcept;
     [[nodiscard]] TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }
     [[nodiscard]] bool isPreviousEmpty() const noexcept { return this->previousTokens.empty(); }
