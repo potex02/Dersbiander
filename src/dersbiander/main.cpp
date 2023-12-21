@@ -1,7 +1,9 @@
-﻿#include "Instruction.h"
+﻿#include "FileReadError.h"
+#include "Instruction.h"
 #include "Tokenizer.h"
 #include "headers.h"
 #include <string>
+namespace fs = std::filesystem;
 
 // #define ONLY_TOKEN_TYPE
 
@@ -19,8 +21,37 @@ DISABLE_WARNINGS_POP()
 DISABLE_WARNINGS_PUSH(26461 26821)
 // NOLINTNEXTLINE
 static void timeTokenizer(Tokenizer &tokenizer, std::vector<Token> &tokens) {
+    tokens.clear();
     AutoTimer timer("tokenizer.tokenize()");
     tokens = tokenizer.tokenize();
+}
+
+static std::string readFromFile(const std::string &filename) {
+    AutoTimer timer("readFromFile");
+    fs::path filePath = filename;
+
+    if(!fs::exists(filePath)) { throw FileReadError(D_FORMAT("File not found: {}", filename)); }
+    if(!fs::is_regular_file(filePath)) { throw FileReadError(D_FORMAT("Path is not a regular file: {}", filename)); }
+
+    std::stringstream buffer;
+
+    if(std::ifstream fileStream{filePath, std::ios::in | std::ios::binary}; fileStream.is_open()) {
+        // Ensure that the file is opened securely
+        fileStream.exceptions(std::ios::failbit | std::ios::badbit);
+
+        try {
+            buffer << fileStream.rdbuf();
+        } catch(const std::ios_base::failure &e) {
+            throw FileReadError(D_FORMAT("Unable to read file: {}. Reason: {}", filename, e.what()));
+        }
+    } else {
+        // Handle the case when the file cannot be opened
+        // You might throw an exception or return an error indicator
+        throw FileReadError(D_FORMAT("Unable to open file: {}", filename));
+    }
+
+    // Extract the content as a string
+    return buffer.str();
 }
 
 #ifdef _WIN32  // Windows
@@ -28,25 +59,15 @@ constexpr std::string_view filename = "../../../input.txt";
 #elif defined __unix__  // Linux and Unix-like systems
 constexpr std::string_view filename = "input.txt";  // Linux and Unix
 #endif
+
 // NOLINTNEXTLINE(bugprone-exception-escape, readability-function-cognitive-complexity)
 int main(int argc, const char **argv) {
-    std::ifstream file(filename.data());
-    std::string lines;
-    // NOLINTNEXTLINE
-    std::size_t line;
-
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-
-    // Close the file
-    file.close();
-
-    // Extract the content as a string
-    lines = buffer.str();
-
     spdlog::set_pattern(R"(%^[%T] [%l] %v%$)");
     const auto console = spdlog::stdout_color_mt(R"(console)");
     spdlog::set_default_logger(console);
+
+    std::string lines = readFromFile(filename.data());
+    std::size_t line;
     try {
         CLI::App app{D_FORMAT("{} version {}", Dersbiander::cmake::project_name, Dersbiander::cmake::project_version)};
 
