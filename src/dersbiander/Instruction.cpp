@@ -34,6 +34,9 @@ Instruction::Instruction() noexcept
         case PROCEDURE_CALL:
             result.emplace_back("PROCEDURE_CALL");
             break;
+        case PARAMETER_EXPRESSION:
+            result.emplace_back("PARAMETER_EXPRESSION");
+            break;
         case OPERATION:
             result.emplace_back("OPERATION");
             break;
@@ -180,8 +183,7 @@ bool Instruction::isExpression() noexcept {
     using enum InstructionType;
     return lastInstructionTypeIs(ASSIGNATION) || lastInstructionTypeIs(INITIALIZATION) ||
            lastInstructionTypeIs(ARRAY_INIZIALIZATION) || lastInstructionTypeIs(EXPRESSION) ||
-           lastInstructionTypeIs(SQUARE_EXPRESSION) || lastInstructionTypeIs(FOR_INITIALIZATION) ||
-           lastInstructionTypeIs(FOR_CONDITION) || lastInstructionTypeIs(FOR_STEP);
+           lastInstructionTypeIs(SQUARE_EXPRESSION) || this->isForExpression();
 }
 
 bool Instruction::isForExpression() noexcept {

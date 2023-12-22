@@ -2,6 +2,7 @@
 
 enum class InstructionType : short {
     PROCEDURE_CALL,
+    PARAMETER_EXPRESSION,
     OPERATION,
     ASSIGNATION,
     EXPRESSION,
