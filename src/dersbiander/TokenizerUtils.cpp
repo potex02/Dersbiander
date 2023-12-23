@@ -13,7 +13,7 @@ bool TokenizerUtils::isComment(const std::span<const char> &inputSpan, size_t po
 }
 // NOLINTNEXTLINE
 bool TokenizerUtils::isOperator(char c) noexcept {
-    static const std::unordered_set<char> operators = {'*', '/', '=', ',', ':', '<', '>', '!', '|', '&', '+', '-'};
+    static const std::unordered_set<char> operators = {'*', '/', '=', ',', ':', '<', '>', '!', '|', '&', '+', '-', '^'};
     return operators.contains(c);
 }
 
