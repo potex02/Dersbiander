@@ -322,8 +322,13 @@ TokenType Tokenizer::typeBySingleCharacter(char c) const {
         return COLON;
     case '!':
         return NOT_OPERATOR;
-    default:
+    case '+':
+    case '*':
+    case '/':
+    case '^':
         return OPERATOR;
+    default:
+        return UNKNOWN;
     }
 }
 
