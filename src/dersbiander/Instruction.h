@@ -45,7 +45,9 @@ private:
     [[nodiscard]] TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }
     [[nodiscard]] bool isPreviousEmpty() const noexcept { return this->previousTokens.empty(); }
     [[nodiscard]] InstructionType &lastInstructionType() noexcept { return this->instructionTypes.back(); }
-    [[nodiscard]] inline bool lastInstructionTypeIs(const InstructionType &type) { return this->lastInstructionType() == type; }
+    [[nodiscard]] inline bool lastInstructionTypeIs(const InstructionType &type) noexcept {
+        return this->lastInstructionType() == type;
+    }
     inline void addInstructionType(InstructionType instructionType) noexcept {
         this->instructionTypes.emplace_back(instructionType);
     }
@@ -82,7 +84,7 @@ private:
     inline void emplaceUnaryOperator(const TokenType &type) noexcept {
         if(type != TokenType::UNARY_OPERATOR) { this->allowedTokens.emplace_back(TokenType::UNARY_OPERATOR); }
     }
-    inline bool emplaceForTokens() {
+    inline bool emplaceForTokens() noexcept {
         if(this->isForExpression()) {
             this->allowedTokens.emplace_back(TokenType::OPEN_CURLY_BRACKETS);
             if(this->lastInstructionType() != InstructionType::FOR_STEP) { this->allowedTokens.emplace_back(TokenType::COMMA); };

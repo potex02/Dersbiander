@@ -11,8 +11,7 @@ DISABLE_WARNINGS_PUSH(
  * @brief A class for tokenizing a given input string.
  */
 // NOLINTNEXTLINE
-Tokenizer::Tokenizer(const std::string &_input)
-  : input(_input), inputSpan(input.c_str(), input.size()), inputSize(input.size()) {}
+Tokenizer::Tokenizer(const std::string &_input) : input(_input), inputSpan(input), inputSize(input.size()) {}
 
 bool Tokenizer::isPositionInText() const noexcept { return currentPosition < inputSize; }
 /**
@@ -148,7 +147,7 @@ std::string Tokenizer::getContextLine(std::size_t lineStart, std::size_t lineEnd
  * @see Token
  */
 std::string Tokenizer::getHighlighting(std::size_t lineStart, std::size_t length) const {
-    return std::string(currentPosition - lineStart, ' ') + std::string(length, '^') + NEWL;
+    return std::string(currentPosition - lineStart, ' ').append(std::string(length, '^')).append(NEWL);
 }
 
 /**
@@ -306,7 +305,7 @@ void Tokenizer::extractVarLenOperator(std::string &value) {
  * @brief A class for tokenizing strings and determining the type of a single character
  */
 // NOLINTNEXTLINE
-TokenType Tokenizer::typeBySingleCharacter(char c) const {
+constexpr TokenType Tokenizer::typeBySingleCharacter(char c) const {
     switch(c) {
         using enum TokenType;
     case '-':
@@ -420,7 +419,7 @@ Token Tokenizer::extractChar() {
     incPosAndCol();
     std::string value;
     while(!TokenizerUtils::isApostrophe(inputSpan[currentPosition])) {
-        if(currentPosition + 1 == inputSpan.size() || inputSpan[currentPosition] == CNL) {
+        if(currentPosition + 1 == inputSize || TokenizerUtils::inCNL(inputSpan[currentPosition])) {
             return {UNKNOWN, "'" + value + "'", currentLine, currentColumn - startcol};
         }
         appendCharToValue(value);
@@ -449,7 +448,7 @@ Token Tokenizer::extractComment() {
     using enum TokenType;
     if(inputSpan[currentPosition + 1] == '/') { return {COMMENT, handleWithSingleLineComment(), currentLine, currentColumn}; }
     if(inputSpan[currentPosition + 1] == '*') {
-        auto [result, value] = this->handleWithMultilineComment();
+        const auto &[result, value] = this->handleWithMultilineComment();
         if(!result) { return {UNKNOWN, value, currentLine, currentColumn}; }
         return {COMMENT, value, currentLine, currentColumn};
     }
@@ -488,7 +487,7 @@ std::pair<bool, std::string> Tokenizer::handleWithMultilineComment() {
     std::string value;
 
     while(currentPosition + 1 != inputSize && (inputSpan[currentPosition] != '*' || inputSpan[currentPosition + 1] != '/')) {
-        if(inputSpan[currentPosition] == CNL) {
+        if(TokenizerUtils::inCNL(inputSpan[currentPosition])) {
             ++currentLine;
             currentColumn = 1;
         }
@@ -511,7 +510,7 @@ std::pair<bool, std::string> Tokenizer::handleWithMultilineComment() {
  * @note This function is declared as noexcept.
  */
 void Tokenizer::handleWhitespace(char currentChar) noexcept {
-    if(currentChar == CNL) {
+    if(TokenizerUtils::inCNL(currentChar)) {
         ++currentLine;
         currentColumn = 1;
     } else {

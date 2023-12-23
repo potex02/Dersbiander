@@ -14,4 +14,5 @@ public:
     [[nodiscard]] static bool isVarLenOperator(const std::string &val) noexcept;
     [[nodiscard]] static bool isBrackets(char c) noexcept;
     [[nodiscard]] static bool isApostrophe(char c) noexcept;
+    [[nodiscard]] static bool inCNL(char c) noexcept;
 };

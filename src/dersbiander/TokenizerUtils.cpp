@@ -40,4 +40,6 @@ bool TokenizerUtils::isBrackets(char c) noexcept { return c == '(' || c == ')' |
 // NOLINTNEXTLINE
 bool TokenizerUtils::isApostrophe(char c) noexcept { return c == '\''; }
 
+bool TokenizerUtils::inCNL(char c) noexcept { return c == CNL; }
+
 DISABLE_WARNINGS_POP()

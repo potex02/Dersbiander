@@ -67,7 +67,7 @@ int main(int argc, const char **argv) {
     spdlog::set_default_logger(console);
 
     std::string lines = readFromFile(filename.data());
-    std::size_t line;
+    std::size_t line{};
     try {
         CLI::App app{D_FORMAT("{} version {}", Dersbiander::cmake::project_name, Dersbiander::cmake::project_version)};
 
@@ -115,7 +115,7 @@ int main(int argc, const char **argv) {
             }
             instructions.reserve(tokens.size());
             AutoTimer tim("tokenizer total time");
-            line = tokens[0].line;
+            line = tokens.at(0).line;
             for(const Token &token : tokens) {
                 if(token.type == TokenType::COMMENT) [[unlikely]] { continue; }
                 if(token.line >= line) [[likely]] {

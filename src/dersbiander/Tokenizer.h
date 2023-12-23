@@ -34,7 +34,7 @@ private:
     [[nodiscard]] bool isPositionInText() const noexcept;
 
     // NOLINTBEGIN
-    TokenType typeBySingleCharacter(char c) const;
+    [[nodiscard]] constexpr TokenType typeBySingleCharacter(char c) const;
     TokenType typeByValue(const std::string &value) const;
     // NOLINTEND
     Token extractIdentifier();
