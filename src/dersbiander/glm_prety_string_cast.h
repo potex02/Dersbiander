@@ -1,6 +1,9 @@
 #pragma once
 
 #include "glm_matld.h"
+#include "log.h"
+
+// #define PRETTY_PRINT
 
 #define GLMP_FUN_QUAL GLM_FUNC_QUALIFIER
 namespace glmp {
@@ -117,7 +120,7 @@ namespace glmp {
                 return D_FORMAT("{}vec4({}, {}, {}, {})", prefix<T>::value(), x[0], x[1], x[2], x[3]);
             }
         };
-
+#ifdef PRETTY_PRINT
         template <typename T, glm::qualifier Q> struct compute_to_string<glm::mat<2, 2, T, Q> > {
             [[nodiscard]] GLMP_FUN_QUAL static std::string call(glm::mat<2, 2, T, Q> const &x) {
                 return D_FORMAT("{}mat2x2(({},{}),\n ({},{})) ", prefix<T>::value(), x[0][0], x[0][1], x[1][0], x[1][1]);
@@ -198,11 +201,92 @@ namespace glmp {
                                 x.real.y, x.real.z, x.dual.w, x.dual.x, x.dual.y, x.dual.z);
             }
         };
+#else
+        template <typename T, glm::qualifier Q> struct compute_to_string<glm::mat<2, 2, T, Q> > {
+            [[nodiscard]] GLMP_FUN_QUAL static std::string call(glm::mat<2, 2, T, Q> const &x) {
+                return D_FORMAT("{}mat2x2(({},{}), ({},{})) ", prefix<T>::value(), x[0][0], x[0][1], x[1][0], x[1][1]);
+            }
+        };
+
+        template <typename T, glm::qualifier Q> struct compute_to_string<glm::mat<2, 3, T, Q> > {
+            [[nodiscard]] GLMP_FUN_QUAL static std::string call(glm::mat<2, 3, T, Q> const &x) {
+                return D_FORMAT("{}mat2x3(({}, {}, {}), ({}, {}, {}))", prefix<T>::value(), x[0][0], x[0][1], x[0][2], x[1][0],
+                                x[1][1], x[1][2]);
+            }
+        };
+
+        template <typename T, glm::qualifier Q> struct compute_to_string<glm::mat<2, 4, T, Q> > {
+            [[nodiscard]] GLMP_FUN_QUAL static std::string call(glm::mat<2, 4, T, Q> const &x) {
+                return D_FORMAT("{}mat2x4(({}, {}, {}, {}), ({}, {}, {}, {}))", prefix<T>::value(), x[0][0], x[0][1], x[0][2],
+                                x[0][3], x[1][0], x[1][1], x[1][2], x[1][3]);
+            }
+        };
+
+        template <typename T, glm::qualifier Q> struct compute_to_string<glm::mat<3, 2, T, Q> > {
+            [[nodiscard]] GLMP_FUN_QUAL static std::string call(glm::mat<3, 2, T, Q> const &x) {
+                return D_FORMAT("{}mat3x2(({}, {}), ({}, {}), ({}, {}))", prefix<T>::value(), x[0][0], x[0][1], x[1][0], x[1][1],
+                                x[2][0], x[2][1]);
+            }
+        };
+
+        template <typename T, glm::qualifier Q> struct compute_to_string<glm::mat<3, 3, T, Q> > {
+            [[nodiscard]] GLMP_FUN_QUAL static std::string call(glm::mat<3, 3, T, Q> const &x) {
+                return D_FORMAT("{}mat3x3(({}, {}, {}), ({}, {}, {}), ({}, {}, {}))", prefix<T>::value(), x[0][0], x[0][1],
+                                x[0][2], x[1][0], x[1][1], x[1][2], x[2][0], x[2][1], x[2][2]);
+            }
+        };
+
+        template <typename T, glm::qualifier Q> struct compute_to_string<glm::mat<3, 4, T, Q> > {
+            [[nodiscard]] GLMP_FUN_QUAL static std::string call(glm::mat<3, 4, T, Q> const &x) {
+                return D_FORMAT("{}mat3x4(({}, {}, {}, {}), ({}, {}, {}, {}), ({}, "
+                                "{}, {}, {}))",
+                                prefix<T>::value(), x[0][0], x[0][1], x[0][2], x[0][3], x[1][0], x[1][1], x[1][2], x[1][3],
+                                x[2][0], x[2][1], x[2][2], x[2][3]);
+            }
+        };
+
+        template <typename T, glm::qualifier Q> struct compute_to_string<glm::mat<4, 2, T, Q> > {
+            [[nodiscard]] GLMP_FUN_QUAL static std::string call(glm::mat<4, 2, T, Q> const &x) {
+                return D_FORMAT("{}mat4x2(({}, {}), ({}, {}), ({}, {}), ({}, {}))", prefix<T>::value(), x[0][0], x[0][1], x[1][0],
+                                x[1][1], x[2][0], x[2][1], x[3][0], x[3][1]);
+            }
+        };
+
+        template <typename T, glm::qualifier Q> struct compute_to_string<glm::mat<4, 3, T, Q> > {
+            [[nodiscard]] GLMP_FUN_QUAL static std::string call(glm::mat<4, 3, T, Q> const &x) {
+                return D_FORMAT("{}mat4x3(({}, {}, {}), ({}, {}, {}), ({}, {}, {}), "
+                                "({}, {}, {}))",
+                                prefix<T>::value(), x[0][0], x[0][1], x[0][2], x[1][0], x[1][1], x[1][2], x[2][0], x[2][1],
+                                x[2][2], x[3][0], x[3][1], x[3][2]);
+            }
+        };
+
+        template <typename T, glm::qualifier Q> struct compute_to_string<glm::mat<4, 4, T, Q> > {
+            [[nodiscard]] GLMP_FUN_QUAL static std::string call(glm::mat<4, 4, T, Q> const &x) {
+                return D_FORMAT("{}mat4x4(({}, {}, {}, {}), ({}, {}, {}, {}), ({}, {}, {}, "
+                                "{}), ({}, {}, {}, {}))",
+                                prefix<T>::value(), x[0][0], x[0][1], x[0][2], x[0][3], x[1][0], x[1][1], x[1][2], x[1][3],
+                                x[2][0], x[2][1], x[2][2], x[2][3], x[3][0], x[3][1], x[3][2], x[3][3]);
+            }
+        };
+
+        template <typename T, glm::qualifier Q> struct compute_to_string<glm::qua<T, Q> > {
+            [[nodiscard]] GLMP_FUN_QUAL static std::string call(glm::qua<T, Q> const &q) {  // NOLINT(*-identifier-length)
+                return D_FORMAT("{}quat({}, [{}, {}, {}])", prefix<T>::value(), q.w, q.x, q.y, q.z);
+            }
+        };
+
+        template <typename T, glm::qualifier Q> struct compute_to_string<glm::tdualquat<T, Q> > {
+            [[nodiscard]] GLMP_FUN_QUAL static std::string call(glm::tdualquat<T, Q> const &x) {
+                return D_FORMAT("{}dualquat(({}, [{}, {}, {}]), ({}, [{}, {}, {}]))", prefix<T>::value(), x.real.w, x.real.x,
+                                x.real.y, x.real.z, x.dual.w, x.dual.x, x.dual.y, x.dual.z);
+            }
+        };
+#endif  // PRETY_PRINT
 
     }  // namespace detail
 
     template <class matType> [[nodiscard]] GLMP_FUN_QUAL std::string to_string(matType const &x) {
         return detail::compute_to_string<matType>::call(x);
     }
-
 }  // namespace glmp

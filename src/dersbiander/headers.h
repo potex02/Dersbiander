@@ -27,26 +27,25 @@ DISABLE_WARNINGS_PUSH(
         26485 26490 26491 26493 26494 26495 26496
         26497 26498 26800 26814 26818 26826)
 
-#include <cassert>
 #include <algorithm>
 #include <array>
 #include <atomic>
+#include <cassert>
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <execution>
-
-#ifdef _WIN32 // Check if the target platform is Windows
-#ifdef _MSC_VER // Check if the compiler is MSVC
+#ifdef _WIN32    // Check if the target platform is Windows
+#ifdef _MSC_VER  // Check if the compiler is MSVC
 
 #include <format>
 
 #endif
 #endif
-
 #include <filesystem>
+#include <fmt/core.h>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -61,22 +60,17 @@ DISABLE_WARNINGS_PUSH(
 #include <random>
 #include <ranges>
 #include <set>
-#include <spdlog/cfg/env.h>
-#include <spdlog/fmt/bundled/format.h>
-#include <spdlog/fmt/ostr.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
+#include <source_location>
 #include <sstream>
 #include <stack>
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <unordered_set>
 #include <utility>
 #include <variant>
 #include <vector>
-#include <source_location>
-#include <type_traits>
 
 // clang-format on
 #include "casts.h"
@@ -84,13 +78,6 @@ DISABLE_WARNINGS_PUSH(
 #include "glm_prety_string_cast.h"
 // Restore warning levels.
 DISABLE_WARNINGS_POP()
-
-#define LTRACE(...) SPDLOG_TRACE(__VA_ARGS__)
-#define LDEBUG(...) SPDLOG_DEBUG(__VA_ARGS__)
-#define LINFO(...) SPDLOG_INFO(__VA_ARGS__)
-#define LWARN(...) SPDLOG_WARN(__VA_ARGS__)
-#define LERROR(...) SPDLOG_ERROR(__VA_ARGS__)
-#define LCRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
 
 // clang-format off
 #ifdef _WIN32
@@ -139,3 +126,28 @@ static inline constexpr long double PI = std::numbers::pi_v<long double>;
 static inline constexpr long double TWO_PI = 2 * PI;
 static inline constexpr long double HALF_PI = PI / 2;
 // NOLINTEND
+
+template <> struct fmt::formatter<std::filesystem::path> : formatter<std::string_view> {
+    template <typename FormatContext> auto format(const std::filesystem::path &path, FormatContext &ctx) {
+        return formatter<std::string_view>::format(path.string(), ctx);
+    }
+};
+
+template <typename T, glm::length_t L, glm::qualifier Q> struct fmt::formatter<glm::vec<L, T, Q>> : formatter<std::string_view> {
+    template <typename FormatContext> auto format(const glm::vec<L, T, Q> &vector, FormatContext &ctx) {
+        return formatter<std::string_view>::format(glmp::to_string(vector), ctx);
+    }
+};
+
+template <typename T, glm::length_t C, glm::length_t R, glm::qualifier Q>
+struct fmt::formatter<glm::mat<C, R, T, Q>> : formatter<std::string_view> {
+    template <typename FormatContext> auto format(const glm::mat<C, R, T, Q> &matrix, FormatContext &ctx) {
+        return formatter<std::string_view>::format(glmp::to_string(matrix), ctx);
+    }
+};
+
+template <typename T, glm::qualifier Q> struct fmt::formatter<glm::qua<T, Q>> : formatter<std::string_view> {
+    template <typename FormatContext> auto format(const glm::qua<T, Q> &quaternion, FormatContext &ctx) {
+        return formatter<std::string_view>::format(glmp::to_string(quaternion), ctx);
+    }
+};
