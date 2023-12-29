@@ -121,7 +121,7 @@ int main(int argc, const char **argv) {
                 if(token.line >= line) [[likely]] {
                     if(instructions.empty() || instructions.back().canTerminate()) [[likely]] {
                         instructions.emplace_back();
-                    } else if(instructions.back().typeToString().back() != "EXPRESSION") [[unlikely]] {
+                    } else if(instructions.back().typeToString().back() != "EXPRESSION" && token.type != TokenType::STRING) [[unlikely]] {
                         LINFO("Unexpected token: ENDL");
                         break;
                     }

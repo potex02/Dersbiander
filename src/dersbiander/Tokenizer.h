@@ -46,6 +46,7 @@ private:
     void extractOperator(std::vector<Token> &tokens);
     Token extractBrackets(char c);
     Token extractChar();
+    Token extractString();
     Token extractComment();
     std::string handleWithSingleLineComment();
     std::pair<bool, std::string> handleWithMultilineComment();

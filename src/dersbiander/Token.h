@@ -9,6 +9,7 @@ enum class TokenType : int {
     INTEGER,
     BOOLEAN,
     DOUBLE,
+    STRING,
     OPERATOR,
     MINUS_OPERATOR,
     EQUAL_OPERATOR,
@@ -56,6 +57,8 @@ struct Token {
             return "INTEGER";
         case DOUBLE:
             return "DOUBLE";
+        case STRING:
+            return "STRING";
         case OPERATOR:
             return "OPERATOR";
         case MINUS_OPERATOR:
