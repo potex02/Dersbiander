@@ -433,17 +433,20 @@ Token Tokenizer::extractChar() {
 
 Token Tokenizer::extractString() {
     using enum TokenType;
-    std::size_t startcol = currentColumn;
     incPosAndCol();
     std::string value;
     while(!TokenizerUtils::isQuotation(inputSpan[currentPosition])) {
         if(currentPosition + 1 == inputSize) {
-            return {UNKNOWN, "\"" + value + "\"", currentLine, currentColumn - startcol};
+            return {UNKNOWN, "\"" + value + "\"", currentLine, currentColumn};
+        }
+        if(TokenizerUtils::inCNL(inputSpan[currentPosition])) {
+            ++currentLine;
+            currentColumn = 1;
         }
         appendCharToValue(value);
     }
     incPosAndCol();
-    return {STRING, "\"" + value + "\"", currentLine, currentColumn - startcol};
+    return {STRING, "\"" + value + "\"", currentLine, currentColumn};
 }
 
 bool Tokenizer::isEscapedChar(const std::string &val) const noexcept {
