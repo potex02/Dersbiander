@@ -46,6 +46,8 @@ std::vector<Token> Tokenizer::tokenize() {
             tokens.emplace_back(extractBrackets(currentChar));
         } else if(TokenizerUtils::isApostrophe(currentChar)) [[likely]] {
             tokens.emplace_back(extractChar());
+        } else if(TokenizerUtils::isQuotation(currentChar)) [[likely]] {
+            tokens.emplace_back(extractString());
         } else if(std::isspace(currentChar)) [[likely]] {
             handleWhitespace(currentChar);
             continue;  // Continue the loop to get the next token
@@ -427,6 +429,21 @@ Token Tokenizer::extractChar() {
     incPosAndCol();
     if(value.empty() || isEscapedChar(value)) { return {CHAR, value, currentLine, currentColumn - startcol}; }
     return {UNKNOWN, "'" + value + "'", currentLine, currentColumn - startcol};
+}
+
+Token Tokenizer::extractString() {
+    using enum TokenType;
+    std::size_t startcol = currentColumn;
+    incPosAndCol();
+    std::string value;
+    while(!TokenizerUtils::isQuotation(inputSpan[currentPosition])) {
+        if(currentPosition + 1 == inputSize) {
+            return {UNKNOWN, "\"" + value + "\"", currentLine, currentColumn - startcol};
+        }
+        appendCharToValue(value);
+    }
+    incPosAndCol();
+    return {STRING, "\"" + value + "\"", currentLine, currentColumn - startcol};
 }
 
 bool Tokenizer::isEscapedChar(const std::string &val) const noexcept {
