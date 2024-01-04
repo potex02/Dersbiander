@@ -39,6 +39,7 @@ private:
     void checkKeywordVar();
     void checkKeywordStructure();
     void checkKeywordFor();
+    void checkKeywordFunc();
     void emplaceCommaEoft() noexcept;
     [[nodiscard]] inline bool isExpression() noexcept;
     // NOLINTNEXTLINE

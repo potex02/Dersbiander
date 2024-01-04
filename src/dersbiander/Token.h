@@ -30,6 +30,7 @@ enum class TokenType : int {
     KEYWORD_VAR,
     KEYWORD_STRUCTURE,
     KEYWORD_FOR,
+    KEYWORD_FUNC,
     COMMENT,
     EOFT,
     ERROR,
@@ -100,6 +101,8 @@ struct Token {
             return "KEYWORD_STRUCTURE";
         case KEYWORD_FOR:
             return "KEYWORD_FOR";
+        case KEYWORD_FUNC:
+            return "KEYWORD_FUNC";
         case COMMENT:
             return "COMMENT";
         case EOFT:

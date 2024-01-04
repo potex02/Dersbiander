@@ -50,3 +50,7 @@ for var i: int = 1 + a[2] - (10 / -20 * 30 -a[2][4] && !b), 12 - i {
 for var i: int = (1 * (1 || b)), [1, 2, 3], 5 {}
 function(1, b(345)[1], !variable, a || b[1][3]((9-8) ^ -3, [1, 2, 3], a - b ^ c(4, 5)))
 a, b, c = function() + function("Ciao", 2), -function(45) && !function('A') * d, d
+func function() {}
+func function(var1: type, var2: type): type1, type2 {
+	variable = 12
+}

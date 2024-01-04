@@ -17,6 +17,8 @@ enum class InstructionType : short {
     FOR_CONDITION,
     FOR_STEP,
     DEFINITION,
+    PARAMETER_DEFINITION,
+    RETURN_DEFINITION,
     OPEN_SCOPE,
     CLOSE_SCOPE,
     BLANK
