@@ -26,6 +26,7 @@ enum class TokenType : int {
     CLOSED_SQUARE_BRACKETS,
     OPEN_CURLY_BRACKETS,
     CLOSED_CURLY_BRACKETS,
+    KEYWORD_MAIN,
     KEYWORD_VAR,
     KEYWORD_STRUCTURE,
     KEYWORD_FOR,
@@ -91,6 +92,8 @@ struct Token {
             return "OPEN_CURLY_BRACKETS";
         case CLOSED_CURLY_BRACKETS:
             return "CLOSED_CURLY_BRACKETS";
+        case KEYWORD_MAIN:
+            return "KEYWORD_MAIN";
         case KEYWORD_VAR:
             return "KEYWORD_VAR";
         case KEYWORD_STRUCTURE:

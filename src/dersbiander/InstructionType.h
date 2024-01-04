@@ -10,6 +10,7 @@ enum class InstructionType : short {
     DECLARATION,
     INITIALIZATION,
     ARRAY_INIZIALIZATION,
+    MAIN,
     STRUCTURE,
     FOR_STRUCTURE,
     FOR_INITIALIZATION,

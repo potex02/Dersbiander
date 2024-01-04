@@ -218,6 +218,7 @@ Token Tokenizer::extractIdentifier() {
 
 void Tokenizer::kewordType(const std::string &value, TokenType &type) const {
     using enum TokenType;
+    if(value == "main") { type = KEYWORD_MAIN; }
     if(value == "var" || value == "const") { type = KEYWORD_VAR; }
     if(value == "if" || value == "while") { type = KEYWORD_STRUCTURE; }
     if(value == "for") { type = KEYWORD_FOR; }

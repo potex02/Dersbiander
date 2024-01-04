@@ -35,6 +35,7 @@ private:
     void checkClosedBrackets(const TokenType &type);
     void checkOpenCurlyBrackets();
     void checkClosedCurlyBracktes();
+    void checkKeywordMain();
     void checkKeywordVar();
     void checkKeywordStructure();
     void checkKeywordFor();

@@ -6,7 +6,7 @@ DISABLE_WARNINGS_PUSH(26461 26821)
 
 Instruction::Instruction() noexcept
   : tokens({}), instructionTypes({InstructionType::BLANK}),
-    allowedTokens({TokenType::KEYWORD_VAR, TokenType::KEYWORD_STRUCTURE, TokenType::KEYWORD_FOR, TokenType::IDENTIFIER,
+    allowedTokens({TokenType::KEYWORD_MAIN, TokenType::KEYWORD_VAR, TokenType::KEYWORD_STRUCTURE, TokenType::KEYWORD_FOR, TokenType::IDENTIFIER,
                    TokenType::OPEN_CURLY_BRACKETS, TokenType::CLOSED_CURLY_BRACKETS, TokenType::EOFT}) {
     booleanOperatorPresent = {false};
     previousTokens.reserve(tokens.size());
@@ -57,6 +57,9 @@ Instruction::Instruction() noexcept
             break;
         case ARRAY_INIZIALIZATION:
             result.emplace_back("ARRAY_INIZIALIZATION");
+            break;
+        case MAIN:
+            result.emplace_back("MAIN");
             break;
         case STRUCTURE:
             result.emplace_back("STRUCTURE");
@@ -154,6 +157,9 @@ Instruction::Instruction() noexcept
         break;
     case CLOSED_CURLY_BRACKETS:
         this->checkClosedCurlyBracktes();
+        break;
+    case KEYWORD_MAIN:
+        this->checkKeywordMain();
         break;
     case KEYWORD_VAR:
         this->checkKeywordVar();
@@ -445,6 +451,17 @@ void Instruction::checkClosedCurlyBracktes() {
     using enum InstructionType;
     if(lastInstructionTypeIs(BLANK)) { this->setLastInstructionType(CLOSE_SCOPE); }
     this->allowedTokens = {eofTokenType};
+}
+
+void Instruction::checkKeywordMain() {
+    using enum InstructionType;
+    using enum TokenType;
+    if(this->lastInstructionTypeIs(BLANK)) {
+        this->setLastInstructionType(MAIN);
+        this->allowedTokens = {OPEN_CURLY_BRACKETS};
+        return;
+    }
+    this->allowedTokens = {};
 }
 
 void Instruction::checkKeywordVar() {
