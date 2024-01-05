@@ -6,8 +6,9 @@ DISABLE_WARNINGS_PUSH(26461 26821)
 
 Instruction::Instruction() noexcept
   : tokens({}), instructionTypes({InstructionType::BLANK}),
-    allowedTokens({TokenType::KEYWORD_VAR, TokenType::KEYWORD_STRUCTURE, TokenType::KEYWORD_FOR, TokenType::IDENTIFIER,
-                   TokenType::OPEN_CURLY_BRACKETS, TokenType::CLOSED_CURLY_BRACKETS, TokenType::EOFT}) {
+    allowedTokens({TokenType::KEYWORD_MAIN, TokenType::KEYWORD_VAR, TokenType::KEYWORD_STRUCTURE, TokenType::KEYWORD_FOR,
+                   TokenType::KEYWORD_FUNC, TokenType::KEYWORD_RETURN, TokenType::IDENTIFIER, TokenType::OPEN_CURLY_BRACKETS,
+                   TokenType::CLOSED_CURLY_BRACKETS, eofTokenType}) {
     booleanOperatorPresent = {false};
     previousTokens.reserve(tokens.size());
 }
@@ -49,6 +50,9 @@ Instruction::Instruction() noexcept
         case SQUARE_EXPRESSION:
             result.emplace_back("SQUARE_EXPRESSION");
             break;
+        case RETURN_EXPRESSION:
+            result.emplace_back("RETURN_EXPRESSION");
+            break;
         case DECLARATION:
             result.emplace_back("DECLARATION");
             break;
@@ -57,6 +61,9 @@ Instruction::Instruction() noexcept
             break;
         case ARRAY_INIZIALIZATION:
             result.emplace_back("ARRAY_INIZIALIZATION");
+            break;
+        case MAIN:
+            result.emplace_back("MAIN");
             break;
         case STRUCTURE:
             result.emplace_back("STRUCTURE");
@@ -75,6 +82,12 @@ Instruction::Instruction() noexcept
             break;
         case DEFINITION:
             result.emplace_back("DEFINITION");
+            break;
+        case PARAMETER_DEFINITION:
+            result.emplace_back("PARAMETER_DEFINITION");
+            break;
+        case RETURN_DEFINITION:
+            result.emplace_back("RETURN_DEFINITION");
             break;
         case OPEN_SCOPE:
             result.emplace_back("OPEN_SCOPE");
@@ -155,6 +168,9 @@ Instruction::Instruction() noexcept
     case CLOSED_CURLY_BRACKETS:
         this->checkClosedCurlyBracktes();
         break;
+    case KEYWORD_MAIN:
+        this->checkKeywordMain();
+        break;
     case KEYWORD_VAR:
         this->checkKeywordVar();
         break;
@@ -164,7 +180,13 @@ Instruction::Instruction() noexcept
     case KEYWORD_FOR:
         this->checkKeywordFor();
         break;
-    case EOFT:
+    case KEYWORD_FUNC:
+        this->checkKeywordFunc();
+        break;
+    case KEYWORD_RETURN:
+        this->checkKeywordReturn();
+        break;
+    case eofTokenType:
     case ERROR:
     case UNKNOWN:
         [[fallthrough]];
@@ -177,14 +199,34 @@ Instruction::Instruction() noexcept
 
 void Instruction::emplaceCommaEoft() noexcept {
     this->allowedTokens.emplace_back(TokenType::COMMA);
-    this->allowedTokens.emplace_back(TokenType::EOFT);
+    this->allowedTokens.emplace_back(eofTokenType);
+}
+
+void Instruction::emplaceExpressionTokens() {
+    using enum InstructionType;
+    using enum TokenType;
+    this->emplaceBooleanOperator();
+    if(this->emplaceTokenType(SQUARE_EXPRESSION, CLOSED_SQUARE_BRACKETS)) { return; }
+    if(this->emplaceTokenType(EXPRESSION, CLOSED_BRACKETS)) { return; }
+    if(this->lastInstructionTypeIs(PARAMETER_EXPRESSION)) {
+        this->allowedTokens.emplace_back(CLOSED_BRACKETS);
+        this->allowedTokens.emplace_back(COMMA);
+        return;
+    }
+    if(lastInstructionTypeIs(ARRAY_INIZIALIZATION)) {
+        this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
+        this->allowedTokens.emplace_back(COMMA);
+        return;
+    }
+    if(this->emplaceForTokens()) { return; }
+    this->emplaceCommaEoft();
 }
 
 bool Instruction::isExpression() noexcept {
     using enum InstructionType;
     return lastInstructionTypeIs(PARAMETER_EXPRESSION) || lastInstructionTypeIs(ASSIGNATION) || lastInstructionTypeIs(INITIALIZATION) ||
-           lastInstructionTypeIs(ARRAY_INIZIALIZATION) || lastInstructionTypeIs(EXPRESSION) ||
-           lastInstructionTypeIs(SQUARE_EXPRESSION) || this->isForExpression();
+           lastInstructionTypeIs(ARRAY_INIZIALIZATION) || lastInstructionTypeIs(EXPRESSION) || lastInstructionTypeIs(SQUARE_EXPRESSION) ||
+           lastInstructionTypeIs(RETURN_EXPRESSION) || this->isForExpression();
 }
 
 bool Instruction::isForExpression() noexcept {
@@ -197,35 +239,21 @@ void Instruction::checkIdentifier(const TokenType &type) noexcept {
     using enum InstructionType;
     if(this->isExpression()) {
         this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR, OPEN_BRACKETS, OPEN_SQUARE_BRACKETS};
-        this->emplaceBooleanOperator();
         this->emplaceUnaryOperator(type);
-        if(this->emplaceTokenType(SQUARE_EXPRESSION, CLOSED_SQUARE_BRACKETS)) { return; }
-        if(this->emplaceTokenType(EXPRESSION, CLOSED_BRACKETS)) { return; }
-        if(this->lastInstructionTypeIs(PARAMETER_EXPRESSION)) {
-            this->allowedTokens.emplace_back(CLOSED_BRACKETS);
-            this->allowedTokens.emplace_back(COMMA);
-            return;
-        }
-        if(lastInstructionTypeIs(ARRAY_INIZIALIZATION)) {
-            this->allowedTokens.emplace_back(COMMA);
-            this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
-            return;
-        }
-        if(this->emplaceForTokens()) { return; }
-        this->emplaceCommaEoft();
+        this->emplaceExpressionTokens();
         return;
     }
     switch(this->lastInstructionType()) {
     case BLANK:
     case OPERATION:
         this->setLastInstructionType(OPERATION);
-        this->allowedTokens = {EQUAL_OPERATOR, OPERATION_EQUAL, COMMA, OPEN_SQUARE_BRACKETS, EOFT};
+        this->allowedTokens = {EQUAL_OPERATOR, OPERATION_EQUAL, COMMA, OPEN_SQUARE_BRACKETS, eofTokenType};
         if(previousTokens.empty()) { this->allowedTokens.emplace_back(OPEN_BRACKETS); }
         this->emplaceUnaryOperator(type);
         break;
     case DECLARATION:
         if(!this->isPreviousEmpty() && this->previousTokensLast() == COLON) {
-            this->allowedTokens = {EQUAL_OPERATOR, OPEN_SQUARE_BRACKETS, EOFT};
+            this->allowedTokens = {EQUAL_OPERATOR, OPEN_SQUARE_BRACKETS, eofTokenType};
             break;
         }
         this->allowedTokens = {COMMA, COLON};
@@ -241,6 +269,19 @@ void Instruction::checkIdentifier(const TokenType &type) noexcept {
         }
         this->allowedTokens = {EQUAL_OPERATOR};
         break;
+    case DEFINITION:
+        this->allowedTokens = {OPEN_BRACKETS};
+        break;
+    case PARAMETER_DEFINITION:
+        if(this->previousTokensLast() == COLON) {
+            this->allowedTokens = {COMMA, CLOSED_BRACKETS};
+            break;
+        }
+        this->allowedTokens = {COLON};
+        break;
+    case RETURN_DEFINITION:
+        this->allowedTokens = {COMMA, OPEN_CURLY_BRACKETS};
+        break;
     default:
         this->allowedTokens = {};
         break;
@@ -252,21 +293,7 @@ void Instruction::checkNumber() noexcept {
     using enum InstructionType;
     if(this->isExpression()) {
         this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR};
-        this->emplaceBooleanOperator();
-        if(this->emplaceTokenType(SQUARE_EXPRESSION, CLOSED_SQUARE_BRACKETS)) { return; }
-        if(this->emplaceTokenType(EXPRESSION, CLOSED_BRACKETS)) { return; }
-        if(this->lastInstructionTypeIs(PARAMETER_EXPRESSION)) {
-            this->allowedTokens.emplace_back(CLOSED_BRACKETS);
-            this->allowedTokens.emplace_back(COMMA);
-            return;
-        }
-        if(lastInstructionTypeIs(ARRAY_INIZIALIZATION)) {
-            this->allowedTokens.emplace_back(COMMA);
-            this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
-            return;
-        }
-        if(this->emplaceForTokens()) { return; }
-        this->emplaceCommaEoft();
+        this->emplaceExpressionTokens();
         return;
     }
     this->allowedTokens = {};
@@ -295,8 +322,7 @@ void Instruction::checkMinusOperator() {
 void Instruction::checkEqualOperator() {
     using enum TokenType;
     using enum InstructionType;
-    this->allowedTokens = {IDENTIFIER,          INTEGER, DOUBLE, CHAR, STRING, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS,
-                           OPEN_SQUARE_BRACKETS};
+    this->allowedTokens = this->expressionStart;
     if(lastInstructionTypeIs(OPERATION) || lastInstructionTypeIs(DECLARATION)) {
         if(lastInstructionTypeIs(OPERATION)) {
             this->setLastInstructionType(ASSIGNATION);
@@ -316,7 +342,7 @@ void Instruction::checkBooleanAndLogicalOperator(const TokenType &type) {
     using enum TokenType;
     using enum InstructionType;
     if(this->isExpression()) {
-        this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, STRING, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS};
+        this->allowedTokens = this->expressionStart;
         if(type != NOT_OPERATOR) {
             this->allowedTokens.emplace_back(NOT_OPERATOR);
             this->setLastBooleanOperatorPresent(type == BOOLEAN_OPERATOR);
@@ -329,7 +355,8 @@ void Instruction::checkBooleanAndLogicalOperator(const TokenType &type) {
 void Instruction::checkComma() {
     using enum TokenType;
     using enum InstructionType;
-    if(lastInstructionTypeIs(OPERATION) || lastInstructionTypeIs(DECLARATION)) {
+    if(lastInstructionTypeIs(OPERATION) || lastInstructionTypeIs(DECLARATION) || lastInstructionTypeIs(PARAMETER_DEFINITION) ||
+       lastInstructionTypeIs(RETURN_DEFINITION)) {
         this->allowedTokens = {IDENTIFIER};
         return;
     }
@@ -338,14 +365,15 @@ void Instruction::checkComma() {
     } else if(lastInstructionTypeIs(FOR_CONDITION)) {
         this->setLastInstructionType(FOR_STEP);
     }
-    this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, STRING, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS,
-                           OPEN_SQUARE_BRACKETS};
+    this->setLastBooleanOperatorPresent(false);
+    this->allowedTokens = this->expressionStart;
 }
 
 void Instruction::checkColon() {
     using enum TokenType;
     using enum InstructionType;
-    if(lastInstructionTypeIs(DECLARATION) || lastInstructionTypeIs(FOR_STRUCTURE)) {
+    if(lastInstructionTypeIs(DECLARATION) || lastInstructionTypeIs(FOR_STRUCTURE) || lastInstructionTypeIs(PARAMETER_DEFINITION) ||
+       lastInstructionTypeIs(RETURN_DEFINITION)) {
         this->allowedTokens = {IDENTIFIER};
         return;
     }
@@ -359,6 +387,11 @@ void Instruction::checkOpenBrackets(const TokenType &type) {
     this->allowedTokens = {IDENTIFIER, INTEGER, DOUBLE, CHAR, STRING, BOOLEAN, MINUS_OPERATOR, NOT_OPERATOR, OPEN_BRACKETS};
     if(type == OPEN_BRACKETS) {
         this->allowedTokens.emplace_back(CLOSED_BRACKETS);
+        if(lastInstructionTypeIs(DEFINITION)) {
+            this->addInstructionType(PARAMETER_DEFINITION);
+            this->allowedTokens = {IDENTIFIER, CLOSED_BRACKETS};
+            return;
+        }
         if(this->previousTokensLast() == IDENTIFIER || this->previousTokensLast() == CLOSED_SQUARE_BRACKETS) {
             if(this->lastInstructionTypeIs(OPERATION)) { this->setLastInstructionType(PROCEDURE_CALL); }
             this->addInstructionType(PARAMETER_EXPRESSION);
@@ -395,21 +428,7 @@ void Instruction::checkClosedBrackets(const TokenType &type) {
                 this->allowedTokens.emplace_back(OPEN_BRACKETS);
             }
         }
-        this->emplaceBooleanOperator();
-        if(this->emplaceTokenType(SQUARE_EXPRESSION, CLOSED_SQUARE_BRACKETS)) { return; }
-        if(this->emplaceTokenType(EXPRESSION, CLOSED_BRACKETS)) { return; }
-        if(this->lastInstructionTypeIs(PARAMETER_EXPRESSION)) {
-            this->allowedTokens.emplace_back(CLOSED_BRACKETS);
-            this->allowedTokens.emplace_back(COMMA);
-            return;
-        }
-        if(lastInstructionTypeIs(ARRAY_INIZIALIZATION)) {
-            this->allowedTokens.emplace_back(COMMA);
-            this->allowedTokens.emplace_back(CLOSED_SQUARE_BRACKETS);
-            return;
-        }
-        if(this->emplaceForTokens()) { return; }
-        this->emplaceCommaEoft();
+        this->emplaceExpressionTokens();
         return;
     }
     switch(this->lastInstructionType()) {
@@ -422,11 +441,15 @@ void Instruction::checkClosedBrackets(const TokenType &type) {
         this->allowedTokens.emplace_back(UNARY_OPERATOR);
         break;
     case DECLARATION:
-        this->allowedTokens = {EQUAL_OPERATOR, EOFT};
+        this->allowedTokens = {EQUAL_OPERATOR, eofTokenType};
         if(type == CLOSED_SQUARE_BRACKETS) { this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS); }
         break;
     case STRUCTURE:
         this->allowedTokens = {OPEN_CURLY_BRACKETS};
+        break;
+    case DEFINITION:
+        this->setLastInstructionType(RETURN_DEFINITION);
+        this->allowedTokens = {COLON, OPEN_CURLY_BRACKETS};
         break;
     default:
         this->allowedTokens = {};
@@ -445,6 +468,17 @@ void Instruction::checkClosedCurlyBracktes() {
     using enum InstructionType;
     if(lastInstructionTypeIs(BLANK)) { this->setLastInstructionType(CLOSE_SCOPE); }
     this->allowedTokens = {eofTokenType};
+}
+
+void Instruction::checkKeywordMain() {
+    using enum InstructionType;
+    using enum TokenType;
+    if(this->lastInstructionTypeIs(BLANK)) {
+        this->setLastInstructionType(MAIN);
+        this->allowedTokens = {OPEN_CURLY_BRACKETS};
+        return;
+    }
+    this->allowedTokens = {};
 }
 
 void Instruction::checkKeywordVar() {
@@ -479,6 +513,29 @@ void Instruction::checkKeywordFor() {
     if(lastInstructionTypeIs(BLANK)) {
         this->setLastInstructionType(FOR_STRUCTURE);
         this->allowedTokens = {KEYWORD_VAR, IDENTIFIER};
+        return;
+    }
+    this->allowedTokens = {};
+}
+
+void Instruction::checkKeywordFunc() {
+    using enum TokenType;
+    using enum InstructionType;
+    if(lastInstructionTypeIs(BLANK)) {
+        this->setLastInstructionType(DEFINITION);
+        this->allowedTokens = {IDENTIFIER};
+        return;
+    }
+    this->allowedTokens = {};
+}
+
+void Instruction::checkKeywordReturn() {
+    using enum TokenType;
+    using enum InstructionType;
+    if(lastInstructionTypeIs(BLANK)) {
+        this->setLastInstructionType(RETURN_EXPRESSION);
+        this->allowedTokens = this->expressionStart;
+        this->allowedTokens.emplace_back(eofTokenType);
         return;
     }
     this->allowedTokens = {};
