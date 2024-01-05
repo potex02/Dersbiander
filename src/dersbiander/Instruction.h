@@ -40,7 +40,9 @@ private:
     void checkKeywordStructure();
     void checkKeywordFor();
     void checkKeywordFunc();
+    void checkKeywordReturn();
     void emplaceCommaEoft() noexcept;
+    void emplaceExpressionTokens();
     [[nodiscard]] inline bool isExpression() noexcept;
     // NOLINTNEXTLINE
     [[nodiscard]] inline bool isForExpression() noexcept;
@@ -94,4 +96,9 @@ private:
         }
         return false;
     }
+    std::vector<TokenType> expressionStart = {
+        TokenType::IDENTIFIER,      TokenType::INTEGER,        TokenType::DOUBLE,         TokenType::CHAR,
+        TokenType::STRING,          TokenType::BOOLEAN,        TokenType::MINUS_OPERATOR, TokenType::NOT_OPERATOR,
+        TokenType::OPEN_BRACKETS,   TokenType::OPEN_SQUARE_BRACKETS
+    };
 };
