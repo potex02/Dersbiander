@@ -104,7 +104,7 @@ int main(int argc, const char **argv) {
                 LINFO("Empty tokens");
                 return 0;
             }
-            for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
+            for(const Token &token : tokens) {
 #ifdef ONLY_TOKEN_TYPE
                 LINFO("Token {}", token.type);
 #else
