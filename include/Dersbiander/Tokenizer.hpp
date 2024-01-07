@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Timer.h"
-#include "Token.h"
-#include "TokenizerUtils.h"
-#include <span>
+#include "Timer.hpp"
+#include "Token.hpp"
+#include "TokenizerUtils.hpp"
+#include "headers.hpp"
 #include <string>
 #include <vector>
 
@@ -23,12 +23,11 @@ public:
     void handleError(const std::string &values, const std::string &errorMsg);
 
 private:
-    std::string input;
-    std::span<const char> inputSpan;
-    std::size_t currentPosition = 0;
-    std::size_t inputSize = 0;
-    std::size_t currentLine = 1;
-    std::size_t currentColumn = 1;
+    std::string_view _input;
+    std::size_t _inputSize;
+    std::size_t position = 0;
+    std::size_t line = 1;
+    std::size_t column = 1;
 
     inline void appendCharToValue(std::string &value);
     [[nodiscard]] bool isPositionInText() const noexcept;
@@ -50,7 +49,7 @@ private:
     Token extractComment();
     std::string handleWithSingleLineComment();
     std::pair<bool, std::string> handleWithMultilineComment();
-    void handleWhitespace(char currentChar) noexcept;
+    void handleWhitespace() noexcept;
     [[nodiscard]] std::size_t findLineStart() const;
     [[nodiscard]] std::size_t findLineEnd() const;
     [[nodiscard]] std::string getContextLine(size_t lineStart, size_t lineEnd) const;

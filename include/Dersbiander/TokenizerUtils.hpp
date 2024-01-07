@@ -1,11 +1,11 @@
 #pragma once
-#include "headers.h"
+#include "headers.hpp"
 #include <span>
 
 class TokenizerUtils {
 public:
     [[nodiscard]] static bool isPlusORMinus(char c) noexcept;
-    [[nodiscard]] static bool isComment(const std::span<const char> &inputSpan, size_t position) noexcept;
+    [[nodiscard]] static bool isComment(const std::string_view &inputSpan, size_t position) noexcept;
     [[nodiscard]] static bool isOperator(char c) noexcept;
     [[nodiscard]] static bool isOperationEqualOperator(const std::string &value) noexcept;
     [[nodiscard]] static bool isBooleanOperator(const std::string &value) noexcept;

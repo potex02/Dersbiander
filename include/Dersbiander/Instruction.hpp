@@ -1,7 +1,7 @@
 #pragma once
 
-#include "InstructionType.h"
-#include "Token.h"
+#include "InstructionType.hpp"
+#include "Token.hpp"
 #include <vector>
 
 class Instruction {
@@ -46,7 +46,7 @@ private:
     [[nodiscard]] inline bool isExpression() noexcept;
     // NOLINTNEXTLINE
     [[nodiscard]] inline bool isForExpression() noexcept;
-    [[nodiscard]] TokenType &previousTokensLast() noexcept { return this->previousTokens.back().type; }
+    [[nodiscard]] const TokenType previousTokensLast() noexcept { return this->previousTokens.back().getType(); }
     [[nodiscard]] bool isPreviousEmpty() const noexcept { return this->previousTokens.empty(); }
     [[nodiscard]] InstructionType &lastInstructionType() noexcept { return this->instructionTypes.back(); }
     [[nodiscard]] inline bool lastInstructionTypeIs(const InstructionType &type) noexcept {

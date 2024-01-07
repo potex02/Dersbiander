@@ -1,4 +1,4 @@
-#include "Instruction.h"
+#include "Dersbiander/Instruction.hpp"
 
 #define ONLY_TOKEN_TYPE
 
@@ -16,12 +16,12 @@ Instruction::Instruction() noexcept
 [[nodiscard]] std::string Instruction::unexpected(const Token &token) const {
     std::string value;
 
-    if(token.type != eofTokenType) {
-        value = token.value;
+    if(token.getType() != eofTokenType) {
+        value = token.getValue();
     } else {
         value = "EOFT";
     }
-    return FORMAT("Unexpected token: {} line {} column {}", value, token.line, token.column);
+    return FORMAT("Unexpected token: {} line {} column {}", value, token.getLine(), token.getColumn());
 }
 
 [[nodiscard]] std::vector<std::string> Instruction::typeToString() const noexcept {
@@ -29,96 +29,23 @@ Instruction::Instruction() noexcept
     result.reserve(this->instructionTypes.size());
 
     // NOLINTNEXTLINE
-    for(const InstructionType &i : this->instructionTypes) {
-        switch(i) {
-            using enum InstructionType;
-        case PROCEDURE_CALL:
-            result.emplace_back("PROCEDURE_CALL");
-            break;
-        case PARAMETER_EXPRESSION:
-            result.emplace_back("PARAMETER_EXPRESSION");
-            break;
-        case OPERATION:
-            result.emplace_back("OPERATION");
-            break;
-        case ASSIGNATION:
-            result.emplace_back("ASSIGNATION");
-            break;
-        case EXPRESSION:
-            result.emplace_back("EXPRESSION");
-            break;
-        case SQUARE_EXPRESSION:
-            result.emplace_back("SQUARE_EXPRESSION");
-            break;
-        case RETURN_EXPRESSION:
-            result.emplace_back("RETURN_EXPRESSION");
-            break;
-        case DECLARATION:
-            result.emplace_back("DECLARATION");
-            break;
-        case INITIALIZATION:
-            result.emplace_back("INITIALIZATION");
-            break;
-        case ARRAY_INIZIALIZATION:
-            result.emplace_back("ARRAY_INIZIALIZATION");
-            break;
-        case MAIN:
-            result.emplace_back("MAIN");
-            break;
-        case STRUCTURE:
-            result.emplace_back("STRUCTURE");
-            break;
-        case FOR_STRUCTURE:
-            result.emplace_back("FOR_STRUCTURE");
-            break;
-        case FOR_INITIALIZATION:
-            result.emplace_back("FOR_INITIALIZATION");
-            break;
-        case FOR_CONDITION:
-            result.emplace_back("FOR_CONDITION");
-            break;
-        case FOR_STEP:
-            result.emplace_back("FOR_STEP");
-            break;
-        case DEFINITION:
-            result.emplace_back("DEFINITION");
-            break;
-        case PARAMETER_DEFINITION:
-            result.emplace_back("PARAMETER_DEFINITION");
-            break;
-        case RETURN_DEFINITION:
-            result.emplace_back("RETURN_DEFINITION");
-            break;
-        case OPEN_SCOPE:
-            result.emplace_back("OPEN_SCOPE");
-            break;
-        case CLOSE_SCOPE:
-            result.emplace_back("CLOSE_SCOPE");
-            break;
-        case BLANK:
-            result.emplace_back("BLANK");
-            break;
-        default:
-            result.emplace_back("UNKNOWN");
-            break;
-        }
-    }
+    for(const InstructionType &i : this->instructionTypes) { result.emplace_back(FORMAT("{}", i)); }
     return result;
 }
 
 [[nodiscard]] std::pair<bool, std::string> Instruction::checkToken(const Token &token) {
 #ifdef ONLY_TOKEN_TYPE
-    std::string msg = token.typeToString();
+    std::string msg = FORMAT("{}", token.getType());
 #else
     std::string msg = token.toString();
 #endif  // ONLY_TOKEN_TYPE
-    if(std::ranges::find(this->allowedTokens, token.type) == this->allowedTokens.end()) [[unlikely]] { return {false, msg}; }
-    switch(token.type) {
+    if(std::ranges::find(this->allowedTokens, token.getType()) == this->allowedTokens.end()) [[unlikely]] { return {false, msg}; }
+    switch(token.getType()) {
         using enum TokenType;
     case IDENTIFIER:
         [[fallthrough]];
     case UNARY_OPERATOR:
-        this->checkIdentifier(token.type);
+        this->checkIdentifier(token.getType());
         break;
     // NOLINTNEXTLINE
     case INTEGER:
@@ -144,7 +71,7 @@ Instruction::Instruction() noexcept
     case NOT_OPERATOR:
         [[fallthrough]];
     case LOGICAL_OPERATOR:
-        this->checkBooleanAndLogicalOperator(token.type);
+        this->checkBooleanAndLogicalOperator(token.getType());
         break;
     case COMMA:
         this->checkComma();
@@ -155,12 +82,12 @@ Instruction::Instruction() noexcept
     case OPEN_BRACKETS:
         [[fallthrough]];
     case OPEN_SQUARE_BRACKETS:
-        this->checkOpenBrackets(token.type);
+        this->checkOpenBrackets(token.getType());
         break;
     case CLOSED_BRACKETS:
         [[fallthrough]];
     case CLOSED_SQUARE_BRACKETS:
-        this->checkClosedBrackets(token.type);
+        this->checkClosedBrackets(token.getType());
         break;
     case OPEN_CURLY_BRACKETS:
         this->checkOpenCurlyBrackets();

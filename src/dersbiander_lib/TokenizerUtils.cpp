@@ -1,4 +1,4 @@
-#include "TokenizerUtils.h"
+#include "Dersbiander/TokenizerUtils.hpp"
 #include <unordered_set>
 
 DISABLE_WARNINGS_PUSH(
@@ -7,7 +7,7 @@ DISABLE_WARNINGS_PUSH(
 // NOLINTNEXTLINE
 bool TokenizerUtils::isPlusORMinus(char c) noexcept { return c == '+' || c == '-'; }
 
-bool TokenizerUtils::isComment(const std::span<const char> &inputSpan, size_t position) noexcept {
+bool TokenizerUtils::isComment(const std::string_view &inputSpan, size_t position) noexcept {
     return position != inputSpan.size() && inputSpan[position] == '/' &&
            (inputSpan[position + 1] == '/' || inputSpan[position + 1] == '*');
 }

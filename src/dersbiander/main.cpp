@@ -1,7 +1,5 @@
-﻿#include "FileReadError.h"
-#include "Instruction.h"
-#include "Tokenizer.h"
-#include "headers.h"
+﻿#include "Dersbiander/dersbiander.hpp"
+#include "FileReadError.h"
 #include <string>
 namespace fs = std::filesystem;
 
@@ -30,8 +28,8 @@ static std::string readFromFile(const std::string &filename) {
     AutoTimer timer("readFromFile");
     fs::path filePath = filename;
 
-    if(!fs::exists(filePath)) { throw FileReadError(D_FORMAT("File not found: {}", filename)); }
-    if(!fs::is_regular_file(filePath)) { throw FileReadError(D_FORMAT("Path is not a regular file: {}", filename)); }
+    if(!fs::exists(filePath)) { throw FileReadError(FORMAT("File not found: {}", filename)); }
+    if(!fs::is_regular_file(filePath)) { throw FileReadError(FORMAT("Path is not a regular file: {}", filename)); }
 
     std::stringstream buffer;
 
@@ -42,12 +40,12 @@ static std::string readFromFile(const std::string &filename) {
         try {
             buffer << fileStream.rdbuf();
         } catch(const std::ios_base::failure &e) {
-            throw FileReadError(D_FORMAT("Unable to read file: {}. Reason: {}", filename, e.what()));
+            throw FileReadError(FORMAT("Unable to read file: {}. Reason: {}", filename, e.what()));
         }
     } else {
         // Handle the case when the file cannot be opened
         // You might throw an exception or return an error indicator
-        throw FileReadError(D_FORMAT("Unable to open file: {}", filename));
+        throw FileReadError(FORMAT("Unable to open file: {}", filename));
     }
 
     // Extract the content as a string
@@ -69,7 +67,7 @@ int main(int argc, const char **argv) {
     std::string lines = readFromFile(filename.data());
     std::size_t line{};
     try {
-        CLI::App app{D_FORMAT("{} version {}", Dersbiander::cmake::project_name, Dersbiander::cmake::project_version)};
+        CLI::App app{FORMAT("{} version {}", Dersbiander::cmake::project_name, Dersbiander::cmake::project_version)};
 
         bool show_version = false;
         bool run_code_from_console = false;
@@ -108,24 +106,25 @@ int main(int argc, const char **argv) {
             }
             for(std::span<Token> tokenSpan(tokens); const Token &token : tokenSpan) {
 #ifdef ONLY_TOKEN_TYPE
-                LINFO("Token {}", token.typeToString());
+                LINFO("Token {}", token.type);
 #else
-                LINFO("{}", token.toString());
+                LINFO("{}", token);
 #endif  // ONLY_TOKEN_TYPE
             }
             instructions.reserve(tokens.size());
             AutoTimer tim("tokenizer total time");
-            line = tokens.at(0).line;
+            line = tokens.at(0).getLine();
             for(const Token &token : tokens) {
-                if(token.type == TokenType::COMMENT) [[unlikely]] { continue; }
-                if(token.line >= line) [[likely]] {
+                if(token.getType() == TokenType::COMMENT) [[unlikely]] { continue; }
+                if(token.getLine() >= line) [[likely]] {
                     if(instructions.empty() || instructions.back().canTerminate()) [[likely]] {
                         instructions.emplace_back();
-                    } else if(instructions.back().typeToString().back() != "EXPRESSION" && token.type != TokenType::STRING) [[unlikely]] {
+                    } else if(instructions.back().typeToString().back() != "EXPRESSION" && token.getType() != TokenType::STRING)
+                        [[unlikely]] {
                         LINFO("Unexpected token: ENDL");
                         break;
                     }
-                    line = token.line + 1;
+                    line = token.getLine() + 1;
                 }
                 const auto &[verify, token_s] = instructions.back().checkToken(token);
                 LINFO("{} {}", verify, token_s);

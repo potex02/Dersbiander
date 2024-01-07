@@ -15,7 +15,7 @@
 #define GLM_FORCE_PRECISION_HIGHP_INT
 #define GLM_FORCE_PRECISION_HIGHP_UINT
 
-#include "disableWarn.h"
+#include "disableWarn.hpp"
 // clang-format off
 DISABLE_WARNINGS_PUSH(
         4005 4201 4459 4514 4625 4626 4820
@@ -37,7 +37,7 @@ DISABLE_WARNINGS_PUSH(
 #include <glm/gtx/hash.hpp>
 #include <glm/gtx/fast_square_root.hpp> // fastNormalize
 // clang-format on
-#include "casts.h"
+#include "casts.hpp"
 // Restore warning levels.
 DISABLE_WARNINGS_POP()
 namespace glm {

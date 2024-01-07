@@ -1,5 +1,6 @@
 #pragma once
 
+// NOLINTNEXTLINE
 #include <bit>
 // #include <gsl/gsl>
 

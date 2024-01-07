@@ -1,14 +1,14 @@
-﻿#pragma once
+#pragma once
+#include "Log.hpp"
+#include "disableWarn.hpp"
+#include "format.hpp"
+#include "headers.hpp"
 
-#include "headers.h"
-
-// On GCC < 4.8, the following define is often missing. Due to the
-// fact that this library only uses sleep_for, this should be safe
+// On GCC < 4.8, the following define is often missing. Since
+// this library only uses sleep_for, this should be safe
 #if defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 5 && __GNUC_MINOR__ < 8
 #define _GLIBCXX_USE_NANOSLEEP
 #endif
-
-#include <iostream>
 
 inline static constexpr long double MICROSENCONDSFACTOR = 1000.0L;
 inline static constexpr long double MILLISENCONDSFACTOR = 1'000'000.0L;
@@ -17,18 +17,19 @@ inline static constexpr long MFACTOR = 100;
 
 DISABLE_WARNINGS_PUSH(6005 26447 26455 26496)
 
-class Timer {
+// OLINTBEGIN(*-include-cleaner)
+class Timer {  // NOLINT(*-special-member-functions)
 protected:
     /// This is a typedef to make clocks easier to use
-    using clock = std::chrono::high_resolution_clock;
-    using times =
-        std::tuple<long double, long double, long double, long double, std::string, std::string, std::string, std::string>;
+    using clock = std::chrono::high_resolution_clock;  // NOLINT(*-include-cleaner)
+    using times = std::tuple<long double, long double, long double, long double, std::string, std::string, std::string,
+                             std::string>;
 
     /// This typedef is for points in time
-    using time_point = std::chrono::time_point<clock>;
+    using time_point = std::chrono::time_point<clock>;  // NOLINT(*-include-cleaner)
 
     /// This is the type of a printing function, you can make your own
-    using time_print_t = std::function<std::string(std::string, std::string)>;
+    using time_print_t = std::function<std::string(std::string, std::string)>;  // NOLINT(*-include-cleaner)
 
     /// This is the title of the timer
     std::string title_;
@@ -44,12 +45,14 @@ protected:
 
 public:
     /// Standard print function, this one is set by default
-    static std::string Simple(const std::string &title, const std::string &time) { return D_FORMAT("{}: {}", title, time); }
+    // NOLINTBEGIN
+    static const std::string Simple(const std::string &title, const std::string &time) { return FORMAT("{}: {}", title, time); }
 
-    static std::string Big(const std::string &title, const std::string &time) {
-        return D_FORMAT("-----------------------------------------\n| {} | Time = {}\n-----------------------------------------",
+    static const std::string Big(const std::string &title, const std::string &time) {
+        return FORMAT("-----------------------------------------\n| {} | Time = {}\n-----------------------------------------",
                         title, time);
     }
+    // NOLINTEND
 
     /// Standard constructor, can set title and print function
     explicit Timer(const std::string &title = "Timer", const time_print_t &time_print = Simple)
@@ -75,7 +78,7 @@ public:
             total_time = elapsed.count();
         } while(n++ < MFACTOR && total_time < target_time);
 
-        std::string out = D_FORMAT("{} for {} tries", make_time_str(total_time / static_cast<long double>(n)), std::to_string(n));
+        std::string out = FORMAT("{} for {} tries", make_time_str(total_time / static_cast<long double>(n)), std::to_string(n));
         start_ = start;
         return out;
     }
@@ -86,24 +89,24 @@ public:
     }
 
     // NOLINTBEGIN
-    [[nodiscard]] times make_named_times(long double time) const {  // NOLINT(*-identifier-length)
-        auto secondsTime = time / SENCONDSFACTOR;
-        auto millisTime = time / MILLISENCONDSFACTOR;
-        auto microTime = time / MICROSENCONDSFACTOR;
+    [[nodiscard]] static times make_named_times(long double time) {  // NOLINT(*-identifier-length)
+        const auto &secondsTime = time / SENCONDSFACTOR;
+        const auto &millisTime = time / MILLISENCONDSFACTOR;
+        const auto &microTime = time / MICROSENCONDSFACTOR;
         return {secondsTime, millisTime, microTime, time, "s", "ms", "us", "ns"};
     }
     // NOLINTEND
 
     [[nodiscard]] times multi_time() const { return make_named_times(make_time()); }
 
-    [[nodiscard]] std::pair<long double, std::string> make_named_time(long double time) const {
+    [[nodiscard]] static std::pair<long double, std::string> make_named_time(long double time) {
         const auto &[ld1, ld2, ld3, ld4, str1, str2, str3, str4] = make_named_times(time);
         // Accessing values
-        if(ld1 > 1) [[likely]] {  // nano
+        if(ld1 > 1) [[likely]] {  // seconds
             return {ld1, str1};
-        } else if(ld2 > 1) [[likely]] {  // micro
+        } else if(ld2 > 1) [[likely]] {  // milli
             return {ld2, str2};
-        } else if(ld3 > 1) [[likely]] {  // seconds
+        } else if(ld3 > 1) [[likely]] {  // micro
             return {ld3, str3};
         } else [[unlikely]] {
             return {ld4, str4};
@@ -118,15 +121,15 @@ public:
 
     // LCOV_EXCL_START
     /// This prints out a time string from a time
-    [[nodiscard]] inline std::string make_time_str(long double time) const {  // NOLINT(modernize-use-nodiscard)
+    [[nodiscard]] static inline std::string make_time_str(long double time) {  // NOLINT(modernize-use-nodiscard)
         const auto &[titme, stime] = make_named_time(time);
-        return D_FORMAT("{:.f} {}", titme, stime);
+        return FORMAT("{:.f} {}", titme, stime);
     }
     // LCOV_EXCL_STOP
 
     /// This is the main function, it creates a string
     [[nodiscard]] inline std::string to_string() const noexcept {
-        return time_print_(title_, make_time_str());
+        return std::invoke(time_print_, title_, make_time_str());
     }  // NOLINT(modernize-use-nodiscard)
 
     /// Division sets the number of cycles to divide by (no graphical change)
@@ -152,12 +155,10 @@ public:
     ~AutoTimer() { LINFO(to_string()); }
 };
 
-/**
- * @file Timer.h
- *
- * @brief Defines the Timer class and a global operator<< function for convenient output of Timer objects
- */
-inline std::ostream &operator<<(std::ostream &in, const Timer &timer) {  // NOLINT(*-identifier-length)
-    return in << timer.to_string();
-}
+template <> struct fmt::formatter<Timer> : formatter<std::string_view> { // NOLINT(*-include-cleaner)
+    template <typename FormatContext> auto format(const Timer &timer, FormatContext &ctx) {
+        return formatter<std::string_view>::format(timer.to_string(), ctx);
+    }
+};
+// OLINTEND
 DISABLE_WARNINGS_POP()
