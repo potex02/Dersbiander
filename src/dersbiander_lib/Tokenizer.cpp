@@ -321,6 +321,8 @@ constexpr TokenType Tokenizer::typeBySingleCharacter(char c) const {
         return COLON;
     case '!':
         return NOT_OPERATOR;
+    case '.':
+        return DOT_OPERATOR;
     case '+':
     case '*':
     case '/':
