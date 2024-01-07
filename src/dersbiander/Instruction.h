@@ -88,17 +88,10 @@ private:
     inline void emplaceUnaryOperator(const TokenType &type) noexcept {
         if(type != TokenType::UNARY_OPERATOR) { this->allowedTokens.emplace_back(TokenType::UNARY_OPERATOR); }
     }
-    inline bool emplaceForTokens() noexcept {
-        if(this->isForExpression()) {
-            this->allowedTokens.emplace_back(TokenType::OPEN_CURLY_BRACKETS);
-            if(this->lastInstructionType() != InstructionType::FOR_STEP) { this->allowedTokens.emplace_back(TokenType::COMMA); };
-            return true;
-        }
-        return false;
-    }
-    std::vector<TokenType> expressionStart = {
-        TokenType::IDENTIFIER,      TokenType::INTEGER,        TokenType::DOUBLE,         TokenType::CHAR,
-        TokenType::STRING,          TokenType::BOOLEAN,        TokenType::MINUS_OPERATOR, TokenType::NOT_OPERATOR,
-        TokenType::OPEN_BRACKETS,   TokenType::OPEN_SQUARE_BRACKETS
-    };
+    inline bool emplaceForTokens() noexcept;
+    std::vector<TokenType> expressionStart = {TokenType::IDENTIFIER,     TokenType::INTEGER,
+                                              TokenType::DOUBLE,         TokenType::CHAR,
+                                              TokenType::STRING,         TokenType::BOOLEAN,
+                                              TokenType::MINUS_OPERATOR, TokenType::NOT_OPERATOR,
+                                              TokenType::OPEN_BRACKETS,  TokenType::OPEN_SQUARE_BRACKETS};
 };

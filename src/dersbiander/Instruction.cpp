@@ -21,7 +21,7 @@ Instruction::Instruction() noexcept
     } else {
         value = "EOFT";
     }
-    return D_FORMAT("Unexpected token: {} line {} column {}", value, token.line, token.column);
+    return FORMAT("Unexpected token: {} line {} column {}", value, token.line, token.column);
 }
 
 [[nodiscard]] std::vector<std::string> Instruction::typeToString() const noexcept {
@@ -224,8 +224,9 @@ void Instruction::emplaceExpressionTokens() {
 
 bool Instruction::isExpression() noexcept {
     using enum InstructionType;
-    return lastInstructionTypeIs(PARAMETER_EXPRESSION) || lastInstructionTypeIs(ASSIGNATION) || lastInstructionTypeIs(INITIALIZATION) ||
-           lastInstructionTypeIs(ARRAY_INIZIALIZATION) || lastInstructionTypeIs(EXPRESSION) || lastInstructionTypeIs(SQUARE_EXPRESSION) ||
+    return lastInstructionTypeIs(PARAMETER_EXPRESSION) || lastInstructionTypeIs(ASSIGNATION) ||
+           lastInstructionTypeIs(INITIALIZATION) || lastInstructionTypeIs(ARRAY_INIZIALIZATION) ||
+           lastInstructionTypeIs(EXPRESSION) || lastInstructionTypeIs(SQUARE_EXPRESSION) ||
            lastInstructionTypeIs(RETURN_EXPRESSION) || this->isForExpression();
 }
 
@@ -372,8 +373,8 @@ void Instruction::checkComma() {
 void Instruction::checkColon() {
     using enum TokenType;
     using enum InstructionType;
-    if(lastInstructionTypeIs(DECLARATION) || lastInstructionTypeIs(FOR_STRUCTURE) || lastInstructionTypeIs(PARAMETER_DEFINITION) ||
-       lastInstructionTypeIs(RETURN_DEFINITION)) {
+    if(lastInstructionTypeIs(DECLARATION) || lastInstructionTypeIs(FOR_STRUCTURE) ||
+       lastInstructionTypeIs(PARAMETER_DEFINITION) || lastInstructionTypeIs(RETURN_DEFINITION)) {
         this->allowedTokens = {IDENTIFIER};
         return;
     }
@@ -539,6 +540,14 @@ void Instruction::checkKeywordReturn() {
         return;
     }
     this->allowedTokens = {};
+}
+bool Instruction::emplaceForTokens() noexcept {
+    if(this->isForExpression()) {
+        this->allowedTokens.emplace_back(TokenType::OPEN_CURLY_BRACKETS);
+        if(this->lastInstructionType() != InstructionType::FOR_STEP) { this->allowedTokens.emplace_back(TokenType::COMMA); };
+        return true;
+    }
+    return false;
 }
 
 DISABLE_WARNINGS_POP()
