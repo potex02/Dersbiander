@@ -155,7 +155,7 @@ public:
     Token(TokenType type, const std::string_view &value, std::size_t line, std::size_t column) noexcept
       : _type(type), _value(value), _line(line), _column(column) {}
 
-    [[nodiscard]] inline TokenType getType() const noexcept { return _type; }
+    [[nodiscard]] inline TokenType getType() noexcept { return _type; }
     [[nodiscard]] inline std::string getValue() const noexcept { return _value; }
     [[nodiscard]] inline std::size_t getLine() const noexcept { return _line; }
     [[nodiscard]] inline std::size_t getColumn() const noexcept { return _column; }
