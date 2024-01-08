@@ -39,6 +39,13 @@ std::vector<Token> Tokenizer::tokenize() {
             tokens.emplace_back(extractComment());
         } else if(TokenizerUtils::isOperator(currentChar)) [[likely]] {
             extractOperator(tokens);
+        } else if(currentChar == '.') {
+            if(this->position + 1 < this->_inputSize && std::isdigit(this->_input[this->position + 1])) {
+                tokens.emplace_back(extractnumber());
+            } else {
+                tokens.emplace_back(TokenType::DOT_OPERATOR, std::string(1, currentChar), line, column - 1);
+                this->incPosAndCol();
+            }
         } else if(TokenizerUtils::isBrackets(currentChar)) [[likely]] {
             tokens.emplace_back(extractBrackets(currentChar));
         } else if(TokenizerUtils::isApostrophe(currentChar)) [[likely]] {
@@ -321,8 +328,6 @@ constexpr TokenType Tokenizer::typeBySingleCharacter(char c) const {
         return COLON;
     case '!':
         return NOT_OPERATOR;
-    case '.':
-        return DOT_OPERATOR;
     case '+':
     case '*':
     case '/':

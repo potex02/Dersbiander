@@ -24,7 +24,7 @@ private:
     [[nodiscard]] std::string unexpected(const Token &token) const;  // NOLINT(*-identifier-length) NOLINT(functionStatic)
     // NOLINTEND
     void checkIdentifier(const TokenType &type) noexcept;
-    void checkNumber() noexcept;
+    void checkNumber(const TokenType &type) noexcept;
     void checkOperator();
     void checkMinusOperator();
     void checkEqualOperator();

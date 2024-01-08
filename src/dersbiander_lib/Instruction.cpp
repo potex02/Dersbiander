@@ -54,7 +54,7 @@ Instruction::Instruction() noexcept
     case STRING:
         [[fallthrough]];
     case BOOLEAN:
-        this->checkNumber();
+        this->checkNumber(token.getType());
         break;
     case OPERATOR:
         this->checkOperator();
@@ -72,6 +72,9 @@ Instruction::Instruction() noexcept
         [[fallthrough]];
     case LOGICAL_OPERATOR:
         this->checkBooleanAndLogicalOperator(token.getType());
+        break;
+    case DOT_OPERATOR:
+        this->allowedTokens = {IDENTIFIER};
         break;
     case COMMA:
         this->checkComma();
@@ -166,7 +169,7 @@ void Instruction::checkIdentifier(const TokenType &type) noexcept {
     using enum TokenType;
     using enum InstructionType;
     if(this->isExpression()) {
-        this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR, OPEN_BRACKETS, OPEN_SQUARE_BRACKETS};
+        this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR, DOT_OPERATOR, OPEN_BRACKETS, OPEN_SQUARE_BRACKETS};
         this->emplaceUnaryOperator(type);
         this->emplaceExpressionTokens();
         return;
@@ -216,11 +219,15 @@ void Instruction::checkIdentifier(const TokenType &type) noexcept {
     }
 }
 
-void Instruction::checkNumber() noexcept {
+void Instruction::checkNumber(const TokenType& type) noexcept {
     using enum TokenType;
     using enum InstructionType;
     if(this->isExpression()) {
         this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR};
+        if(type == STRING) {
+            this->allowedTokens.emplace_back(DOT_OPERATOR);
+            this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS);
+        }
         this->emplaceExpressionTokens();
         return;
     }
@@ -342,19 +349,14 @@ void Instruction::checkOpenBrackets(const TokenType &type) {
 void Instruction::checkClosedBrackets(const TokenType &type) {
     using enum TokenType;
     using enum InstructionType;
-
-    const InstructionType last = this->lastInstructionType();
-
+    
     this->removeInstructionType();
     this->removeBooleanOperatorPresent();
     if(this->isExpression()) {
-        this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR};
-        if(last != ARRAY_INIZIALIZATION) {
-            this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS);
-            if(type == CLOSED_SQUARE_BRACKETS) {
-                this->allowedTokens.emplace_back(UNARY_OPERATOR);
-                this->allowedTokens.emplace_back(OPEN_BRACKETS);
-            }
+        this->allowedTokens = {OPERATOR, MINUS_OPERATOR, LOGICAL_OPERATOR, DOT_OPERATOR, OPEN_SQUARE_BRACKETS};
+        if(type == CLOSED_SQUARE_BRACKETS) {
+            this->allowedTokens.emplace_back(UNARY_OPERATOR);
+            this->allowedTokens.emplace_back(OPEN_BRACKETS);
         }
         this->emplaceExpressionTokens();
         return;
