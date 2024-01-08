@@ -3,7 +3,6 @@
 #include "format.hpp"
 
 enum class InstructionType : short {
-    PROCEDURE_CALL,
     PARAMETER_EXPRESSION,
     OPERATION,
     ASSIGNATION,
@@ -31,9 +30,6 @@ template <> struct fmt::formatter<InstructionType> : fmt::formatter<std::string_
         std::string_view name;
         switch(tokenType) {
             using enum InstructionType;
-        case PROCEDURE_CALL:
-            name = "PROCEDURE_CALL";
-            break;
         case PARAMETER_EXPRESSION:
             name = "PARAMETER_EXPRESSION";
             break;

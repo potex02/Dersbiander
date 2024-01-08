@@ -8,8 +8,7 @@ Instruction::Instruction() noexcept
   : tokens({}), instructionTypes({InstructionType::BLANK}),
     allowedTokens({TokenType::KEYWORD_MAIN, TokenType::KEYWORD_VAR, TokenType::KEYWORD_STRUCTURE, TokenType::KEYWORD_FOR,
                    TokenType::KEYWORD_FUNC, TokenType::KEYWORD_RETURN, TokenType::IDENTIFIER, TokenType::OPEN_CURLY_BRACKETS,
-                   TokenType::CLOSED_CURLY_BRACKETS, eofTokenType}) {
-    booleanOperatorPresent = {false};
+                   TokenType::CLOSED_CURLY_BRACKETS, eofTokenType}), booleanOperatorPresent({false}) {
     previousTokens.reserve(tokens.size());
 }
 
@@ -178,7 +177,7 @@ void Instruction::checkIdentifier(const TokenType &type) noexcept {
     case BLANK:
     case OPERATION:
         this->setLastInstructionType(OPERATION);
-        this->allowedTokens = {EQUAL_OPERATOR, OPERATION_EQUAL, COMMA, OPEN_SQUARE_BRACKETS, eofTokenType};
+        this->allowedTokens = {EQUAL_OPERATOR, OPERATION_EQUAL, DOT_OPERATOR, COMMA, OPEN_BRACKETS, OPEN_SQUARE_BRACKETS, eofTokenType};
         if(previousTokens.empty()) { this->allowedTokens.emplace_back(OPEN_BRACKETS); }
         this->emplaceUnaryOperator(type);
         break;
@@ -328,7 +327,6 @@ void Instruction::checkOpenBrackets(const TokenType &type) {
             return;
         }
         if(this->previousTokensLast() == IDENTIFIER || this->previousTokensLast() == CLOSED_SQUARE_BRACKETS) {
-            if(this->lastInstructionTypeIs(OPERATION)) { this->setLastInstructionType(PROCEDURE_CALL); }
             this->addInstructionType(PARAMETER_EXPRESSION);
             return;
         }
@@ -362,13 +360,17 @@ void Instruction::checkClosedBrackets(const TokenType &type) {
         return;
     }
     switch(this->lastInstructionType()) {
-    case PROCEDURE_CALL:
-        this->allowedTokens = {eofTokenType};
-        break;
     case OPERATION:
-        this->allowedTokens = {EQUAL_OPERATOR, OPERATION_EQUAL, COMMA};
-        if(type == CLOSED_SQUARE_BRACKETS) { this->allowedTokens.emplace_back(OPEN_SQUARE_BRACKETS); }
+        this->allowedTokens = {DOT_OPERATOR, OPEN_SQUARE_BRACKETS};
+        if (type == CLOSED_BRACKETS) {
+            this->allowedTokens.emplace_back(eofTokenType);
+            break;
+        }
+        this->allowedTokens.emplace_back(EQUAL_OPERATOR);
+        this->allowedTokens.emplace_back(OPERATION_EQUAL);
         this->allowedTokens.emplace_back(UNARY_OPERATOR);
+        this->allowedTokens.emplace_back(COMMA);
+        this->allowedTokens.emplace_back(OPEN_BRACKETS);
         break;
     case DECLARATION:
         this->allowedTokens = {EQUAL_OPERATOR, eofTokenType};

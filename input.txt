@@ -7,11 +7,12 @@ main {
 	variable[1]++ = -4
 }
 main {}
-variable++, variable2--
+variable.method().a++, variable2--, ciao.a()
 
 var variable2, variable3: type = variable[0 + true && (!false || '\n')] == -4, !variable[2][true]['a' / "HELLO"]-- && 7.2
 variable = variable < -4
 variable += 4
+variable.len().a, variable2[0], variable3, function(1, 2).method()[0]()[2][1]('c')[0].b[0] = function().method()[0]()[2][1]('\r', false), 1, 2, variable2[0][3].method(params)
 //Comment
 variable -= -4. + ( // Single line comment
 	12 + 56 && (1 + 2) == 3 &&
