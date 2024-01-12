@@ -53,7 +53,7 @@ static std::string readFromFile(const std::string &filename) {
 }
 
 #ifdef _WIN32  // Windows
-constexpr std::string_view filename = "../../../input.txt";
+constexpr std::string_view filename = "../../../input.der";
 #elif defined __unix__  // Linux and Unix-like systems
 constexpr std::string_view filename = "input.txt";  // Linux and Unix
 #endif
