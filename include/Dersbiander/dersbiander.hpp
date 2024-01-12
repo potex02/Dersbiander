@@ -8,4 +8,5 @@
 #include "not_null.hpp"
 #include "Instruction.hpp"
 #include "Tokenizer.hpp"
+#include "Transpiler.hpp"
 // clang-format on

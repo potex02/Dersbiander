@@ -130,6 +130,8 @@ int main(int argc, const char **argv) {
                 LINFO("{} {}", verify, token_s);
                 if(!verify) [[unlikely]] { break; }
             }
+            Transpiler transpiler(instructions);
+            transpiler.transpile();
             //}
         }
     } catch(const std::exception &e) {

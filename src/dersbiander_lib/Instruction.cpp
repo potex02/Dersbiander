@@ -32,6 +32,13 @@ Instruction::Instruction() noexcept
     return result;
 }
 
+InstructionType Instruction::getType() const noexcept {
+    
+    if (this->instructionTypes.empty()) { return InstructionType::BLANK; }
+    return this->instructionTypes.back();
+
+}
+
 [[nodiscard]] std::pair<bool, std::string> Instruction::checkToken(const Token &token) {
 #ifdef ONLY_TOKEN_TYPE
     std::string msg = FORMAT("{}", token.getType());

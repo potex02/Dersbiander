@@ -12,6 +12,7 @@ public:
     [[nodiscard]] inline bool canTerminate() {
         return std::ranges::find(this->allowedTokens, eofTokenType) != this->allowedTokens.end();
     }
+    InstructionType getType() const noexcept;
 
 private:
     std::vector<Token> tokens;

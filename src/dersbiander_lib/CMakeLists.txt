@@ -2,7 +2,7 @@ include(GenerateExportHeader)
 
 find_package(glm REQUIRED)
 add_library(dersbiander_lib dersbiander.cpp TokenizerUtils.cpp Tokenizer.cpp Instruction.cpp
-        Token.cpp)
+        Token.cpp Transpiler.cpp ExpressionTree.cpp)
 
 add_library(Dersbiander::dersbiander_lib ALIAS dersbiander_lib)
 
