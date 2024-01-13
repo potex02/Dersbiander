@@ -9,14 +9,21 @@ void Transpiler::transpile() {
 	
 	output << "#include <iostream>\n";
 	using enum InstructionType;
-	for(const Instruction i : this->instructions) {
-		switch(i.getType()) {
-			case MAIN:
-				if(this->main) { break; }
-				output << "int main() {}\n";
-                this->main = true;
-                break;
+    try {
+		for(const Instruction i : this->instructions) {
+			switch(i.getType()) {
+				case MAIN:
+					if(this->main) { throw TranspilerException("Main already declared"); }
+					output << "int main() {}\n";
+					this->main = true;
+					break;
+			}
 		}
+	}
+	catch (TranspilerException& e) {
+
+		LERROR("{}", e.what());
+
 	}
     output.close();
 

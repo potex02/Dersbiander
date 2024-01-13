@@ -4,6 +4,8 @@
 #include <memory>
 #include "Instruction.hpp"
 #include "Scope.hpp"
+#include "TranpilerException.hpp"
+#include "Log.hpp"
 
 class Transpiler {
 	
