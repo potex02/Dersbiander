@@ -13,9 +13,11 @@ public:
         return std::ranges::find(this->allowedTokens, eofTokenType) != this->allowedTokens.end();
     }
     InstructionType getType() const noexcept;
+    Token getToken(size_t index) const;
+    size_t size() const noexcept;
+    std::string toString() const;
 
 private:
-    std::vector<Token> tokens;
     std::vector<Token> previousTokens;
     std::vector<InstructionType> instructionTypes;
     std::vector<TokenType> allowedTokens;

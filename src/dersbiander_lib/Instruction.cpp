@@ -1,15 +1,16 @@
 #include "Dersbiander/Instruction.hpp"
+#include "Dersbiander/Log.hpp"
 
 #define ONLY_TOKEN_TYPE
 
 DISABLE_WARNINGS_PUSH(26461 26821)
 
 Instruction::Instruction() noexcept
-  : tokens({}), instructionTypes({InstructionType::BLANK}),
+  : instructionTypes({InstructionType::BLANK}),
     allowedTokens({TokenType::KEYWORD_MAIN, TokenType::KEYWORD_VAR, TokenType::KEYWORD_STRUCTURE, TokenType::KEYWORD_FOR,
                    TokenType::KEYWORD_FUNC, TokenType::KEYWORD_RETURN, TokenType::IDENTIFIER, TokenType::OPEN_CURLY_BRACKETS,
                    TokenType::CLOSED_CURLY_BRACKETS, eofTokenType}), booleanOperatorPresent({false}) {
-    previousTokens.reserve(tokens.size());
+    previousTokens.reserve({});
 }
 
 [[nodiscard]] std::string Instruction::unexpected(const Token &token) const {
@@ -32,11 +33,34 @@ Instruction::Instruction() noexcept
     return result;
 }
 
+Token Instruction::getToken(size_t index) const {
+
+    return this->previousTokens.at(index);
+
+}
+
+size_t Instruction::size() const noexcept {
+
+    return this->previousTokens.size();
+
+}
+
 InstructionType Instruction::getType() const noexcept {
     
     if (this->instructionTypes.empty()) { return InstructionType::BLANK; }
     return this->instructionTypes.back();
 
+}
+
+std::string Instruction::toString() const {
+
+    std::string result = "";
+
+    if(!this->previousTokens.empty()) { result = std::to_string(this->previousTokens[0].getLine()) + ":\t"; }
+    for(Token i : this->previousTokens) {
+        result += i.getValue() + " ";
+    }
+    return result;
 }
 
 [[nodiscard]] std::pair<bool, std::string> Instruction::checkToken(const Token &token) {
