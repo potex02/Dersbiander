@@ -5,18 +5,17 @@ void Transpiler::transpile() {
 	
     this->output.open("output.cpp");
 	this->write("#include <iostream>\n");
+	using enum TokenType;
 	using enum InstructionType;
     try {
 		for(const Instruction i : this->instructions) {
 			switch(i.getType()) {
 				case MAIN:
-					if(this->main) { throw TranspilerException("Main already declared", i); }
-					this->write("int main() {");
-                    this->openScope();
-                    this->checkTrailingBracket(i);
-                    this->write("\n");
-					this->main = true;
+					this->writeMain(i);
 					break;
+                case DECLARATION:
+                case INITIALIZATION:
+                    this->writeDeclaration(i);
 			}
 		}
 	}
@@ -35,7 +34,7 @@ void Transpiler::write(const std::string& str) {
 
 void Transpiler::checkTrailingBracket(const Instruction& instruction) {
 	if (instruction.size() == 0) { return; }
-    if(instruction.getToken(instruction.size() - 1).getType() == TokenType::CLOSED_CURLY_BRACKETS) {
+    if(instruction.getTokens().back().getType() == TokenType::CLOSED_CURLY_BRACKETS) {
         this->write("}");
         this->closeScope();
     }
@@ -55,3 +54,16 @@ void Transpiler::closeScope() {
     this->scope = this->scope->getParent();
     oldScope->removeParent();
 }
+
+void Transpiler::writeMain(const Instruction& instruction) {
+
+	if(this->main) { throw TranspilerException("Main already declared", instruction); }
+    this->write("int main() {");
+    this->openScope();
+    this->checkTrailingBracket(instruction);
+    this->write("\n");
+    this->main = true;
+
+}
+
+void Transpiler::writeDeclaration(const Instruction &i) { LINFO(i.toString()); }

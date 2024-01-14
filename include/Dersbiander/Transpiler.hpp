@@ -22,5 +22,8 @@ class Transpiler {
         void checkTrailingBracket(const Instruction& instruction);
         void openScope();
         void closeScope();
+        void writeMain(const Instruction& i);
+        void writeDeclaration(const Instruction& i);
+
 
 };

@@ -33,9 +33,9 @@ Instruction::Instruction() noexcept
     return result;
 }
 
-Token Instruction::getToken(size_t index) const {
+std::vector<Token> Instruction::getTokens() const noexcept {
 
-    return this->previousTokens.at(index);
+    return this->previousTokens;
 
 }
 

@@ -37,7 +37,6 @@ enum class TokenType : int {
     EOFT,
     ERROR,
     UNKNOWN
-
 };
 
 template <> struct fmt::formatter<TokenType> : fmt::formatter<std::string_view> {  // NOLINT(*-include-cleaner)
